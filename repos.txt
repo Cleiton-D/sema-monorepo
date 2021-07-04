@@ -1,0 +1,2 @@
+git@github.com:Cleiton-D/sema.git api lib/api
+git@github.com:Cleiton-D/sema-front.git client lib/client
