@@ -1,0 +1,13 @@
+FROM node:lts-alpine
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN mkdir app && chown -R appuser:appgroup ./app
+
+USER appuser
+
+WORKDIR /app
+
+ENTRYPOINT ["/bin/ash", "-c"]
+CMD ["./init.dev.sh"]
+
+EXPOSE 3333

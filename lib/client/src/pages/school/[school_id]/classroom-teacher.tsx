@@ -1,0 +1,46 @@
+import { GetServerSidePropsContext } from 'next';
+
+import ClassroomTeacher, {
+  ClassroomTeacherProps
+} from 'templates/ClassroomTeacher';
+
+import prefetchQuery from 'utils/prefetch-query';
+import protectedRoutes from 'utils/protected-routes';
+
+import { listClassrooms } from 'requests/queries/classrooms';
+import { getSchool } from 'requests/queries/schools';
+
+function ClassroomTeacherPage(props: ClassroomTeacherProps) {
+  return <ClassroomTeacher {...props} />;
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await protectedRoutes(context);
+
+  const { school_id } = context.params!;
+
+  const school = await getSchool(session, { id: school_id as string });
+
+  const filters = {
+    school_id: school.id
+  };
+
+  const dehydratedState = await prefetchQuery({
+    key: `list-classrooms-${JSON.stringify(filters)}`,
+    fetcher: () => listClassrooms(session, filters)
+  });
+
+  return {
+    props: {
+      session,
+      dehydratedState,
+      school
+    }
+  };
+}
+
+ClassroomTeacherPage.auth = {
+  module: 'CLASSROOM_TEACHER'
+};
+
+export default ClassroomTeacherPage;
