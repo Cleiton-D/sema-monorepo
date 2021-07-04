@@ -91,6 +91,11 @@ const signInProvider = Credentials({
       const response = await api.post(`/sessions`, {
         login: email,
         password
+      }).catch((err) => {
+        console.log("status", err.response.status);
+        console.log("data", err.response.data);
+
+        throw err;
       });
 
       const { data } = response;
