@@ -32,9 +32,10 @@ jobs:
           node-version: "14"
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
-        run: |
-          cd lib/client && npm install
-          cd lib/client && npm run build
+      - run: |
+          cd lib/client
+          npm install
+          npm run build
 
       - name: down previous version
         id: deploy
