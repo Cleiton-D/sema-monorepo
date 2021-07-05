@@ -26,13 +26,15 @@ jobs:
       - run: cd lib/api && npm install
       - run: cd lib/api && npm run build
 
-      - name: build client
+      - name: setup client
         uses: actions/setup-node@v2
         with:
           node-version: "14"
+
+      - name: build client
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
-      - run: |
+        run: |
           cd lib/client
           npm install
           npm run build
