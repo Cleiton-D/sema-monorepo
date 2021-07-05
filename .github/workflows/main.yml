@@ -34,10 +34,7 @@ jobs:
           connect_timeout: 10s
           first_ssh: |
             DIR="$HOME/test"
-            if [ -d "$DIR" ]; then
-              cd test && docker-compose down
-              cd .. && mv test teste_bkp
-            fi
+            if [ -d "$DIR" ]; then cd test && docker-compose down && cd .. && mv test teste_bkp fi
           scp: |
             * => /test
           last_ssh: |
@@ -67,10 +64,7 @@ jobs:
           connect_timeout: 10s
           script: |
             DIR="$HOME/test"
-            if [ -d "$DIR" ]; then
-              cd test && docker-compose down
-              cd .. && rm -rf test
-            fi
+            if [ -d "$DIR" ]; then cd test && docker-compose down && cd .. && rm -rf test fi
             
             mv teste_bkp test
             cd test && docker-compose up --build
