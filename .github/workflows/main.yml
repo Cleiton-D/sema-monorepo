@@ -70,6 +70,7 @@ jobs:
             export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             export POSTGRES_USERNAME=${{ secrets.POSTGRES_USERNAME }}
+            export POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}
             export APP_URL=${{ secrets.APP_URL }}
             export API_URL=${{ secrets.API_URL }}
 
