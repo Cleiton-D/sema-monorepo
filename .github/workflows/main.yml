@@ -37,7 +37,7 @@ jobs:
             [ -d "${DIR}" ] && { cd teste_bkp
               docker-compose down
               cd ..
-              mv test teste_bkp; }
+              mv test teste_bkp; } &&
           scp: |
             * => /test
           last_ssh: |
