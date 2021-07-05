@@ -28,12 +28,12 @@ jobs:
         with:
           command: |
             DIR="$HOME/test"
-            [ -d "${DIR}" ] && {
+            if [ -d "$DIR" ]; then
               cd test
               docker-compose down
               cd ..
               mv test test_bk
-            }
+            fi
             
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -65,7 +65,9 @@ jobs:
         with:
           command: |
             BK_DIR="$HOME/teste_bkp"
-            [ -d "${BK_DIR}" ] && { rm -rf teste_bkp; }
+            if [ -d "$BK_DIR" ]; then
+              rm -rf teste_bkp
+            fi
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -78,18 +80,18 @@ jobs:
             DIR="$HOME/test"
             BK_DIR="$HOME/teste_bkp"
             
-            [ -d "${DIR}" ] && {
+            if [ -d "$DIR" ]; then
               cd test
               docker-compose down
               cd ..
               rm -rf test
               
-              [ -d "${BK_DIR}" ] && { 
+              if [ -d "$BK_DIR" ]; then
                 mv teste_bkp test
                 cd test
                 docker-compose up --build; 
-              } 
-            }
+              fi
+            fi
 
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
