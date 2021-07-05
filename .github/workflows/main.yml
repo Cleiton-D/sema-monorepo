@@ -26,14 +26,14 @@ jobs:
         id: deploy
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: testando comando que da erro
+          command: echo sucesso
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
 
       
       - name: delete previous version
-        if: steps.deploy.outputs.status == 'success'
+        if: success()
         uses: cross-the-world/ssh-pipeline@master
         with:
           host: ${{ secrets.HOST }}
