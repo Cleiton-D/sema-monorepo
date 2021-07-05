@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   workflow_dispatch:
 
@@ -16,23 +16,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v2
       - name: build api
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "14"
       - run: cd lib/api && npm install
       - run: cd lib/api && npm run build
-      
+
       - name: build client
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "14"
       - run: cd lib/client && npm install
       - run: cd lib/client && npm run build
-
 
       - name: down previous version
         id: deploy
@@ -46,7 +45,7 @@ jobs:
               cd ..
               mv test test_bk
             fi
-            
+
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -61,29 +60,29 @@ jobs:
           port: ${{ secrets.PORT }}
           source: "lib/api/dist, lib/api/package.json, lib/api/init.sh, lib/api/ormconfig.js, lib/client/public, lib/client/.next, lib/client/package.json"
           target: "test"
-          
-#       - name: deploy new version
-#         if: success()
-#         uses: garygrossgarten/github-action-ssh@release
-#         with:
-#           command: cd test && docker-compose up --build
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-        
-#       - name: delete previous version
-#         if: success()
-#         uses: garygrossgarten/github-action-ssh@release
-#         with:
-#           command: |
-#             BK_DIR="$HOME/teste_bkp"
-#             if [ -d "$BK_DIR" ]; then
-#               rm -rf teste_bkp
-#             fi
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-      
+
+      - name: deploy new version
+        if: success()
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd test && docker-compose up --build
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: delete previous version
+        if: success()
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: |
+            BK_DIR="$HOME/teste_bkp"
+            if [ -d "$BK_DIR" ]; then
+              rm -rf teste_bkp
+            fi
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: restore previous version
         if: failure()
         uses: garygrossgarten/github-action-ssh@release
@@ -91,7 +90,7 @@ jobs:
           command: |
             DIR="$HOME/test"
             BK_DIR="$HOME/teste_bkp"
-            
+
             if [ -d "$DIR" ]; then
               cd test
               docker-compose down
