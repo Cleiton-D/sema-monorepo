@@ -31,7 +31,7 @@ jobs:
           remote_docker_host: 34.139.77.41
           args:
             NODE_ENV=production
-          
+          stack_file_name: docker-compose.yaml
           ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
     # SSH private key used to connect to the docker host
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
