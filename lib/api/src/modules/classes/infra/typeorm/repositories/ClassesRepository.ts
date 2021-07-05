@@ -27,14 +27,25 @@ class ClassesRepository implements IClassesRepository {
     classroom_id,
     employee_id,
     school_subject_id,
+    limit,
+    order: orderDirection,
+    sortBy,
   }: FindClassDTO): Promise<Class[]> {
     const where: FindConditions<Class> = {};
+    const order: Record<string, 'ASC' | 'DESC'> = {};
+
     if (classroom_id) where.classroom_id = classroom_id;
     if (employee_id) where.employee_id = employee_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
 
+    if (sortBy) {
+      order[sortBy] = orderDirection || 'DESC';
+    }
+
     const classes = await this.ormRepository.find({
       where,
+      order,
+      take: limit,
       relations: ['classroom', 'school_subject', 'employee', 'employee.person'],
     });
     return classes;

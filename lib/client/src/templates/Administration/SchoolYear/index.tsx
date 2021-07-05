@@ -46,11 +46,11 @@ const SchoolYear = () => {
           <Button
             size="medium"
             styleType="normal"
-            icon={data?.status !== 'INACTIVE' ? <Edit3 /> : <PlusCircle />}
+            icon={data?.status === 'PENDING' ? <Edit3 /> : <PlusCircle />}
             onClick={handleAddSchoolYear}
             disabled={data?.status === 'ACTIVE'}
           >
-            {data?.status !== 'INACTIVE'
+            {data?.status === 'PENDING'
               ? 'Alterar ano letivo'
               : 'Cadastrar ano letivo'}
           </Button>

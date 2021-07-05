@@ -9,6 +9,7 @@ import CreateUserService from '@modules/users/services/CreateUserService';
 import DeleteUserService from '@modules/users/services/DeleteUserService';
 
 import privateRoute from '@shared/decorators/privateRoute';
+import CountUsersService from '@modules/users/services/CountUsersService';
 
 class UsersController {
   @privateRoute()
@@ -29,6 +30,13 @@ class UsersController {
     const users = await listUsers.execute();
 
     return response.json(classToClass(users));
+  }
+
+  public async count(request: Request, response: Response): Promise<Response> {
+    const countUsers = container.resolve(CountUsersService);
+    const countResult = await countUsers.execute();
+
+    return response.json(countResult);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {

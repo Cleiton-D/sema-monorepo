@@ -3,6 +3,7 @@ import { getRepository, Repository } from 'typeorm';
 import CreateUserDTO from '@modules/users/dtos/CreateUserDTO';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import CountResultDTO from '@modules/users/dtos/CountResultDTO';
 import User from '../entities/User';
 
 class UsersRepository implements IUsersRepository {
@@ -27,6 +28,11 @@ class UsersRepository implements IUsersRepository {
   public async findAll(): Promise<User[]> {
     const users = await this.ormRepository.find();
     return users;
+  }
+
+  public async count(): Promise<CountResultDTO> {
+    const count = await this.ormRepository.count();
+    return { count };
   }
 
   public async create({

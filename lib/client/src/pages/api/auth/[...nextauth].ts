@@ -91,11 +91,6 @@ const signInProvider = Credentials({
       const response = await api.post(`/sessions`, {
         login: email,
         password
-      }).catch((err) => {
-        console.log("status", err.response.status);
-        console.log("data", err.response.data);
-
-        throw err;
       });
 
       const { data } = response;
@@ -111,8 +106,8 @@ const signInProvider = Credentials({
           name: data.user.username,
           jwt: data.token,
           employeeId: employee?.id,
-          profileId: data.profile.id,
-          accessLevel: data.profile.access_level,
+          profileId: data.profile?.id,
+          accessLevel: data.profile?.access_level,
           schoolId: school ? school.id : undefined,
           branchId: branch ? branch.id : undefined,
           branchType: branch ? branch.type : undefined

@@ -7,6 +7,9 @@ type ListClassesRequest = {
   classroom_id?: string;
   school_subject_id?: string;
   employee_id?: string;
+  limit?: number;
+  sortBy?: string;
+  order?: 'DESC' | 'ASC';
 };
 
 @injectable()
@@ -19,11 +22,17 @@ class ListClassesService {
     classroom_id,
     employee_id,
     school_subject_id,
+    limit,
+    sortBy,
+    order,
   }: ListClassesRequest): Promise<Class[]> {
     const classes = await this.classesRepository.findAll({
       classroom_id,
       employee_id,
       school_subject_id,
+      limit,
+      sortBy,
+      order,
     });
 
     return classes;

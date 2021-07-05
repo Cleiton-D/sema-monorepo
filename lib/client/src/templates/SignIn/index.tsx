@@ -11,8 +11,6 @@ import Button from 'components/Button';
 
 import { signInSchema } from './rules/schema';
 
-import {initializeApi} from "services/api";
-
 import * as S from './styles';
 
 export type SigninFormData = {
@@ -39,9 +37,6 @@ const SignIn = () => {
       const callbackUrl = `${window.location.origin}${
         query?.callbackUrl || ''
       }`;
-      const api = initializeApi();
-      api.post('/sessions', {login: values.email, password: values.password});
-
       const result = await signIn('credentials', {
         ...values,
         redirect: false,

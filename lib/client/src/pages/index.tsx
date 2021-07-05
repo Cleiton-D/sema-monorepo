@@ -1,4 +1,5 @@
 import { GetServerSidePropsContext } from 'next';
+import { Session } from 'next-auth';
 
 import Dashboard, { DashboardProps } from 'templates/Dashboard';
 
@@ -17,15 +18,17 @@ function DashboardPage(props: DashboardProps) {
   return <Dashboard {...props} />;
 }
 
+const getSchoolData = async (session: Session | null) => {
+  return session?.branch.type !== 'MUNICIPAL_SECRETARY' &&
+    session?.accessLevel?.code !== 'administrator'
+    ? await getSchool(session, { id: 'me' })
+    : null;
+};
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await protectedRoutes(context);
 
-  console.log(session);
-  const school =
-    session?.branch.type !== 'MUNICIPAL_SECRETARY' &&
-    session?.accessLevel?.code !== 'administrator'
-      ? await getSchool(session, { id: 'me' })
-      : null;
+  const school = session ? await getSchoolData(session) : null;
 
   // const queries =
   //   session?.branch.type === 'MUNICIPAL_SECRETARY'

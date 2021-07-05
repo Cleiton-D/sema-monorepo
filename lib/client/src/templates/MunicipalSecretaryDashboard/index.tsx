@@ -29,7 +29,7 @@ const MunicipalSecretaryDashboard = () => {
     <Base>
       <S.Wrapper>
         <Card
-          description={`${schoolYear?.reference_year}`}
+          description={`${schoolYear?.reference_year || 'não definido'}`}
           link="/administration/school-year"
           module="SCHOOL_YEAR"
         >

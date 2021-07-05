@@ -10,14 +10,15 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
 
-
 const isServer = typeof window === 'undefined';
 
 const createApi = (session?: Session | null) => {
   const jwt = session?.jwt;
 
   const api = axios.create({
-    baseURL: isServer ? process.env.SERVER_API_URL : process.env.NEXT_PUBLIC_API_URL,
+    baseURL: isServer
+      ? process.env.SERVER_API_URL
+      : process.env.NEXT_PUBLIC_API_URL,
     headers: {
       authorization: jwt ? `Bearer ${jwt}` : ''
     }

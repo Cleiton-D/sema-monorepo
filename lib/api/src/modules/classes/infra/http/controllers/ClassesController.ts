@@ -20,13 +20,23 @@ class ClassesController {
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
-    const { classroom_id, employee_id, school_subject_id } = request.query;
+    const {
+      classroom_id,
+      employee_id,
+      school_subject_id,
+      limit,
+      sortBy,
+      order,
+    } = request.query;
 
     const listClasses = container.resolve(ListClassesService);
     const classes = await listClasses.execute({
       classroom_id: classroom_id as string,
       employee_id: employee_id as string,
       school_subject_id: school_subject_id as string,
+      limit: limit ? Number(limit) : undefined,
+      sortBy: sortBy as string,
+      order: order as 'ASC' | 'DESC',
     });
 
     return response.json(classes);

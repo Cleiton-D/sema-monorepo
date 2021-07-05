@@ -1,8 +1,15 @@
 import { Session } from 'next-auth';
+import { useQuery } from 'react-query';
+
+import { User, FormattedUser } from 'models/User';
 
 import { initializeApi } from 'services/api';
-import { User, FormattedUser } from 'models/User';
+
 import { userMapper } from 'utils/mappers/userMapper';
+
+type CountUsersResponse = {
+  count: number;
+};
 
 export const listUsers = (
   session?: Session | null
@@ -12,4 +19,19 @@ export const listUsers = (
   return api
     .get<User[]>('/users')
     .then((response) => response.data.map(userMapper));
+};
+
+export const countUsers = (session?: Session | null) => {
+  const api = initializeApi(session);
+
+  return api
+    .get<CountUsersResponse>('/users/count')
+    .then((response) => response.data);
+};
+
+export const useCountUsers = (session: Session | null) => {
+  const key = `count-users`;
+  const result = useQuery(key, () => countUsers(session));
+
+  return { ...result, key };
 };

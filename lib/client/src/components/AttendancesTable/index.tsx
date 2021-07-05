@@ -48,7 +48,10 @@ export const AttendancesTable = ({
 
   const { data: oldClasses } = useListClasses(session, {
     classroom_id: classEntity?.classroom_id,
-    school_subject_id: classEntity?.school_subject_id
+    school_subject_id: classEntity?.school_subject_id,
+    limit: 6,
+    sortBy: 'time_start',
+    order: 'DESC'
   });
 
   const { data: enrolls } = useListEnrolls(session, {
@@ -97,10 +100,17 @@ export const AttendancesTable = ({
   const classes = useMemo(() => {
     if (!oldClasses) return [];
 
-    return oldClasses.map((item) => ({
-      ...item,
-      date: format(parseISO(item.class_date), 'dd/MM')
-    }));
+    return oldClasses
+      .map((item) => ({
+        ...item,
+        date: format(parseISO(item.class_date), 'dd/MM')
+      }))
+      .sort((a, b) => {
+        const parsedA = parseISO(a.created_at);
+        const parsedB = parseISO(b.created_at);
+
+        return parsedA.getTime() - parsedB.getTime();
+      });
   }, [oldClasses]);
 
   const enrollsWithAttendances = useMemo(() => {

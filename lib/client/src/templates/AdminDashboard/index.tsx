@@ -3,12 +3,14 @@ import { useSession } from 'next-auth/client';
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
+import DatabaseDumpCard from 'components/DatabaseDumpCard';
 
 import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useCountSchools } from 'requests/queries/schools';
 import { useGradesCount } from 'requests/queries/grades';
 import { useEmployeesCount } from 'requests/queries/employee';
 import { useCountSchoolSubjects } from 'requests/queries/school-subjects';
+import { useCountUsers } from 'requests/queries/users';
 
 import * as S from './styles';
 
@@ -22,6 +24,7 @@ const AdminDashboard = () => {
   const { data: gradesCount } = useGradesCount(session);
   const { data: employeesCount } = useEmployeesCount(session);
   const { data: schoolSubjectsCount } = useCountSchoolSubjects(session);
+  const { data: usersCount } = useCountUsers(session);
 
   return (
     <Base>
@@ -42,7 +45,7 @@ const AdminDashboard = () => {
         />
 
         <Card description="Usuários" link="/users" module="USER" rule="READ">
-          25
+          {usersCount?.count}
         </Card>
 
         <Card
@@ -89,6 +92,8 @@ const AdminDashboard = () => {
         >
           {schoolSubjectsCount?.count}
         </Card>
+
+        <DatabaseDumpCard />
       </S.Wrapper>
     </Base>
   );

@@ -16,6 +16,7 @@ import classesRouter from '@modules/classes/infra/http/routes/classes.routes';
 import enrollsRouter from '@modules/enrolls/infra/http/routes/enrolls.routes';
 import usersRouter from '@modules/users/infra/http/routes/users.routes';
 import personRouter from '@modules/persons/infra/http/routes/person.routes';
+import adminRouter from '@modules/admin/infra/http/routes/admin.routes';
 
 import AppError from '@shared/errors/AppError';
 
@@ -33,6 +34,7 @@ app.use('/sessions', sessionsRouter);
 app.use('/schools', schoolsRoutes);
 app.use('/students', studentRouter);
 app.use('/education/admin', educationAdminRouter);
+app.use('/admin', adminRouter);
 app.use('/teachers', teachersRouter);
 app.use('/classes', classesRouter);
 app.use('/enrolls', enrollsRouter);
