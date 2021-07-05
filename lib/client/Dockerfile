@@ -1,8 +1,8 @@
-FROM node:alpine AS deps
+# FROM node:alpine AS deps
 
-WORKDIR /app
-COPY . .
-RUN yarn install --production --ignore-scripts --prefer-offline
+# WORKDIR /app
+# COPY . .
+# RUN yarn install --production --ignore-scripts --prefer-offline
 
 FROM node:alpine AS runner
 
@@ -20,7 +20,8 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-COPY --from=deps /app/node_modules ./node_modules
+# COPY --from=deps /app/node_modules ./node_modules
+COPY node_modules ./node_modules
 
 COPY  public ./public
 COPY --chown=nextjs:nodejs .next ./.next
