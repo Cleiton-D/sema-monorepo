@@ -22,48 +22,75 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: ssh scp ssh pipelines
+      - name: down previous version
         id: deploy
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: echo sucesso
+          command: |
+            DIR="$HOME/test"
+            [ -d "${DIR}" ] && {
+              cd test
+              docker-compose down
+              cd ..
+              mv test test_bk
+            }
+            
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      
-      - name: delete previous version
+      - name: copy new version
         if: success()
-        uses: cross-the-world/ssh-pipeline@master
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
-          user: ${{ secrets.USERNAME }}
-          pass: ${{ secrets.PASSWORD }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          connect_timeout: 10s
-          script: |
+          source: "*"
+          target: "test"
+          
+      - name: deploy new version
+        if: success()
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd test && docker-compose up --build
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+      - name: delete previous version
+        if: success()
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: |
             BK_DIR="$HOME/teste_bkp"
             [ -d "${BK_DIR}" ] && { rm -rf teste_bkp; }
-      
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
       
       - name: restore previous version
         if: failure()
-        uses: cross-the-world/ssh-pipeline@master
+        uses: garygrossgarten/github-action-ssh@release
         with:
-          host: ${{ secrets.HOST }}
-          user: ${{ secrets.USERNAME }}
-          pass: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          connect_timeout: 10s
-          script: |
+          command: |
             DIR="$HOME/test"
             BK_DIR="$HOME/teste_bkp"
             
-            [ -d "${DIR}" ] && { cd test
+            [ -d "${DIR}" ] && {
+              cd test
               docker-compose down
               cd ..
               rm -rf test
               
-              [ -d "${BK_DIR}" ] && { mv teste_bkp test
+              [ -d "${BK_DIR}" ] && { 
+                mv teste_bkp test
                 cd test
-                docker-compose up --build; }; }
+                docker-compose up --build; 
+              } 
+            }
+
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
