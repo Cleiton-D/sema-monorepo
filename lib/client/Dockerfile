@@ -20,6 +20,8 @@ WORKDIR /app
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
+RUN echo $NEXT_PUBLIC_API_URL
+
 # COPY --from=deps /app/node_modules ./node_modules
 COPY node_modules ./node_modules
 
