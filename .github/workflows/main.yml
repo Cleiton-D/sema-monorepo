@@ -25,12 +25,12 @@ jobs:
       - name: ssh scp ssh pipelines
         id: deploy
         continue-on-error: true
-        uses: JimCronqvist/action-ssh@master
+        uses: garygrossgarten/github-action-ssh@release
         with:
-          hosts: '${{ secrets.USERNAME }}@${{ secrets.HOST }}'
+          command: testando comando que da erro
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-          command: |
-            testando comando nada a ver
 
       
       - name: delete previous version
