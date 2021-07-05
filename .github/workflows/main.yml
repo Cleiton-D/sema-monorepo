@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: "docker-compose.yaml, lib/api/dist, lib/api/package.json, lib/api/init.sh, lib/api/ormconfig.js, lib/client/public, lib/client/.next, lib/client/package.json"
+          source: "docker-compose.yaml, lib/api/Dockerfile, lib/api/dist, lib/api/package.json, lib/api/init.sh, lib/api/ormconfig.js, lib/client/Dockerfile, lib/client/public, lib/client/.next, lib/client/package.json"
           target: "test"
 
       - name: deploy new version
