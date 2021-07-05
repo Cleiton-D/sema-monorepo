@@ -18,6 +18,8 @@ COPY dist ./dist
 COPY init.sh ./init.sh
 COPY ormconfig.js ./ormconfig.js
 
+RUN chmod +x ./init.sh
+
 USER nodejs
 
 WORKDIR /app
