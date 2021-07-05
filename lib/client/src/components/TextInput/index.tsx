@@ -100,6 +100,8 @@ const TextInput: React.ForwardRefRenderFunction<
         <S.InputContainer size={size} hasIcon={!!icon}>
           <S.Input
             inputSize={size}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore: Unreachable code error
             onChange={handleChange}
             as={as}
             ref={mergeRefs([fieldRef, ref])}
