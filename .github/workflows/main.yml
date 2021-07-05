@@ -25,18 +25,16 @@ jobs:
       - name: ssh scp ssh pipelines
         id: deploy
         continue-on-error: true
-        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+        uses: cross-the-world/ssh-pipeline@master
         with:
           host: ${{ secrets.HOST }}
           user: ${{ secrets.USERNAME }}
           pass: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           connect_timeout: 10s
+          script: |
+            testando comando nada a ver
 
-          scp: |
-            * => /test
-          last_ssh: |
-            cd test && docker-compose up --build
       
       - name: delete previous version
         if: steps.deploy.outputs.status == 'success'
