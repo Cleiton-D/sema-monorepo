@@ -34,12 +34,10 @@ jobs:
           connect_timeout: 10s
           first_ssh: |
             DIR="$HOME/teste_bkp"
-            [ -d "${DIR}" ] && { \
-              cd teste_bkp
+            [ -d "${DIR}" ] && { cd teste_bkp
               docker-compose down
               cd ..
-              mv test teste_bkp \
-            }
+              mv test teste_bkp }
           scp: |
             * => /test
           last_ssh: |
@@ -56,9 +54,7 @@ jobs:
           connect_timeout: 10s
           script: |
             BK_DIR="$HOME/teste_bkp"
-            [ -d "${BK_DIR}" ] && { \
-              rm -rf teste_bkp \
-            }
+            [ -d "${BK_DIR}" ] && { rm -rf teste_bkp; }
       
       
       - name: restore previous version
@@ -74,15 +70,11 @@ jobs:
             DIR="$HOME/test"
             BK_DIR="$HOME/teste_bkp"
             
-            [ -d "${DIR}" ] && { \
-              cd test
+            [ -d "${DIR}" ] && { cd test
               docker-compose down
               cd ..
               rm -rf test
               
-              [ -d "${BK_DIR}" ] && { \
-                mv teste_bkp test
+              [ -d "${BK_DIR}" ] && { mv teste_bkp test
                 cd test
-                docker-compose up --build \
-              } \
-            }
+                docker-compose up --build } }
