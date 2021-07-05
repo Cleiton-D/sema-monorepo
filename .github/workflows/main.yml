@@ -24,7 +24,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: ssh scp ssh pipelines
         id: deploy
-        continue-on-error: true
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: testando comando que da erro
