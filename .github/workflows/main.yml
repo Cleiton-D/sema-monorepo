@@ -33,8 +33,11 @@ jobs:
           port: ${{ secrets.PORT }}
           connect_timeout: 10s
           first_ssh: |
-            docker-compose down
-            mv test teste_bkp
+            DIR="$HOME/test"
+            if [ -d "$DIR" ]; then
+              cd test && docker-compose down
+              cd .. && mv test teste_bkp
+            fi
           scp: |
             * => /test
           last_ssh: |
@@ -63,9 +66,12 @@ jobs:
           port: ${{ secrets.PORT }}
           connect_timeout: 10s
           script: |
-            cd test && docker-compose down &&
-            cd ..
-            rm -rf test &&
-            mv teste_bkp test &&
+            DIR="$HOME/test"
+            if [ -d "$DIR" ]; then
+              cd test && docker-compose down
+              cd .. && rm -rf test
+            fi
+            
+            mv teste_bkp test
             cd test && docker-compose up --build
             
