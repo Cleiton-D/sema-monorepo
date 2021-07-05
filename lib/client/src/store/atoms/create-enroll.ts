@@ -26,9 +26,9 @@ export const createEnrollData = atom<
   },
   (_get, set, newValue) => {
     if (newValue === RESET) {
-      set(personEnrollData, newValue);
-      set(personEnrollContactsData, newValue);
-      set(enrollData, newValue);
+      set(personEnrollData, RESET);
+      set(personEnrollContactsData, RESET);
+      set(enrollData, RESET);
       return;
     }
 
