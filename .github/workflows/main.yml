@@ -47,7 +47,7 @@ jobs:
       
       
       - name: restore previous version
-        if: steps.deploy.outputs.status == 'failure'
+        if: failure()
         uses: cross-the-world/ssh-pipeline@master
         with:
           host: ${{ secrets.HOST }}
