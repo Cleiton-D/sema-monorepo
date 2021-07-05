@@ -22,12 +22,50 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: copy file via ssh password
-        uses: appleboy/scp-action@master
+      - name: ssh scp ssh pipelines
+        id: deploy
+        continue-on-error: true
+        uses: cross-the-world/ssh-scp-ssh-pipelines@latest
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          user: ${{ secrets.USERNAME }}
+          pass: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: "*"
-          target: "test"
+          connect_timeout: 10s
+          first_ssh: |
+            docker-compose down
+            mv test teste_bkp
+          scp: |
+            * => /test
+          last_ssh: |
+            cd test && docker-compose up --build
+      
+      - name: delete previous version
+        if: steps.deploy.outputs.status == 'success'
+        uses: cross-the-world/ssh-pipeline@master
+        with:
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USERNAME }}
+          pass: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          connect_timeout: 10s
+          script: |
+            rm -rf teste_bkp
+        
+      
+      - name: restore previous version
+        if: steps.deploy.outputs.status == 'failure'
+        uses: cross-the-world/ssh-pipeline@master
+        with:
+          host: ${{ secrets.HOST }}
+          user: ${{ secrets.USERNAME }}
+          pass: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          connect_timeout: 10s
+          script: |
+            cd test && docker-compose down &&
+            cd ..
+            rm -rf test &&
+            mv teste_bkp test &&
+            cd test && docker-compose up --build
+            
