@@ -52,7 +52,7 @@ class Class {
   @Column({ type: 'time' })
   time_end: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['PROGRESS', 'DONE'] })
   status: ClassStatus;
 
   @CreateDateColumn()

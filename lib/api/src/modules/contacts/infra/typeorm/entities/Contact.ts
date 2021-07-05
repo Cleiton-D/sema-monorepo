@@ -16,7 +16,7 @@ class Contact {
   @Column()
   description: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['email', 'phone'] })
   type: ContactType;
 
   @CreateDateColumn()

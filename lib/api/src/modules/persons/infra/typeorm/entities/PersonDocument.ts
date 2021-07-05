@@ -26,7 +26,7 @@ class PersonDocument {
   @Column()
   document_number: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['RG', 'CPF', 'CNH', 'PIS-PASEP'] })
   document_type: DocumentType;
 
   @CreateDateColumn()

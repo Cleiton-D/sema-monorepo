@@ -32,7 +32,7 @@ class StudentSchool {
   @JoinColumn({ name: 'school_id' })
   school: School;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['ACTIVE', 'INACTIVE', 'TRANSFERRED'] })
   status: StudentSchoolStatus;
 
   @CreateDateColumn()

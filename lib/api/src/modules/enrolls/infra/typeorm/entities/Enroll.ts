@@ -26,7 +26,7 @@ class Enroll {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['ACTIVE', 'INACTIVE', 'TRANSFERRED'] })
   status: EnrollStatus;
 
   @Column()

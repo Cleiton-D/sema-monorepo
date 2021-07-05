@@ -24,7 +24,7 @@ class SchoolTermPeriod {
   @JoinColumn({ name: 'school_year_id' })
   school_year: SchoolYear;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['FIRST', 'SECOND', 'THIRD', 'FOURTH'] })
   school_term: SchoolTerm;
 
   @Column()

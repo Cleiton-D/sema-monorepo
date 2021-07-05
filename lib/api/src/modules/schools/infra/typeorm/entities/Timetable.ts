@@ -26,7 +26,18 @@ class Timetable {
   @Column()
   school_subject_id: string;
 
-  @Column({ type: 'enum' })
+  @Column({
+    type: 'enum',
+    enum: [
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ],
+  })
   day_of_week: DayOfWeek;
 
   @Column({ type: 'time' })

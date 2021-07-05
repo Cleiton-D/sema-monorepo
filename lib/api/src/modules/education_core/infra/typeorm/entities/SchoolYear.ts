@@ -22,7 +22,7 @@ class SchoolYear {
   @Column()
   date_end: Date;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['ACTIVE', 'INACTIVE', 'PENDING'] })
   status: Status;
 
   @CreateDateColumn()

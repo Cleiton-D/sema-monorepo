@@ -35,7 +35,7 @@ class SchoolReport {
   @Column()
   average: number;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['FIRST', 'SECOND', 'THIRD', 'FOURTH'] })
   school_term: SchoolTerm;
 
   @CreateDateColumn()

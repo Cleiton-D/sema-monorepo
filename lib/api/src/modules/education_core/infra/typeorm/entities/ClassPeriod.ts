@@ -17,7 +17,7 @@ class ClassPeriod {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['MORNING', 'EVENING', 'NOCTURNAL'] })
   description: ClassPeriodType;
 
   @Column({ type: 'time' })

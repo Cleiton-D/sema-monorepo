@@ -16,7 +16,7 @@ class Branch {
   @Column()
   description: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['SCHOOL', 'MUNICIPAL_SECRETARY'] })
   type: BranchType;
 
   @CreateDateColumn()

@@ -32,7 +32,7 @@ class Person {
   @Column()
   dad_name?: string;
 
-  @Column({ type: 'enum' })
+  @Column({ type: 'enum', enum: ['male', 'female'] })
   gender: Gender;
 
   @Column()
