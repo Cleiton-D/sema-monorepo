@@ -60,9 +60,9 @@ const TextInput: React.ForwardRefRenderFunction<
 
   const fieldRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = (event) => {
     const { value } = event.target;
 
     const masked = mask ? masks[mask](value) : value;
