@@ -33,8 +33,13 @@ jobs:
           port: ${{ secrets.PORT }}
           connect_timeout: 10s
           first_ssh: |
-            DIR="$HOME/test"
-            if [ -d "$DIR" ]; then cd test && docker-compose down && cd .. && mv test teste_bkp fi
+            DIR="$HOME/teste_bkp"
+            [ -d "${DIR}" ] && {
+              cd teste_bkp
+              docker-compose down
+              cd ..
+              mv test teste_bkp
+            }
           scp: |
             * => /test
           last_ssh: |
@@ -50,8 +55,11 @@ jobs:
           port: ${{ secrets.PORT }}
           connect_timeout: 10s
           script: |
-            rm -rf teste_bkp
-        
+            BK_DIR="$HOME/teste_bkp"
+            [ -d "${BK_DIR}" ] && {
+              rm -rf teste_bkp
+            }
+      
       
       - name: restore previous version
         if: steps.deploy.outputs.status == 'failure'
@@ -64,8 +72,17 @@ jobs:
           connect_timeout: 10s
           script: |
             DIR="$HOME/test"
-            if [ -d "$DIR" ]; then cd test && docker-compose down && cd .. && rm -rf test fi
+            BK_DIR="$HOME/teste_bkp"
             
-            mv teste_bkp test
-            cd test && docker-compose up --build
-            
+            [ -d "${DIR}" ] && {
+              cd test
+              docker-compose down
+              cd ..
+              rm -rf test
+              
+              [ -d "${BK_DIR}" ] && {
+                mv teste_bkp test
+                cd test
+                docker-compose up --build
+              }
+            }
