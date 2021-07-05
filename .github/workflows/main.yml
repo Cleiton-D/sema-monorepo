@@ -33,14 +33,7 @@ jobs:
       - run: cd lib/client && npm install
       - run: cd lib/client && npm run build
 
-  publish:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
       - name: down previous version
         id: deploy
         uses: garygrossgarten/github-action-ssh@release
