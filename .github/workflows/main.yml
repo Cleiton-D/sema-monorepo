@@ -44,12 +44,12 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            DIR="$HOME/test"
+            DIR="$HOME/app"
             if [ -d "$DIR" ]; then
-              cd test
+              cd app
               docker-compose down
               cd ..
-              mv test test_bk
+              mv app app_backup
             fi
 
           host: ${{ secrets.HOST }}
@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           source: "docker-compose.yaml, lib/api/Dockerfile, lib/api/dist, lib/api/package.json, lib/api/init.sh, lib/api/ormconfig.js, lib/client/Dockerfile, lib/client/node_modules, lib/client/public, lib/client/.next, lib/client/package.json"
-          target: "test"
+          target: "app"
 
       - name: deploy new version
         if: success()
@@ -80,7 +80,7 @@ jobs:
             export APP_URL=${{ secrets.APP_URL }}
             export API_URL=${{ secrets.API_URL }}
 
-            cd test && docker-compose up --build -d
+            cd app && docker-compose up --build -d
 
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -91,9 +91,9 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            BK_DIR="$HOME/teste_bkp"
+            BK_DIR="$HOME/app_backup"
             if [ -d "$BK_DIR" ]; then
-              rm -rf teste_bkp
+              rm -rf app_backup
             fi
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -104,18 +104,18 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: |
-            DIR="$HOME/test"
-            BK_DIR="$HOME/teste_bkp"
+            DIR="$HOME/app"
+            BK_DIR="$HOME/app_backup"
 
             if [ -d "$DIR" ]; then
-              cd test
+              cd app
               docker-compose down
               cd ..
-              rm -rf test
+              rm -rf app
               
               if [ -d "$BK_DIR" ]; then
-                mv teste_bkp test
-                cd test
+                mv app_backup app
+                cd app
                 docker-compose up --build; 
               fi
             fi
