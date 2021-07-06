@@ -20,7 +20,7 @@ const Header = () => {
       <div style={{ height: '100%' }}>
         <UserDropdown
           username={session?.user.name || ''}
-          image="/img/fry.jpg"
+          image="/img/user2.png"
         />
       </div>
     </S.Wrapper>
