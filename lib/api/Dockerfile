@@ -3,6 +3,7 @@ WORKDIR /app
 COPY . .
 RUN yarn install --production --ignore-scripts --prefer-offline
 
+
 FROM node:alpine AS runner
 WORKDIR /app
 
