@@ -6,6 +6,8 @@ RUN yarn install --production --ignore-scripts --prefer-offline
 FROM node:alpine AS runner
 WORKDIR /app
 
+RUN apk add --no-cache postgresql-client
+
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
 
