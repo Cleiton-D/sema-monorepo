@@ -20,6 +20,8 @@ COPY dist ./dist
 COPY init.sh ./init.sh
 COPY ormconfig.js ./ormconfig.js
 
+RUN mkdir -b storage/temp
+
 RUN chmod +x ./init.sh
 
 USER nodejs
