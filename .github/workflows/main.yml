@@ -80,7 +80,7 @@ jobs:
             export APP_URL=${{ secrets.APP_URL }}
             export API_URL=${{ secrets.API_URL }}
 
-            cd test && docker-compose up --build
+            cd test && docker-compose up --build -d
 
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
