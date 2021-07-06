@@ -15,9 +15,6 @@ const isServer = typeof window === 'undefined';
 const createApi = (session?: Session | null) => {
   const jwt = session?.jwt;
 
-  console.log("ENVS", process.env);
-  console.log("API URL", process.env.NEXT_PUBLIC_API_URL);
-
   const api = axios.create({
     baseURL: isServer
       ? process.env.SERVER_API_URL
