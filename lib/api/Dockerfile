@@ -21,6 +21,7 @@ COPY init.sh ./init.sh
 COPY ormconfig.js ./ormconfig.js
 
 RUN mkdir -p storage/temp
+RUN chmod -R 777 ./storage
 
 RUN chmod +x ./init.sh
 
