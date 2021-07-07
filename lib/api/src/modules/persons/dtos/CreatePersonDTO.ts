@@ -15,11 +15,11 @@ type DocumentData = {
 
 type CreatePersonDTO = {
   name: string;
-  mother_name: string;
+  mother_name?: string;
   dad_name?: string;
-  gender: Gender;
-  birth_date: Date;
-  address: Address;
+  gender?: Gender;
+  birth_date?: Date;
+  address?: Address;
   documents: DocumentData[];
   contacts: ContactData[];
 };
