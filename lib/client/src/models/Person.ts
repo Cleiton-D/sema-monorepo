@@ -18,6 +18,7 @@ export type Person = {
 
 export type PersonBasicFormData = {
   name: string;
+  gender?: 'male' | 'female';
   birth_date: string;
   mother_name: string;
   dad_name?: string;

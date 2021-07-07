@@ -79,4 +79,27 @@ const administrator = [
   }
 ];
 
+export const schoolAdministration = [
+  {
+    path: '/administration/school-year',
+    name: 'Ano Letivo'
+  },
+  {
+    path: '/enrolls?school_id=me',
+    name: 'Alunos ativos'
+  },
+  {
+    path: '/school/me/classrooms',
+    name: 'Turmas'
+  },
+  {
+    path: '/school/me/teacher-school-subjects',
+    name: 'Professores'
+  },
+  {
+    path: '/school/me/classroom-teacher',
+    name: 'Turmas x Professores'
+  }
+];
+
 export { administrator, municipalSecretary, teacher };

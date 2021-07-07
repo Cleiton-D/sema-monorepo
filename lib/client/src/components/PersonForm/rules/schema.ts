@@ -21,6 +21,7 @@ export const addressSchema = Yup.object({
 
 export const personSchema = Yup.object({
   name: Yup.string().required('Campo obrigatório.'),
+  gender: Yup.string().required('Campo obrigatório.'),
   mother_name: Yup.string().required('Campo obrigatório.'),
   birth_date: Yup.string().test(
     'test-birth_date',
