@@ -2,6 +2,7 @@ version: "3.3"
 services:
   postgres:
     image: postgres
+    restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DATABASE}
@@ -25,6 +26,7 @@ services:
     build:
       context: ./lib/api
       dockerfile: Dockerfile
+    restart: always
     environment:
       POSTGRES_HOST: "${POSTGRES_HOST}"
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -50,7 +52,7 @@ services:
         - NEXTAUTH_URL=${APP_URL}
         - NEXT_PUBLIC_API_URL=${API_URL}
         - SERVER_API_URL=http://api:3333
-
+    restart: always
     ports:
       - 3000:3000
 
