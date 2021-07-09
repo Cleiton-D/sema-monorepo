@@ -17,7 +17,7 @@ export default class CreateAdminUser1624323334330
       login: 'admin@admin.com',
       username: 'Admin',
       password,
-      change_password: false,
+      change_password: true,
     });
 
     const adminAccess = await accessLevelsRepository.findOne({

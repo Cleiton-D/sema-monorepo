@@ -2,7 +2,6 @@ version: "3.3"
 services:
   postgres:
     image: postgres
-    command: ["postgres", "-c", "log_statement=all"]
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DATABASE}
