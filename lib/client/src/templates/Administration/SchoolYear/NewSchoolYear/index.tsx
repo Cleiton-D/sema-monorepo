@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
+import { signIn, useSession } from 'next-auth/client';
 import { useResetAtom } from 'jotai/utils';
 
 import Base from 'templates/Base';
@@ -26,10 +27,18 @@ const NewSchoolYear = () => {
 
   const resetForm = useResetAtom(schoolYearAtom);
 
-  const handleFinish = useCallback(() => {
+  const [session] = useSession();
+  const handleFinish = useCallback(async () => {
     resetForm();
+
+    await signIn('refresh', {
+      profileId: session?.profileId,
+      token: session?.jwt,
+      redirect: false
+    });
+
     push(`/administration/school-year`);
-  }, [push, resetForm]);
+  }, [push, resetForm, session]);
 
   return (
     <Base>

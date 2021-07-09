@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
 import { PlusCircle, Edit3 } from '@styled-icons/feather';
@@ -20,16 +20,19 @@ const SchoolYear = () => {
   const { enableAccess } = useAccess();
 
   const [session] = useSession();
-  const { data } = useSchoolYearWithSchoolTerms(session);
+  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session);
+
+  useEffect(() => {
+    console.log(session);
+  }, [session]);
 
   const { push } = useRouter();
 
   const handleAddSchoolYear = () => {
-    if (data?.status === 'PENDING') {
-      push(`/administration/school-year/${data.id}/edit`);
+    if (schoolYear?.status === 'PENDING') {
+      push(`/administration/school-year/${schoolYear.id}/edit`);
       return;
     }
-
     push('/administration/school-year/new');
   };
 
@@ -46,11 +49,11 @@ const SchoolYear = () => {
           <Button
             size="medium"
             styleType="normal"
-            icon={data?.status === 'PENDING' ? <Edit3 /> : <PlusCircle />}
+            icon={schoolYear?.status === 'PENDING' ? <Edit3 /> : <PlusCircle />}
             onClick={handleAddSchoolYear}
-            disabled={data?.status === 'ACTIVE'}
+            disabled={schoolYear?.status === 'ACTIVE'}
           >
-            {data?.status === 'PENDING'
+            {schoolYear?.status === 'PENDING'
               ? 'Alterar ano letivo'
               : 'Cadastrar ano letivo'}
           </Button>
@@ -58,126 +61,164 @@ const SchoolYear = () => {
       )}
 
       <S.Wrapper>
-        <S.Grid columns={3}>
-          <S.GridItem>
-            <strong>Data de Início</strong>
-            <span>{data?.formattedDateStart}</span>
-          </S.GridItem>
-          <S.GridItem>
-            <strong>Data de Término</strong>
-            <span>{data?.formattedDateEnd}</span>
-          </S.GridItem>
-          <S.GridItem>
-            <strong>Status</strong>
-            {data?.status && (
-              <Badge
-                styledType={
-                  data.status === 'ACTIVE'
-                    ? 'green'
-                    : data.status === 'INACTIVE'
-                    ? 'red'
-                    : 'orange'
-                }
-              >
-                {data?.translatedStatus}
-              </Badge>
-            )}
-          </S.GridItem>
-        </S.Grid>
-
-        {data?.schoolTermPeriods && (
+        {schoolYear?.id ? (
           <>
-            <S.Divider style={{ marginTop: 24 }} />
-            <S.Grid columns={4} gap={20} style={{ marginTop: 24 }}>
-              {data.schoolTermPeriods.FIRST && (
-                <S.SchoolTermContainer>
-                  <strong>1º Bimestre</strong>
-                  <div>
-                    <div>
-                      <strong>Início:</strong>
-                      <span>
-                        {data?.schoolTermPeriods.FIRST?.formattedDateStart}
-                      </span>
-                    </div>
-                    <div>
-                      <strong>Fim:</strong>
-                      <span>
-                        {data?.schoolTermPeriods.FIRST?.formattedDateEnd}
-                      </span>
-                    </div>
-                  </div>
-                </S.SchoolTermContainer>
-              )}
-              {data.schoolTermPeriods.SECOND && (
-                <S.SchoolTermContainer>
-                  <strong>2º Bimestre</strong>
-                  <div>
-                    <div>
-                      <strong>Início:</strong>
-                      <span>
-                        {data.schoolTermPeriods.SECOND.formattedDateStart}
-                      </span>
-                    </div>
-                    <div>
-                      <strong>Fim:</strong>
-                      <span>
-                        {data.schoolTermPeriods.SECOND.formattedDateEnd}
-                      </span>
-                    </div>
-                  </div>
-                </S.SchoolTermContainer>
-              )}
-
-              {data.schoolTermPeriods.THIRD && (
-                <S.SchoolTermContainer>
-                  <strong>3º Bimestre</strong>
-                  <div>
-                    <div>
-                      <strong>Início:</strong>
-                      <span>
-                        {data.schoolTermPeriods.THIRD.formattedDateStart}
-                      </span>
-                    </div>
-                    <div>
-                      <strong>Fim:</strong>
-                      <span>
-                        {data.schoolTermPeriods.THIRD.formattedDateEnd}
-                      </span>
-                    </div>
-                  </div>
-                </S.SchoolTermContainer>
-              )}
-
-              {data.schoolTermPeriods.FOURTH && (
-                <S.SchoolTermContainer>
-                  <strong>4º Bimestre</strong>
-                  <div>
-                    <div>
-                      <strong>Início:</strong>
-                      <span>
-                        {data.schoolTermPeriods.FOURTH.formattedDateStart}
-                      </span>
-                    </div>
-                    <div>
-                      <strong>Fim:</strong>
-                      <span>
-                        {data.schoolTermPeriods.FOURTH.formattedDateEnd}
-                      </span>
-                    </div>
-                  </div>
-                </S.SchoolTermContainer>
-              )}
+            <S.Grid columns={3}>
+              <S.GridItem>
+                <strong>Data de Início</strong>
+                <span>{schoolYear?.formattedDateStart}</span>
+              </S.GridItem>
+              <S.GridItem>
+                <strong>Data de Término</strong>
+                <span>{schoolYear?.formattedDateEnd}</span>
+              </S.GridItem>
+              <S.GridItem>
+                <strong>Status</strong>
+                {schoolYear?.status && (
+                  <Badge
+                    styledType={
+                      schoolYear.status === 'ACTIVE'
+                        ? 'green'
+                        : schoolYear.status === 'INACTIVE'
+                        ? 'red'
+                        : 'orange'
+                    }
+                  >
+                    {schoolYear?.translatedStatus}
+                  </Badge>
+                )}
+              </S.GridItem>
             </S.Grid>
+
+            {schoolYear?.schoolTermPeriods && (
+              <>
+                <S.Divider style={{ marginTop: 24 }} />
+                <S.Grid columns={4} gap={20} style={{ marginTop: 24 }}>
+                  {schoolYear.schoolTermPeriods.FIRST && (
+                    <S.SchoolTermContainer>
+                      <strong>1º Bimestre</strong>
+                      <div>
+                        <div>
+                          <strong>Início:</strong>
+                          <span>
+                            {
+                              schoolYear?.schoolTermPeriods.FIRST
+                                ?.formattedDateStart
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Fim:</strong>
+                          <span>
+                            {
+                              schoolYear?.schoolTermPeriods.FIRST
+                                ?.formattedDateEnd
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </S.SchoolTermContainer>
+                  )}
+                  {schoolYear.schoolTermPeriods.SECOND && (
+                    <S.SchoolTermContainer>
+                      <strong>2º Bimestre</strong>
+                      <div>
+                        <div>
+                          <strong>Início:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.SECOND
+                                .formattedDateStart
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Fim:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.SECOND
+                                .formattedDateEnd
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </S.SchoolTermContainer>
+                  )}
+
+                  {schoolYear.schoolTermPeriods.THIRD && (
+                    <S.SchoolTermContainer>
+                      <strong>3º Bimestre</strong>
+                      <div>
+                        <div>
+                          <strong>Início:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.THIRD
+                                .formattedDateStart
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Fim:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.THIRD
+                                .formattedDateEnd
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </S.SchoolTermContainer>
+                  )}
+
+                  {schoolYear.schoolTermPeriods.FOURTH && (
+                    <S.SchoolTermContainer>
+                      <strong>4º Bimestre</strong>
+                      <div>
+                        <div>
+                          <strong>Início:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.FOURTH
+                                .formattedDateStart
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Fim:</strong>
+                          <span>
+                            {
+                              schoolYear.schoolTermPeriods.FOURTH
+                                .formattedDateEnd
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </S.SchoolTermContainer>
+                  )}
+                </S.Grid>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <S.Message>
+              Ainda não temos nenhum ano letivo cadastrado, clique no botão
+              &quot;Cadastrar ano letivo&quot; para adicionar um novo ano
+              letivo.
+            </S.Message>
           </>
         )}
       </S.Wrapper>
 
-      <S.TableSection>
-        <S.SectionTitle>
-          <h4>Períodos</h4>
-        </S.SectionTitle>
-        <ClassPeriodsTable classPeriods={data?.classPeriods || []} />
-      </S.TableSection>
+      {schoolYear?.classPeriods && schoolYear.classPeriods.length > 0 && (
+        <S.TableSection>
+          <S.SectionTitle>
+            <h4>Períodos</h4>
+          </S.SectionTitle>
+          <ClassPeriodsTable classPeriods={schoolYear?.classPeriods || []} />
+        </S.TableSection>
+      )}
     </Base>
   );
 };

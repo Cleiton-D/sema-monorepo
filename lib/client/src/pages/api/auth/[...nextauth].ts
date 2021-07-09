@@ -136,8 +136,22 @@ const options = {
         headers: { authorization: user.jwt ? `Bearer ${user.jwt}` : '' }
       });
 
+      const sessionConfigs: Record<string, string | undefined> = {};
+
+      try {
+        const { data } = await api.get<SchoolYear>(
+          '/education/admin/school-years/current',
+          {
+            headers: { authorization: user.jwt ? `Bearer ${user.jwt}` : '' }
+          }
+        );
+
+        sessionConfigs.school_year_id = data?.id;
+      } catch {
+        sessionConfigs.school_year_id = undefined;
+      }
+
       const {
-        school_year_id,
         schoolId,
         profileId,
         accessLevel,
@@ -160,29 +174,12 @@ const options = {
         id: branchId,
         type: branchType
       };
-      session.configs = {
-        school_year_id: school_year_id
-      };
+      session.configs = sessionConfigs;
 
       return Promise.resolve(session);
     },
     jwt: async (token: any, user: any) => {
       if (user) {
-        const api = initializeApi();
-
-        try {
-          const { data } = await api.get<SchoolYear>(
-            '/education/admin/school-years/current',
-            {
-              headers: { authorization: user.jwt ? `Bearer ${user.jwt}` : '' }
-            }
-          );
-
-          token.school_year_id = data?.id;
-        } catch {
-          token.school_year_id = undefined;
-        }
-
         token.id = user.id;
         token.email = user.login;
         token.jwt = user.jwt;

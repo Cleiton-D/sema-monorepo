@@ -111,3 +111,25 @@ export const SectionTitle = styled.div`
     padding-top: 1.5rem;
   `}
 `;
+
+export const Message = styled.p`
+  ${({ theme }) => css`
+    display: block;
+    margin: 4rem auto;
+
+    display: block;
+    width: fit-content;
+    text-align: center;
+    padding: 0 2rem;
+
+    color: ${theme.colors.lightSilver};
+    font-size: ${theme.font.sizes.large};
+    font-weight: ${theme.font.medium};
+
+    a {
+      color: ${theme.colors.primary};
+      font: inherit;
+      text-decoration: underline;
+    }
+  `}
+`;
