@@ -9,8 +9,6 @@ import Heading from 'components/Heading';
 import FormStep from 'components/FormStep';
 
 import SchoolYearBasicForm from 'components/SchoolYearBasicForm';
-import SchoolYearClassPeriodForm from 'components/SchoolYearClassPeriodForm';
-import SchoolClassPeriodsForm from 'components/SchoolClassPeriodsForm';
 import GradeSchoolSubjectsForm from 'components/GradeSchoolSubjectsForm';
 
 import { schoolYearAtom } from 'store/atoms/school-year';
@@ -18,8 +16,6 @@ import { schoolYearAtom } from 'store/atoms/school-year';
 import * as S from './styles';
 
 const basicForm = <SchoolYearBasicForm />;
-const classPeriodsForm = <SchoolYearClassPeriodForm />;
-const schoolClassPeriodsForm = <SchoolClassPeriodsForm />;
 const gradeSchoolSubjectsForm = <GradeSchoolSubjectsForm />;
 
 const NewSchoolYear = () => {
@@ -45,12 +41,7 @@ const NewSchoolYear = () => {
       <Heading>Cadastrar ano letivo</Heading>
       <S.FormsSection>
         <FormStep
-          items={[
-            basicForm,
-            classPeriodsForm,
-            schoolClassPeriodsForm,
-            gradeSchoolSubjectsForm
-          ]}
+          items={[basicForm, gradeSchoolSubjectsForm]}
           finishButtonText="Finalizar"
           onFinish={handleFinish}
         />

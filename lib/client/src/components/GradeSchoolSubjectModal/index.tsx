@@ -26,7 +26,6 @@ export type GradeSchoolSubjectModalRef = {
 
 type GradeSchoolSubjectModalProps = {
   gradeId?: string;
-  schoolYearId?: string;
   refetchFn: () => Promise<unknown>;
 };
 
@@ -38,7 +37,7 @@ type GradeSchoolSubjectForm = {
 const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
   GradeSchoolSubjectModalRef,
   GradeSchoolSubjectModalProps
-> = ({ gradeId, schoolYearId, refetchFn }, ref) => {
+> = ({ gradeId, refetchFn }, ref) => {
   const [
     gradeSchoolSubject,
     setGradeSchoolSubject
@@ -65,7 +64,7 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
   };
 
   const handleSubmit = async (values: GradeSchoolSubjectForm) => {
-    if (!gradeId || !schoolYearId) return;
+    if (!gradeId) return;
 
     setSaving(true);
     try {
@@ -86,7 +85,6 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
       } else {
         const requestData = {
           grade_id: gradeId,
-          school_year_id: schoolYearId,
           school_subjects: [
             {
               school_subject_id,

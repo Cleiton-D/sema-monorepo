@@ -5,14 +5,15 @@ import ISchoolYearsRepository from '@modules/education_core/repositories/ISchool
 
 import AppError from '@shared/errors/AppError';
 
-import Classroom from '../infra/typeorm/entities/Classroom';
+import Classroom, {
+  ClassPeriodType,
+} from '../infra/typeorm/entities/Classroom';
 import IClassroomsRepository from '../repositories/IClassroomsRepository';
 import ISchoolsRepository from '../repositories/ISchoolsRepository';
-import ISchoolClassPeriodsRepository from '../repositories/ISchoolClassPeriodsRepository';
 
 type CreateClassroomRequest = {
   description: string;
-  class_period_id: string;
+  class_period: ClassPeriodType;
   school_id?: string;
   branch_id?: string;
   grade_id: string;
@@ -28,13 +29,11 @@ class CreateClassroomService {
     @inject('GradesRepository') private gradesRepository: IGradesRepository,
     @inject('SchoolYearsRepository')
     private schoolYearsRepository: ISchoolYearsRepository,
-    @inject('SchoolClassPeriodsRepository')
-    private schoolClassPeriodsRepository: ISchoolClassPeriodsRepository,
   ) {}
 
   public async execute({
     description,
-    class_period_id,
+    class_period,
     grade_id,
     school_id,
     school_year_id,
@@ -60,18 +59,9 @@ class CreateClassroomService {
       throw new AppError('School year not found');
     }
 
-    const schoolClassPeriod = await this.schoolClassPeriodsRepository.getOne({
-      school_year_id,
-      school_id: school.id,
-      class_period_id,
-    });
-    if (!schoolClassPeriod) {
-      throw new AppError('School class period not found');
-    }
-
     const classroom = await this.classroomsRepository.create({
       description,
-      class_period_id: schoolClassPeriod.class_period_id,
+      class_period,
       grade_id,
       school_id: school.id,
       school_year_id,

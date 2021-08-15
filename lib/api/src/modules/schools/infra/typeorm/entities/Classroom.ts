@@ -13,9 +13,10 @@ import {
 
 import Grade from '@modules/education_core/infra/typeorm/entities/Grade';
 import SchoolYear from '@modules/education_core/infra/typeorm/entities/SchoolYear';
-import ClassPeriod from '@modules/education_core/infra/typeorm/entities/ClassPeriod';
 import EnrollClassroom from '@modules/enrolls/infra/typeorm/entities/EnrollClassroom';
 import School from './School';
+
+export type ClassPeriodType = 'MORNING' | 'EVENING' | 'NOCTURNAL';
 
 @Entity('classrooms')
 class Classroom {
@@ -25,12 +26,8 @@ class Classroom {
   @Column()
   description: string;
 
-  @Column()
-  class_period_id: string;
-
-  @ManyToOne(() => ClassPeriod)
-  @JoinColumn({ name: 'class_period_id' })
-  class_period: ClassPeriod;
+  @Column({ type: 'enum', enum: ['MORNING', 'EVENING', 'NOCTURNAL'] })
+  class_period: ClassPeriodType;
 
   @Column()
   school_id: string;

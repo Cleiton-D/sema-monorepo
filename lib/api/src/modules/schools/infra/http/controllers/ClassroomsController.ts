@@ -8,6 +8,7 @@ import CountClassroomsService from '@modules/schools/services/CountClassroomsSer
 import ListClassroomsService from '@modules/schools/services/ListClassroomsService';
 import DeleteClassroomService from '@modules/schools/services/DeleteClassroomService';
 import ShowClassroomService from '@modules/schools/services/ShowClassroomService';
+import { ClassPeriodType } from '../../typeorm/entities/Classroom';
 
 class ClassroomsController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -22,7 +23,7 @@ class ClassroomsController {
   @privateRoute({ module: 'CLASSROOM' })
   public async index(request: Request, response: Response): Promise<Response> {
     const { school_id } = request.params;
-    const { grade_id, class_period_id } = request.query;
+    const { grade_id, class_period } = request.query;
 
     const listClassrooms = container.resolve(ListClassroomsService);
     if (school_id === 'me') {
@@ -30,7 +31,7 @@ class ClassroomsController {
       const classrooms = await listClassrooms.execute({
         branch_id,
         grade_id: grade_id as string,
-        class_period_id: class_period_id as string,
+        class_period: class_period as ClassPeriodType,
       });
       return response.json(classrooms);
     }
@@ -38,19 +39,19 @@ class ClassroomsController {
     const classrooms = await listClassrooms.execute({
       school_id,
       grade_id: grade_id as string,
-      class_period_id: class_period_id as string,
+      class_period: class_period as ClassPeriodType,
     });
     return response.json(classrooms);
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
     const { school_id } = request.params;
-    const { class_period_id, grade_id, school_year_id } = request.query;
+    const { class_period, grade_id, school_year_id } = request.query;
 
     const countClassrooms = container.resolve(CountClassroomsService);
     const result = await countClassrooms.execute({
       school_id,
-      class_period_id: class_period_id as string,
+      class_period: class_period as ClassPeriodType,
       grade_id: grade_id as string,
       school_year_id: school_year_id as string,
     });
@@ -63,7 +64,7 @@ class ClassroomsController {
     const { school_id } = request.params;
     const {
       description,
-      class_period_id,
+      class_period,
       grade_id,
       school_year_id,
     } = request.body;
@@ -74,7 +75,7 @@ class ClassroomsController {
 
       const classroom = await createClassroom.execute({
         description,
-        class_period_id,
+        class_period,
         grade_id,
         branch_id,
         school_year_id,
@@ -84,7 +85,7 @@ class ClassroomsController {
     }
     const classroom = await createClassroom.execute({
       description,
-      class_period_id,
+      class_period,
       grade_id,
       school_id,
       school_year_id,

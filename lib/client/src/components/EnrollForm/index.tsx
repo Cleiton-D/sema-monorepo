@@ -17,10 +17,10 @@ import Select from 'components/Select';
 import { EnrollFormData } from 'models/Enroll';
 import { FormHandles } from 'models/Form';
 import { School } from 'models/School';
+import { ClassPeriod } from 'models/ClassPeriod';
 
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassrooms } from 'requests/queries/classrooms';
-import { useListClassPeriods } from 'requests/queries/class-periods';
 
 import { enrollSchema } from './rules/schema';
 
@@ -36,7 +36,7 @@ const EnrollForm: React.ForwardRefRenderFunction<
   EnrollFormProps
 > = ({ jotaiState, school }, ref) => {
   const [selectedGrade, setSelectedGrade] = useState<string>();
-  const [selectedClassPeriod, setSelectedClassPeriod] = useState<string>();
+  const [selectedClassPeriod, setSelectedClassPeriod] = useState<ClassPeriod>();
 
   const formRef = useRef<UnformHandles>(null);
 
@@ -47,7 +47,7 @@ const EnrollForm: React.ForwardRefRenderFunction<
   const { data: classrooms, isLoading } = useListClassrooms(session, {
     school_id: school.id,
     grade_id: selectedGrade,
-    class_period_id: selectedClassPeriod
+    class_period: selectedClassPeriod
   });
 
   const gradesOptions = useMemo(() => {
@@ -59,18 +59,22 @@ const EnrollForm: React.ForwardRefRenderFunction<
     }));
   }, [grades]);
 
-  const { data: classPeriods } = useListClassPeriods(session, {
-    school_year_id: session?.configs.school_year_id
-  });
-
   const classPeriodsOptions = useMemo(() => {
-    if (!classPeriods) return [];
-
-    return classPeriods.map(({ translated_description, id }) => ({
-      label: translated_description,
-      value: id
-    }));
-  }, [classPeriods]);
+    return [
+      {
+        value: 'MORNING',
+        label: 'Matutino'
+      },
+      {
+        value: 'EVENING',
+        label: 'Vespertino'
+      },
+      {
+        value: 'NOCTURNAL',
+        label: 'Noturno'
+      }
+    ];
+  }, []);
 
   const classroomsOptions = useMemo(() => {
     if (isLoading) return [{ value: '', label: 'Carregando...' }];
@@ -83,9 +87,9 @@ const EnrollForm: React.ForwardRefRenderFunction<
   }, [classrooms, isLoading]);
 
   useEffect(() => {
-    const { grade_id, class_period_id } = state;
+    const { grade_id, class_period } = state;
     setSelectedGrade(grade_id);
-    setSelectedClassPeriod(class_period_id);
+    setSelectedClassPeriod(class_period);
   }, [state]);
 
   const handleSubmit = useCallback(
@@ -133,7 +137,7 @@ const EnrollForm: React.ForwardRefRenderFunction<
           onChange={(value) => setSelectedGrade(value)}
         />
         <Select
-          name="class_period_id"
+          name="class_period"
           label="Período"
           options={classPeriodsOptions}
           onChange={(value) => setSelectedClassPeriod(value)}

@@ -13,7 +13,6 @@ type SchoolSubject = {
 
 type CreateGradeSchoolSubjectsRequest = {
   grade_id: string;
-  school_year_id: string;
   school_subjects: SchoolSubject[];
 };
 
@@ -28,12 +27,10 @@ class CreateGradeSchoolSubjectsService {
 
   public async execute({
     grade_id,
-    school_year_id,
     school_subjects,
   }: CreateGradeSchoolSubjectsRequest): Promise<GradeSchoolSubject[]> {
     const data = school_subjects.map(({ school_subject_id, workload }) => ({
       grade_id,
-      school_year_id,
       school_subject_id,
       workload,
     }));
@@ -44,7 +41,7 @@ class CreateGradeSchoolSubjectsService {
 
     const enrolls = await this.enrollsRepository.findAll({
       grade_id,
-      school_year_id,
+      status: 'ACTIVE',
     });
 
     const schoolSubjectIds = gradeSchoolSubjects.map(

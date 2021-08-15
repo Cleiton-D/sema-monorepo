@@ -16,10 +16,6 @@ const municipalSecretary = [
     name: 'Lotação de professores'
   },
   {
-    path: '/class-periods',
-    name: 'Períodos e Horários'
-  },
-  {
     path: '/administration/grades',
     name: 'Séries'
   },

@@ -7,7 +7,6 @@ import Select from 'components/Select';
 import Button from 'components/Button';
 
 import { useAddClassroom } from 'requests/mutations/classroom';
-import { useListClassPeriods } from 'requests/queries/class-periods';
 import { useListGrades } from 'requests/queries/grades';
 
 import { ProcessQueryDataFn } from 'services/api';
@@ -36,21 +35,26 @@ const ClassroomModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
 
   const [session] = useSession();
-  const { data: classPeriods } = useListClassPeriods(session, {
-    school_year_id: session?.configs.school_year_id
-  });
   const { data: grades } = useListGrades(session);
 
   const addClassroomMutation = useAddClassroom(createQueries);
 
   const classPeriodsOptions = useMemo(() => {
-    if (!classPeriods) return [];
-
-    return classPeriods.map(({ translated_description, id }) => ({
-      label: translated_description,
-      value: id
-    }));
-  }, [classPeriods]);
+    return [
+      {
+        value: 'MORNING',
+        label: 'Matutino'
+      },
+      {
+        value: 'EVENING',
+        label: 'Vespertino'
+      },
+      {
+        value: 'NOCTURNAL',
+        label: 'Noturno'
+      }
+    ];
+  }, []);
 
   const gradesOptions = useMemo(() => {
     if (!grades) return [];
@@ -65,9 +69,6 @@ const ClassroomModal: React.ForwardRefRenderFunction<
     const selectedGrade = gradesOptions.find(
       ({ value }) => value === values.grade_id
     );
-    const selectedClassPeriods = classPeriodsOptions.find(
-      ({ value }) => value === values.class_period_id
-    );
 
     addClassroomMutation.mutate({
       ...values,
@@ -75,9 +76,6 @@ const ClassroomModal: React.ForwardRefRenderFunction<
       enroll_count: 0,
       grade: {
         description: selectedGrade?.label
-      },
-      class_period: {
-        description: selectedClassPeriods?.label
       }
     });
     modalRef.current?.closeModal();
@@ -99,7 +97,7 @@ const ClassroomModal: React.ForwardRefRenderFunction<
         <S.Form onSubmit={handleSubmit}>
           <TextInput name="description" label="Descrição" />
           <Select
-            name="class_period_id"
+            name="class_period"
             label="Período"
             options={classPeriodsOptions}
           />

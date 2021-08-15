@@ -47,11 +47,13 @@ class AccessLevelsRepository implements IAccessLevelsRepository {
     description,
     code,
     only_on,
+    editable,
   }: CreateAccessLevelDTO): Promise<AccessLevel> {
     const accessLevel = this.ormRepository.create({
       description,
       code,
       only_on,
+      editable,
     });
 
     await this.ormRepository.save(accessLevel);

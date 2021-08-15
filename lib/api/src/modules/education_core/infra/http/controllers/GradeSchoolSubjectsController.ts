@@ -9,7 +9,7 @@ import UpdateGradeSchoolSubjectService from '@modules/education_core/services/Up
 class GradeSchoolSubjectsController {
   public async index(request: Request, response: Response): Promise<Response> {
     const { grade_id } = request.params;
-    const { school_year_id, school_subject_id } = request.query;
+    const { school_subject_id } = request.query;
 
     const listGradeSchoolSubjects = container.resolve(
       ListGradeSchoolSubjectsService,
@@ -18,7 +18,6 @@ class GradeSchoolSubjectsController {
     const gradeSchoolSubjects = await listGradeSchoolSubjects.execute({
       grade_id,
       school_subject_id: school_subject_id as string,
-      school_year_id: school_year_id as string,
     });
 
     return response.json(gradeSchoolSubjects);
@@ -26,7 +25,7 @@ class GradeSchoolSubjectsController {
 
   public async create(request: Request, response: Response): Promise<Response> {
     const { grade_id } = request.params;
-    const { school_subjects, school_year_id } = request.body;
+    const { school_subjects } = request.body;
 
     const createGradeSchoolSubjects = container.resolve(
       CreateGradeSchoolSubjectsService,
@@ -34,7 +33,6 @@ class GradeSchoolSubjectsController {
     const gradeSchoolSubjects = await createGradeSchoolSubjects.execute({
       grade_id,
       school_subjects,
-      school_year_id,
     });
 
     return response.json(gradeSchoolSubjects);

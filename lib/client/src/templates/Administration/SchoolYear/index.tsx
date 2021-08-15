@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
 import { PlusCircle, Edit3 } from '@styled-icons/feather';
@@ -7,7 +7,6 @@ import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
 import Badge from 'components/Badge';
-import ClassPeriodsTable from 'components/ClassPeriodsTable';
 import Button from 'components/Button';
 
 import { useAccess } from 'hooks/AccessProvider';
@@ -21,10 +20,6 @@ const SchoolYear = () => {
 
   const [session] = useSession();
   const { data: schoolYear } = useSchoolYearWithSchoolTerms(session);
-
-  useEffect(() => {
-    console.log(session);
-  }, [session]);
 
   const { push } = useRouter();
 
@@ -210,15 +205,6 @@ const SchoolYear = () => {
           </>
         )}
       </S.Wrapper>
-
-      {schoolYear?.classPeriods && schoolYear.classPeriods.length > 0 && (
-        <S.TableSection>
-          <S.SectionTitle>
-            <h4>Períodos</h4>
-          </S.SectionTitle>
-          <ClassPeriodsTable classPeriods={schoolYear?.classPeriods || []} />
-        </S.TableSection>
-      )}
     </Base>
   );
 };

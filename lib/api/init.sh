@@ -1,2 +1,2 @@
-yarn createdb;
-yarn start:server;
+npm run createdb;
+npm run start:server;

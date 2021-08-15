@@ -8,14 +8,11 @@ export type GradeSchoolSubject = {
   school_subject?: SchoolSubject;
   grade_id: string;
   grade?: Grade;
-  school_year_id: string;
-  school_year?: SchoolYear;
   workload: number;
 };
 
 export type CreateGradeSchoolSubjectsRequest = {
   grade_id: string;
-  school_year_id: string;
   school_subjects: Array<{
     school_subject_id: string;
     workload: number;

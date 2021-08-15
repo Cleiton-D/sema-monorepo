@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Classroom } from 'models/Classroom';
+import { ClassPeriod } from 'models/ClassPeriod';
 
 import { initializeApi } from 'services/api';
 
@@ -25,7 +26,7 @@ export const deleteClassroomQueryMutation = (
 type ListClassroomsFilters = {
   school_id?: string;
   grade_id?: string;
-  class_period_id?: string;
+  class_period?: ClassPeriod;
 };
 
 export const listClassrooms = (

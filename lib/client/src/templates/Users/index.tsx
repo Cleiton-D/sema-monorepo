@@ -40,6 +40,13 @@ const Users = () => {
     modalRef.current?.openModal();
   };
 
+  const handleDeleteUser = (user: User) => {
+    const confirm = window.confirm(`Deseja apagar o usuário ${user.username}?`);
+    if (confirm) {
+      mutation.mutate(user);
+    }
+  };
+
   const canChangeUsers = useMemo(
     () => enableAccess({ module: 'USER', rule: 'WRITE' }),
     [enableAccess]
@@ -112,7 +119,7 @@ const Users = () => {
                     color="red"
                     type="button"
                     title={`Remover ${user.username}`}
-                    onClick={() => mutation.mutate(user)}
+                    onClick={() => handleDeleteUser(user)}
                   >
                     <X size={20} />
                   </S.ActionButton>

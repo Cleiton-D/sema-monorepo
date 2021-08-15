@@ -57,12 +57,6 @@ import TeachersRepository from '@modules/teachers/infra/typeorm/repositories/Tea
 import IClassroomsRepository from '@modules/schools/repositories/IClassroomsRepository';
 import ClassroomsRepository from '@modules/schools/infra/typeorm/repositories/ClassroomsRepository';
 
-import IClassPeriodsRepository from '@modules/education_core/repositories/IClassPeriodsRepository';
-import ClassPeriodsRepository from '@modules/education_core/infra/typeorm/repositories/ClassPeriodsRepository';
-
-import ISchoolClassPeriodsRepository from '@modules/schools/repositories/ISchoolClassPeriodsRepository';
-import SchoolClassPeriodsRepository from '@modules/schools/infra/typeorm/repositories/SchoolClassPeriodsRepository';
-
 import IGradeSchoolSubjectsRepository from '@modules/education_core/repositories/IGradeSchoolSubjectsRepository';
 import GradeSchoolSubjectsRepository from '@modules/education_core/infra/typeorm/repositories/GradeSchoolSubjectsRepository';
 
@@ -192,16 +186,6 @@ container.registerSingleton<ITeachersRepository>(
 container.registerSingleton<IClassroomsRepository>(
   'ClassroomsRepository',
   ClassroomsRepository,
-);
-
-container.registerSingleton<IClassPeriodsRepository>(
-  'ClassPeriodsRepository',
-  ClassPeriodsRepository,
-);
-
-container.registerSingleton<ISchoolClassPeriodsRepository>(
-  'SchoolClassPeriodsRepository',
-  SchoolClassPeriodsRepository,
 );
 
 container.registerSingleton<IGradeSchoolSubjectsRepository>(

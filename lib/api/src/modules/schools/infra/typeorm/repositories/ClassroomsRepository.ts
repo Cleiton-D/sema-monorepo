@@ -21,7 +21,7 @@ class ClassroomsRepository implements IClassroomsRepository {
   public async count({
     description,
     grade_id,
-    class_period_id,
+    class_period,
     school_id,
     school_year_id,
   }: FindClassroomsDTO): Promise<CountResultDTO> {
@@ -29,7 +29,7 @@ class ClassroomsRepository implements IClassroomsRepository {
 
     if (description) where.description = description;
     if (grade_id) where.grade_id = grade_id;
-    if (class_period_id) where.class_period_id = class_period_id;
+    if (class_period) where.class_period = class_period;
     if (school_id) where.school_id = school_id;
     if (school_year_id) where.school_year_id = school_year_id;
 
@@ -40,7 +40,7 @@ class ClassroomsRepository implements IClassroomsRepository {
   public async findAll({
     description,
     grade_id,
-    class_period_id,
+    class_period,
     school_id,
     school_year_id,
   }: FindClassroomsDTO): Promise<Classroom[]> {
@@ -58,9 +58,9 @@ class ClassroomsRepository implements IClassroomsRepository {
       });
     }
 
-    if (class_period_id) {
-      queryBuilder.andWhere(`classroom.class_period_id = :classPeriodId`, {
-        classPeriodId: class_period_id,
+    if (class_period) {
+      queryBuilder.andWhere(`classroom.class_period = :classPeriod`, {
+        classPeriod: class_period,
       });
     }
 
@@ -78,7 +78,6 @@ class ClassroomsRepository implements IClassroomsRepository {
 
     queryBuilder
       .innerJoinAndSelect('classroom.grade', 'grade')
-      .innerJoinAndSelect('classroom.class_period', 'class_period')
       .loadRelationCountAndMap(
         'classroom.enroll_count',
         'classroom.enroll_classrooms',
@@ -100,14 +99,14 @@ class ClassroomsRepository implements IClassroomsRepository {
 
   public async create({
     description,
-    class_period_id,
+    class_period,
     grade_id,
     school_id,
     school_year_id,
   }: CreateClassroomDTO): Promise<Classroom> {
     const classroom = this.ormRepository.create({
       description,
-      class_period_id,
+      class_period,
       grade_id,
       school_id,
       school_year_id,

@@ -1,7 +1,10 @@
-import ToastContent from 'components/ToastContent';
-import { Classroom } from 'models/Classroom';
-import { useSession } from 'next-auth/client';
 import { useCallback } from 'react';
+import { useSession } from 'next-auth/client';
+
+import ToastContent from 'components/ToastContent';
+
+import { ClassPeriod } from 'models/ClassPeriod';
+import { Classroom } from 'models/Classroom';
 
 import { initializeApi, useMutation, ProcessQueryDataFn } from 'services/api';
 
@@ -14,9 +17,7 @@ type CreateClassroomForm = {
   grade: {
     description: string;
   };
-  class_period: {
-    description: string;
-  };
+  class_period: ClassPeriod;
 };
 
 export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
@@ -28,7 +29,6 @@ export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
       const {
         enroll_count: _enroll_count,
         grade: _grade,
-        class_period: _class_period,
         school_id,
         ...data
       } = values;

@@ -4,11 +4,11 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_PASSWORD: sema
+      POSTGRES_DB: sema
 
-    volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data
+    # volumes:
+    #   - /var/lib/postgresql/data:/var/lib/postgresql/data
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -28,11 +28,11 @@ services:
       dockerfile: Dockerfile
     restart: always
     environment:
-      POSTGRES_HOST: "${POSTGRES_HOST}"
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_USERNAME: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: sema
+      POSTGRES_DATABASE: sema
 
     ports:
       - 3333:3333
@@ -49,8 +49,8 @@ services:
       context: ./lib/client
       dockerfile: Dockerfile
       args:
-        - NEXTAUTH_URL=${APP_URL}
-        - NEXT_PUBLIC_API_URL=${API_URL}
+        - NEXTAUTH_URL=http://localhost:3000
+        - NEXT_PUBLIC_API_URL=http://localhost:3333
         - SERVER_API_URL=http://api:3333
     restart: always
     ports:

@@ -97,9 +97,7 @@ const Classrooms = ({ school }: ClassroomsProps) => {
           <TableColumn
             label="Período"
             tableKey="class_period"
-            render={(class_period) =>
-              translateDescription(class_period.description)
-            }
+            render={(class_period) => translateDescription(class_period)}
           />
           <TableColumn
             label="Matriculas ativas"

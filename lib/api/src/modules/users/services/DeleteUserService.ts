@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
 
+import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepository';
 import IUsersRepository from '../repositories/IUsersRepository';
 
 type DeleteUserRequest = {
@@ -13,6 +14,8 @@ type DeleteUserRequest = {
 class DeleteUserService {
   constructor(
     @inject('UsersRepository') private usersRepository: IUsersRepository,
+    @inject('EmployeesRepository')
+    private employeesRepository: IEmployeesRepository,
   ) {}
 
   public async execute({
@@ -26,6 +29,13 @@ class DeleteUserService {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
       throw new AppError('User not found');
+    }
+
+    const employee = await this.employeesRepository.findOne({
+      user_id: user.id,
+    });
+    if (employee) {
+      throw new AppError('This user is linked with an employee');
     }
 
     await this.usersRepository.delete(user);

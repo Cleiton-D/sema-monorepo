@@ -33,7 +33,7 @@ class CreateDatabaseDumpService {
     );
 
     shell.exec(
-      `pg_dump --dbname=postgresql://${username}:${pass}@${host}:${port}/${database} -f ${fileDir} -F t`,
+      `PGPASSWORD="${pass}" pg_dump -U ${username} -h ${host} -p ${port} -s ${database} -f ${fileDir} -F t`,
     );
 
     const file = fs.readFileSync(fileDir);

@@ -19,21 +19,16 @@ import * as S from './styles';
 
 type GradeSchoolSubjectsCardProps = {
   gradeId?: string;
-  schoolYearId?: string;
 };
 
-const GradeSchoolSubjectsCard = ({
-  gradeId,
-  schoolYearId
-}: GradeSchoolSubjectsCardProps) => {
+const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
   const modalRef = useRef<GradeSchoolSubjectModalRef>(null);
 
   const { enableAccess } = useAccess();
 
   const [session] = useSession();
   const { data, isLoading, refetch } = useListGradeSchoolSubjects(session, {
-    grade_id: gradeId,
-    school_year_id: schoolYearId
+    grade_id: gradeId
   });
   const deleteGradeSchoolSubjectMutation = useDeleteGradeSchoolSubject();
 
@@ -132,7 +127,6 @@ const GradeSchoolSubjectsCard = ({
       </S.Section>
       <GradeSchoolSubjectModal
         gradeId={gradeId}
-        schoolYearId={schoolYearId}
         refetchFn={refetch}
         ref={modalRef}
       />

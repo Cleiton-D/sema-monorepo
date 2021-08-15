@@ -2,7 +2,9 @@ import { inject, injectable } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
 
-import Classroom from '../infra/typeorm/entities/Classroom';
+import Classroom, {
+  ClassPeriodType,
+} from '../infra/typeorm/entities/Classroom';
 import IClassroomsRepository from '../repositories/IClassroomsRepository';
 import ISchoolsRepository from '../repositories/ISchoolsRepository';
 
@@ -10,7 +12,7 @@ type ListClassroomsRequest = {
   school_id?: string;
   branch_id?: string;
   grade_id?: string;
-  class_period_id?: string;
+  class_period?: ClassPeriodType;
 };
 
 @injectable()
@@ -25,7 +27,7 @@ class ListClassroomsService {
     branch_id,
     school_id,
     grade_id,
-    class_period_id,
+    class_period,
   }: ListClassroomsRequest): Promise<Classroom[]> {
     const school = await this.schoolsRepository.findOne({
       branch_id,
@@ -39,7 +41,7 @@ class ListClassroomsService {
     const classrooms = this.classroomsRepository.findAll({
       school_id: school.id,
       grade_id,
-      class_period_id,
+      class_period,
     });
 
     return classrooms;

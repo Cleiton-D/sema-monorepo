@@ -7,7 +7,6 @@ import { initializeApi } from 'services/api';
 
 type GradeSchoolSubjectsFilters = {
   grade_id?: string;
-  school_year_id?: string;
 };
 
 export const listGradeSchoolSubjects = (

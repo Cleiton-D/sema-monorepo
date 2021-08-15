@@ -8,7 +8,6 @@ import { initializeApi } from 'services/api';
 import { mapSchoolTermPeriodsToObject } from 'utils/mappers/schoolTermPeriodMapper';
 import { schoolYearMapper } from 'utils/mappers/schoolYearMapper';
 
-import { listClassPeriods } from './class-periods';
 import { listSchoolTermPeriods } from './school-term-periods';
 
 type GetSchoolYearFilters = {
@@ -30,26 +29,14 @@ export const getSchoolYearWithSchoolTerms = async (
     .then((response) => response.data)
     .catch(() => undefined);
 
-  const schoolTermPeriodsRequest = schoolYear
-    ? listSchoolTermPeriods(session, {
+  const schoolTermPeriodsResponse = schoolYear
+    ? await listSchoolTermPeriods(session, {
         school_year_id: schoolYear.id
       }).catch(() => [])
-    : Promise.resolve([]);
-
-  const listClassPeriodsRequest = schoolYear
-    ? listClassPeriods(session, {
-        school_year_id: schoolYear.id
-      }).catch(() => [])
-    : Promise.resolve([]);
-
-  const [
-    schoolTermPeriodsResponse,
-    listClassPeriodsResponse
-  ] = await Promise.all([schoolTermPeriodsRequest, listClassPeriodsRequest]);
+    : [];
 
   return {
     ...(schoolYear ? schoolYearMapper(schoolYear) : {}),
-    classPeriods: listClassPeriodsResponse,
     schoolTermPeriods: mapSchoolTermPeriodsToObject(schoolTermPeriodsResponse)
   };
 };

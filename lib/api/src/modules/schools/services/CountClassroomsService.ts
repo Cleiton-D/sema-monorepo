@@ -1,9 +1,10 @@
 import { inject, injectable } from 'tsyringe';
+import { ClassPeriodType } from '../infra/typeorm/entities/Classroom';
 
 import IClassroomsRepository from '../repositories/IClassroomsRepository';
 
 type CountClassroomsRequest = {
-  class_period_id?: string;
+  class_period?: ClassPeriodType;
   school_id?: string;
   grade_id?: string;
   school_year_id?: string;
@@ -21,13 +22,13 @@ class CountClassroomsService {
   ) {}
 
   public async execute({
-    class_period_id,
+    class_period,
     grade_id,
     school_id,
     school_year_id,
   }: CountClassroomsRequest): Promise<CountClassroomsResponse> {
     const { count } = await this.classroomsRepository.count({
-      class_period_id,
+      class_period,
       grade_id,
       school_id,
       school_year_id,
