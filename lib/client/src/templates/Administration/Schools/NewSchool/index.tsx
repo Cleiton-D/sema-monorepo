@@ -5,7 +5,7 @@ import { useResetAtom } from 'jotai/utils';
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
-import FormStep from 'components/FormStep';
+import Button from 'components/Button';
 
 import SchoolBasicForm from 'components/SchoolBasicForm';
 import AddressForm from 'components/AddressForm';
@@ -24,15 +24,6 @@ import useAtomCallback from 'hooks/use-atom-callback';
 import { useAddSchoolMutation } from 'requests/mutations/schools';
 
 import * as S from './styles';
-
-const addressForm = <AddressForm jotaiState={schoolAddressData} />;
-const contactsForm = <ContactsForm jotaiState={schoolContactsData} />;
-const schoolAdminForm = (
-  <SchoolAdministrationForm
-    jotaiState={employeesSchoolData}
-    basicJotaiState={basicSchoolData}
-  />
-);
 
 const NewSchool = () => {
   const [session] = useSession();
@@ -73,11 +64,18 @@ const NewSchool = () => {
       <SchoolBasicForm />
 
       <S.FormsSection>
-        <FormStep
-          items={[addressForm, contactsForm, schoolAdminForm]}
-          finishButtonText="Finalizar"
-          onFinish={handleFinish}
+        <AddressForm jotaiState={schoolAddressData} />
+        <ContactsForm jotaiState={schoolContactsData} />
+        <SchoolAdministrationForm
+          jotaiState={employeesSchoolData}
+          basicJotaiState={basicSchoolData}
         />
+
+        <S.SectionButton>
+          <Button styleType="rounded" onClick={handleFinish}>
+            Finalizar
+          </Button>
+        </S.SectionButton>
       </S.FormsSection>
     </Base>
   );

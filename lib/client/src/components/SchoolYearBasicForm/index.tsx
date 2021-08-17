@@ -191,11 +191,9 @@ const SchoolYearBasicForm: React.ForwardRefRenderFunction<FormHandles> = (
                       fromDate={schoolYear.dateStart}
                       toDate={schoolYear.dateEnd}
                       month={month}
-                      value={schoolYear.dateStart}
                       onChangeDay={(date) =>
                         handleChangeValue(setFirst, 'dateStart', date)
                       }
-                      disabled
                     />
                     <DatePicker
                       name="date_end"
@@ -291,11 +289,9 @@ const SchoolYearBasicForm: React.ForwardRefRenderFunction<FormHandles> = (
                       toDate={schoolYear.dateEnd}
                       month={month}
                       initialMonth={fourth.dateStart}
-                      value={schoolYear.dateEnd}
                       onChangeDay={(date) =>
                         handleChangeValue(setFourth, 'dateEnd', date)
                       }
-                      disabled
                     />
                   </Scope>
                 </S.TermPeriodFields>

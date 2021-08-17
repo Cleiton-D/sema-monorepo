@@ -2,9 +2,9 @@ import { memo } from 'react';
 import { useSession } from 'next-auth/client';
 
 import UserDropdown from 'components/UserDropdown';
+import ProfileListDropdown from 'components/ProfileListDropdown';
 
 import * as S from './styles';
-import ProfileListDropdown from 'components/ProfileListDropdown';
 
 const Header = () => {
   const [session] = useSession();
@@ -14,8 +14,6 @@ const Header = () => {
       <S.ProfileContainer>
         <span>Perfil:</span>
         <ProfileListDropdown />
-
-        {/* <p>Professor - Escola Municipal Cecília Meireles</p> */}
       </S.ProfileContainer>
       <div style={{ height: '100%' }}>
         <UserDropdown
