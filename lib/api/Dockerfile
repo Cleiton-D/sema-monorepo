@@ -3,8 +3,11 @@ WORKDIR /app
 COPY . .
 RUN yarn install --production --ignore-scripts --prefer-offline
 
+
 FROM node:alpine AS runner
 WORKDIR /app
+
+RUN apk add --no-cache postgresql-client
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
@@ -17,6 +20,9 @@ COPY package.json ./package.json
 COPY dist ./dist
 COPY init.sh ./init.sh
 COPY ormconfig.js ./ormconfig.js
+
+RUN mkdir -p storage/temp
+RUN chmod -R 777 ./storage
 
 RUN chmod +x ./init.sh
 

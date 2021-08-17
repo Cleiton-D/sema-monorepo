@@ -62,7 +62,6 @@ class EnrollsRepository implements IEnrollsRepository {
           enroll_classroom: 'enroll.enroll_classrooms',
           classroom: 'enroll_classroom.classroom',
           school: 'classroom.school',
-          class_period: 'classroom.class_period',
           person: 'enroll.person',
           person_contact: 'person.person_contacts',
           contact: 'person_contact.contact',

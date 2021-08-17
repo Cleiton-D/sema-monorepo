@@ -7,6 +7,9 @@ import {
   useCallback
 } from 'react';
 import { useSession } from 'next-auth/client';
+import { useQueryClient } from 'react-query';
+import { FormHandles } from '@unform/core';
+import { ValidationError } from 'yup';
 
 import Modal, { ModalRef } from 'components/Modal';
 import Select from 'components/Select';
@@ -18,10 +21,9 @@ import { useListAccessLevels } from 'requests/queries/access-levels';
 import { useListBranchs } from 'requests/queries/branch';
 import { useCreateUserProfile } from 'requests/mutations/user-profile';
 
-import * as S from './styles';
-import { FormHandles } from '@unform/core';
-import { ValidationError } from 'yup';
 import { userProfileSchema } from './rules/schema';
+
+import * as S from './styles';
 
 type UserProfileFormData = {
   access_level_id: string;
@@ -42,6 +44,8 @@ const CreateUserProfileModal: React.ForwardRefRenderFunction<CreateUserProfileMo
   const formRef = useRef<FormHandles>(null);
 
   const [session] = useSession();
+  const queryClient = useQueryClient();
+
   const { data: accessLevels, isLoading: loadingAccess } = useListAccessLevels(
     session
   );
@@ -62,11 +66,17 @@ const CreateUserProfileModal: React.ForwardRefRenderFunction<CreateUserProfileMo
         formRef.current?.setErrors({});
 
         await userProfileSchema.validate(values, { abortEarly: false });
-        createUserProfile.mutate({
-          user_id: user.id,
-          branch_id: values.branch_id,
-          access_level_id: values.access_level_id
-        });
+        createUserProfile
+          .mutateAsync({
+            user_id: user.id,
+            branch_id: values.branch_id,
+            access_level_id: values.access_level_id
+          })
+          .then(() => {
+            queryClient.invalidateQueries(
+              `list-profiles-${JSON.stringify({ user_id: user.id })}`
+            );
+          });
 
         handleBack();
       } catch (err) {

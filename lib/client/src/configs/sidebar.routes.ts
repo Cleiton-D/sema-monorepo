@@ -16,10 +16,6 @@ const municipalSecretary = [
     name: 'Lotação de professores'
   },
   {
-    path: '/class-periods',
-    name: 'Períodos e Horários'
-  },
-  {
     path: '/administration/grades',
     name: 'Séries'
   },
@@ -76,6 +72,29 @@ const administrator = [
   {
     path: '/administration/school-subjects',
     name: 'Disciplinas'
+  }
+];
+
+export const schoolAdministration = [
+  {
+    path: '/administration/school-year',
+    name: 'Ano Letivo'
+  },
+  {
+    path: '/enrolls?school_id=me',
+    name: 'Alunos ativos'
+  },
+  {
+    path: '/school/me/classrooms',
+    name: 'Turmas'
+  },
+  {
+    path: '/school/me/teacher-school-subjects',
+    name: 'Professores'
+  },
+  {
+    path: '/school/me/classroom-teacher',
+    name: 'Turmas x Professores'
   }
 ];
 

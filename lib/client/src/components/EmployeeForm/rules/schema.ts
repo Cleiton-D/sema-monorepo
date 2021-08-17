@@ -21,12 +21,12 @@ export const addressSchema = Yup.object({
 
 export const employeeSchema = Yup.object({
   name: Yup.string().required('Campo obrigatório.'),
-  mother_name: Yup.string().required('Campo obrigatório.'),
-  birth_date: Yup.string().test(
-    'test-birth_date',
-    'Informe uma data válida',
-    testBirthDate
-  ),
-  education_level: Yup.string().required('Campo obrigatório.'),
-  address: addressSchema
+  // mother_name: Yup.string().required('Campo obrigatório.'),
+  // birth_date: Yup.string().test(
+  //   'test-birth_date',
+  //   'Informe uma data válida',
+  //   testBirthDate
+  // ),
+  education_level: Yup.string().required('Campo obrigatório.')
+  // address: addressSchema
 }).defined();

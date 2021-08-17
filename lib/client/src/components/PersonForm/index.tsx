@@ -4,6 +4,7 @@ import { PrimitiveAtom, useAtom } from 'jotai';
 import { ValidationError } from 'yup';
 
 import TextInput from 'components/TextInput';
+import Select from 'components/Select';
 
 import { PersonBasicFormData } from 'models/Person';
 import { FormHandles } from 'models/Form';
@@ -66,6 +67,14 @@ const PersonForm: React.ForwardRefRenderFunction<
         <S.FieldsContainer>
           <TextInput label="Nome" name="name" />
           <TextInput label="Data de nascimento" name="birth_date" mask="date" />
+          <Select
+            label="Sexo"
+            name="gender"
+            options={[
+              { label: 'Masculino', value: 'male' },
+              { label: 'Femininio', value: 'female' }
+            ]}
+          />
           <TextInput label="Nome da mãe" name="mother_name" />
           <TextInput label="Nome do pai" name="dad_name" />
         </S.FieldsContainer>

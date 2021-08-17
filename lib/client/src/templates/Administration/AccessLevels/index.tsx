@@ -152,15 +152,7 @@ const AccessLevels = () => {
             module="ACCESS_LEVEL"
             rule="WRITE"
             render={(accessLevel: AccessLevel) => (
-              <S.ActionButtons
-                onClick={() =>
-                  accessModuleModalRef.current?.openModal(accessLevel)
-                }
-              >
-                <S.ActionButton color="primary">
-                  <PlusCircle />
-                </S.ActionButton>
-
+              <S.ActionButtons>
                 <S.ActionButton
                   color="red"
                   onClick={(event) => handleDelete(event, accessLevel)}

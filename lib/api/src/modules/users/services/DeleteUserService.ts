@@ -36,9 +36,7 @@ class DeleteUserService {
       user_id: user.id,
     });
     if (employee) {
-      throw new AppError(
-        'You cannot delete this user because there is an employee linked to him.',
-      );
+      throw new AppError('This user is linked with an employee');
     }
 
     await this.usersRepository.delete(user);

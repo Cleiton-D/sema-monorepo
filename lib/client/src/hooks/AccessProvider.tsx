@@ -12,13 +12,11 @@ import { Session } from 'next-auth';
 import { useSession } from 'next-auth/client';
 
 import Loading from 'templates/Loading';
+import NoAccessTemplate from 'templates/NoAccess';
 
 import { AccessModule } from 'models/AccessModule';
 
-import {
-  listAccessModules,
-  useListAccessModules
-} from 'requests/queries/access-modules';
+import { listAccessModules } from 'requests/queries/access-modules';
 
 import { validateHasAccess, WithAccessOptions } from 'utils/validateHasAccess';
 
@@ -75,7 +73,7 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
       {loading ? (
         <Loading />
       ) : (
-        <>{hasAccess ? children : <h1>Nao tem acesso malucao</h1>}</>
+        <>{hasAccess ? children : <NoAccessTemplate />}</>
       )}
     </AccessContext.Provider>
   );

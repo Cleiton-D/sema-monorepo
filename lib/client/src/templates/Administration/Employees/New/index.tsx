@@ -40,7 +40,7 @@ const NewEmployee = () => {
     const contacts = get(employeeContactsData);
     const documents = get(employeeDocuments);
 
-    const newBirthDate = birth_date.replace(
+    const newBirthDate = birth_date?.replace(
       /(^[0-9]{2})\/([0-9]{2})\/([0-9]{4})$/,
       '$3-$2-$1'
     );

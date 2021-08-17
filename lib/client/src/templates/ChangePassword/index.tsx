@@ -77,7 +77,7 @@ const ChangePassword = () => {
           <Heading>Criar senha</Heading>
           <S.UserImageContainer>
             <Image
-              src="/img/fry.jpg"
+              src="/img/user2.png"
               layout="fill"
               objectFit="cover"
               quality={80}

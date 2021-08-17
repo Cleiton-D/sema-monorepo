@@ -51,9 +51,7 @@ const StudentPageTemplate = () => {
               <strong>Turno</strong>
               <span>
                 {enroll?.current_classroom.class_period &&
-                  translateDescription(
-                    enroll?.current_classroom.class_period.description
-                  )}
+                  translateDescription(enroll?.current_classroom.class_period)}
               </span>
             </S.GridItem>
             <S.GridItem>

@@ -31,11 +31,11 @@ type ContactData = {
 
 type CreatePersonRequest = {
   name: string;
-  mother_name: string;
+  mother_name?: string;
   dad_name?: string;
-  gender: Gender;
-  birth_date: Date;
-  address: AddressData;
+  gender?: Gender;
+  birth_date?: Date;
+  address?: AddressData;
   documents?: DocumentData[];
   contacts: ContactData[];
 };
@@ -68,14 +68,15 @@ class CreatePersonService {
       ),
     );
 
-    const { city, district, house_number, region, street } = addressData;
-    const address = await this.createAddressService.execute({
-      city,
-      district,
-      house_number,
-      region,
-      street,
-    });
+    const address = addressData
+      ? await this.createAddressService.execute({
+          city: addressData.city,
+          district: addressData.district,
+          house_number: addressData.house_number,
+          region: addressData.region,
+          street: addressData.street,
+        })
+      : undefined;
 
     const person = await this.personsRepository.create({
       name,

@@ -5,7 +5,6 @@ import IGradeSchoolSubjectsRepository from '../repositories/IGradeSchoolSubjects
 
 type ListGradeSchoolSubjectsRequest = {
   grade_id?: string | 'all';
-  school_year_id?: string;
   school_subject_id?: string;
 };
 
@@ -19,12 +18,10 @@ class ListGradeSchoolSubjectsService {
   public async execute({
     grade_id,
     school_subject_id,
-    school_year_id,
   }: ListGradeSchoolSubjectsRequest): Promise<GradeSchoolSubject[]> {
     const gradeSchoolSubjects = await this.gradeSchoolSubjectsRepository.find({
       grade_id: grade_id !== 'all' ? grade_id : undefined,
       school_subject_id,
-      school_year_id,
     });
 
     return gradeSchoolSubjects;

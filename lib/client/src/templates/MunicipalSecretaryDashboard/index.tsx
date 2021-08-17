@@ -79,8 +79,6 @@ const MunicipalSecretaryDashboard = () => {
           link="/administration/school-teachers"
           module="SCHOOL_TEACHER"
         />
-
-        <Card description="Períodos e Horários&nbsp;" link="/class-periods" />
       </S.Wrapper>
     </Base>
   );

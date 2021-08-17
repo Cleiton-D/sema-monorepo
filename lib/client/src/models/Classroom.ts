@@ -6,7 +6,6 @@ import { SchoolYear } from './SchoolYear';
 export type Classroom = {
   id: string;
   description: string;
-  class_period_id: string;
   class_period: ClassPeriod;
   school_id: string;
   school?: School;

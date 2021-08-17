@@ -98,7 +98,6 @@ class CreateEnrollService {
 
     const gradeSchoolSubjects = await this.gradeSchoolSubjectsRepository.find({
       grade_id,
-      school_year_id,
     });
 
     const schoolSubjects = gradeSchoolSubjects.map(

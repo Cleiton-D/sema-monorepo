@@ -24,7 +24,11 @@ const UserProfilesTable = ({ userId }: UserProfilesTableProps) => {
 
   const handleDelete = async (userProfile: UserProfile) => {
     const confirm = window.confirm(
-      `Deseja remover o acesso de ${userProfile.access_level?.description} na unidade ${userProfile.branch?.description} para este usuário?`
+      `Deseja remover o acesso de ${userProfile.access_level?.description} ${
+        userProfile.branch
+          ? ` na unidade ${userProfile.branch.description}`
+          : ''
+      } para este usuário?`
     );
     if (confirm) {
       await deleteUserProfile.mutateAsync({ id: userProfile.id });

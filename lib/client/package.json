@@ -9,6 +9,7 @@
     "storybook": "start-storybook -s ./public -p 6006"
   },
   "dependencies": {
+    "@next/bundle-analyzer": "^10.2.3",
     "@styled-icons/bootstrap": "^10.34.0",
     "@styled-icons/boxicons-regular": "^10.23.0",
     "@styled-icons/feather": "^10.18.0",
@@ -31,6 +32,7 @@
     "nextjs-progressbar": "^0.0.11",
     "polished": "^4.1.1",
     "react": "^17.0.2",
+    "puppeteer": "^10.1.0",
     "react-day-picker": "^7.4.10",
     "react-dom": "^17.0.2",
     "react-loading-skeleton": "^2.2.0",
@@ -45,7 +47,6 @@
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@babel/preset-typescript": "^7.13.0",
-    "@next/bundle-analyzer": "^10.2.3",
     "@storybook/addon-essentials": "^6.2.2",
     "@storybook/react": "^6.2.2",
     "@svgr/webpack": "^5.5.0",

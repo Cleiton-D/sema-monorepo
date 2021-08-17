@@ -31,11 +31,11 @@ type ContactData = {
 
 type CreateEmployeeRequest = {
   name: string;
-  mother_name: string;
+  mother_name?: string;
   dad_name?: string;
-  gender: Gender;
-  birth_date: Date;
-  address: AddressData;
+  gender?: Gender;
+  birth_date?: Date;
+  address?: AddressData;
   documents: DocumentData[];
   contacts: ContactData[];
   pis_pasep: string;

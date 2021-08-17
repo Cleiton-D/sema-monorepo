@@ -17,7 +17,6 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
     id,
     grade_id,
     school_subject_id,
-    school_year_id,
     workload,
   }: FindGradeSchoolSubjectDTO): Promise<GradeSchoolSubject[]> {
     const where: FindConditions<GradeSchoolSubject> = {};
@@ -25,7 +24,6 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
     if (id) where.id = id;
     if (grade_id) where.grade_id = grade_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
-    if (school_year_id) where.school_year_id = school_year_id;
     if (workload) where.workload = workload;
 
     where.deleted_at = IsNull();
@@ -41,14 +39,12 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
   public async findOne({
     grade_id,
     school_subject_id,
-    school_year_id,
     workload,
   }: FindGradeSchoolSubjectDTO): Promise<GradeSchoolSubject | undefined> {
     const where: FindConditions<GradeSchoolSubject> = {};
 
     if (grade_id) where.grade_id = grade_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
-    if (school_year_id) where.school_year_id = school_year_id;
     if (workload) where.workload = workload;
 
     where.deleted_at = IsNull();
@@ -63,13 +59,11 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
   public async create({
     grade_id,
     school_subject_id,
-    school_year_id,
     workload,
   }: CreateGradeSchoolSubjectDTO): Promise<GradeSchoolSubject> {
     const gradeSchoolSubject = await this.ormRepository.create({
       grade_id,
       school_subject_id,
-      school_year_id,
       workload,
     });
 
@@ -81,10 +75,9 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
     data: CreateGradeSchoolSubjectDTO[],
   ): Promise<GradeSchoolSubject[]> {
     const gradeSchoolSubjects = data.map(
-      ({ grade_id, school_year_id, school_subject_id, workload }) =>
+      ({ grade_id, school_subject_id, workload }) =>
         this.ormRepository.create({
           grade_id,
-          school_year_id,
           school_subject_id,
           workload,
         }),

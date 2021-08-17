@@ -83,7 +83,6 @@ class LinkSchoolSubjectsWithTimetablesService {
 
     const gradeSchoolSubject = await this.gradeSchoolSubjectsRepository.find({
       grade_id: classroom.grade_id,
-      school_year_id: classroom.school_year_id,
       school_subject_id,
     });
     if (!gradeSchoolSubject.length) {

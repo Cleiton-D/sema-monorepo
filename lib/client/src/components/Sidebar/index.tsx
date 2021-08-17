@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/client';
 import {
   administrator,
   municipalSecretary,
-  teacher
+  teacher,
+  schoolAdministration
 } from 'configs/sidebar.routes';
 
 import * as S from './styles';
@@ -23,7 +24,7 @@ const Sidebar = () => {
     if (session?.accessLevel?.code === 'administrator') return administrator;
     if (session?.accessLevel?.code === 'teacher') return teacher;
 
-    return [];
+    return schoolAdministration;
   }, [session]);
 
   return (

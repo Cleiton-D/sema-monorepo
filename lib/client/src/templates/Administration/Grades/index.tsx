@@ -95,10 +95,7 @@ const Grades = () => {
         </S.Wrapper>
 
         <S.GradeSchoolSubjectsCardContainer>
-          <GradeSchoolSubjectsCard
-            gradeId={selectedGrade?.id}
-            schoolYearId={session?.configs.school_year_id}
-          />
+          <GradeSchoolSubjectsCard gradeId={selectedGrade?.id} />
         </S.GradeSchoolSubjectsCardContainer>
       </S.Content>
       <S.Overlay

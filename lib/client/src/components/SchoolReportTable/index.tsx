@@ -8,6 +8,7 @@ import { MappedSchoolReportSubject } from 'models/SchoolReport';
 import { useListSchoolReports } from 'requests/queries/school-reports';
 import { schoolReportsSubjectsMapper } from 'utils/mappers/schoolReportsMapper';
 import { useMemo } from 'react';
+import { masks } from 'utils/masks';
 
 type SchoolReportTableProps = {
   enrollId?: string;
@@ -39,21 +40,25 @@ const SchoolReportTable = ({
         label="Notas 1° Bi."
         tableKey="FIRST"
         contentAlign="center"
+        render={(value) => masks['school-report'](`${value}`) || '-'}
       />
       <TableColumn
         label="Notas 2° Bi."
         tableKey="SECOND"
         contentAlign="center"
+        render={(value) => masks['school-report'](`${value} `) || '-'}
       />
       <TableColumn
         label="Notas 3° Bi."
         tableKey="THIRD"
         contentAlign="center"
+        render={(value) => masks['school-report'](`${value}`) || '-'}
       />
       <TableColumn
         label="Notas 4° Bi."
         tableKey="FOURTH"
         contentAlign="center"
+        render={(value) => masks['school-report'](`${value}`) || '-'}
       />
     </Table>
   );

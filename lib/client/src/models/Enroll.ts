@@ -1,3 +1,4 @@
+import { ClassPeriod } from './ClassPeriod';
 import { Classroom } from './Classroom';
 import { ContactFormData } from './Contact';
 import { Grade } from './Grade';
@@ -24,7 +25,7 @@ export type EnrollCountResponse = {
 
 export type EnrollFormData = {
   grade_id: string;
-  class_period_id: string;
+  class_period: ClassPeriod;
   classroom_id: string;
 };
 

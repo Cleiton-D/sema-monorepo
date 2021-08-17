@@ -122,7 +122,7 @@ const AccessModuleTable = ({
           />
         )}
       />
-      <TableColumn
+      {/* <TableColumn
         label="Ações"
         tableKey=""
         module="ACCESS_LEVEL"
@@ -133,7 +133,7 @@ const AccessModuleTable = ({
             <X size={16} />
           </S.ActionButton>
         )}
-      />
+      /> */}
     </Table>
   );
 };

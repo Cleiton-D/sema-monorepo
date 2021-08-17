@@ -11,7 +11,6 @@ import {
 
 import SchoolSubject from './SchoolSubject';
 import Grade from './Grade';
-import SchoolYear from './SchoolYear';
 
 @Entity('grade_school_subjects')
 class GradeSchoolSubject {
@@ -31,13 +30,6 @@ class GradeSchoolSubject {
   @ManyToOne(() => Grade)
   @JoinColumn({ name: 'grade_id' })
   grade: Grade;
-
-  @Column()
-  school_year_id: string;
-
-  @ManyToOne(() => SchoolYear)
-  @JoinColumn({ name: 'school_year_id' })
-  school_year: SchoolYear;
 
   @Column()
   workload: number;
