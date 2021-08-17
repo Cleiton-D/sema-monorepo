@@ -5,7 +5,7 @@ services:
     command: ['postgres', '-c', 'log_statement=all']
     environment:
       POSTGRES_PASSWORD: sema-dev
-      POSTGRES_DB: sema-dev
+      POSTGRES_DB: diarioonline
 
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
@@ -30,7 +30,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: sema-dev
-      POSTGRES_DATABASE: sema-dev
+      POSTGRES_DATABASE: diarioonline
 
     ports:
       - 3333:3333

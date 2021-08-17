@@ -1,5 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
+import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepository';
+
 import AppError from '@shared/errors/AppError';
 
 import IUsersRepository from '../repositories/IUsersRepository';
@@ -13,6 +15,8 @@ type DeleteUserRequest = {
 class DeleteUserService {
   constructor(
     @inject('UsersRepository') private usersRepository: IUsersRepository,
+    @inject('EmployeesRepository')
+    private employeesRepository: IEmployeesRepository,
   ) {}
 
   public async execute({
@@ -26,6 +30,15 @@ class DeleteUserService {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
       throw new AppError('User not found');
+    }
+
+    const employee = await this.employeesRepository.findOne({
+      user_id: user.id,
+    });
+    if (employee) {
+      throw new AppError(
+        'You cannot delete this user because there is an employee linked to him.',
+      );
     }
 
     await this.usersRepository.delete(user);
