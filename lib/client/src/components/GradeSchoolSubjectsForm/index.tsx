@@ -92,10 +92,7 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
         </S.Wrapper>
 
         <S.GradeSchoolSubjectsCardContainer>
-          <GradeSchoolSubjectsCard
-            gradeId={selectedGrade?.id}
-            schoolYearId={schoolYearAtomValue?.schoolYear.id}
-          />
+          <GradeSchoolSubjectsCard gradeId={selectedGrade?.id} />
         </S.GradeSchoolSubjectsCardContainer>
       </S.Content>
       <S.Overlay

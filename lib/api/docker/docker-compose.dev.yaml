@@ -26,7 +26,7 @@ services:
     volumes:
       - ../:/app
     environment:
-      POSTGRES_HOST: 172.16.255.29
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: sema-dev

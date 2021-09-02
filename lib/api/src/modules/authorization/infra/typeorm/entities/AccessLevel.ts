@@ -19,7 +19,7 @@ class AccessLevel {
   @Column()
   code: string;
 
-  @Column({ type: 'enum', enum: ["SCHOOL", "MUNICIPAL_SECRETARY"] })
+  @Column({ type: 'enum', enum: ['SCHOOL', 'MUNICIPAL_SECRETARY'] })
   only_on: BranchType;
 
   @Column()

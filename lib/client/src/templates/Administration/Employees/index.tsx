@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/client';
-import { PlusCircle } from '@styled-icons/feather';
+import { PlusCircle, Edit3 } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -21,6 +22,7 @@ import * as S from './styles';
 const Employees = () => {
   const { enableAccess } = useAccess();
 
+  const router = useRouter();
   const [session] = useSession();
   const { data: employees } = useListEmployees(session);
 
@@ -58,6 +60,27 @@ const Employees = () => {
           <TableColumn label="Nome" tableKey="person.name" />
           <TableColumn label="PIS / PASEP" tableKey="pis_pasep" />
           <TableColumn label="Grau de Instrução" tableKey="education_level" />
+          <TableColumn label="Grau de Instrução" tableKey="education_level" />
+          <TableColumn
+            label="Ações"
+            tableKey="id"
+            contentAlign="center"
+            module="EMPLOYEE"
+            rule="WRITE"
+            actionColumn
+            render={(employee: Employee) => (
+              <S.ActionButton
+                color="primary"
+                type="button"
+                title={`Editar ${employee.person.name}`}
+                onClick={() =>
+                  router.push(`/administration/employees/edit/${employee.id}`)
+                }
+              >
+                <Edit3 size={20} />
+              </S.ActionButton>
+            )}
+          />
         </Table>
       </S.TableSection>
     </Base>
