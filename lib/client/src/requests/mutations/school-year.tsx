@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
@@ -24,7 +24,7 @@ type CreateSchoolYearParams = {
 };
 
 export function useCreateSchoolYearMudation() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const createSchoolYear = useCallback(
     async (values: CreateSchoolYearParams) => {

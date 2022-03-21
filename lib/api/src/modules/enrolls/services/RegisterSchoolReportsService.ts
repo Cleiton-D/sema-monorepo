@@ -4,7 +4,6 @@ import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISch
 import IGradeSchoolSubjectsRepository from '@modules/education_core/repositories/IGradeSchoolSubjectsRepository';
 
 import AppError from '@shared/errors/AppError';
-import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
 
 import SchoolReport from '../infra/typeorm/entities/SchoolReport';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
@@ -12,12 +11,19 @@ import ISchoolReportsRepository from '../repositories/ISchoolReportsRepository';
 
 type SchoolReportRequestType = {
   enroll_id: string;
-  average: number;
+  averages: {
+    first?: number;
+    second?: number;
+    first_rec?: number;
+    third?: number;
+    fourth?: number;
+    second_rec?: number;
+    exam?: number;
+  };
 };
 
 type RegisterSchoolReportsRequest = {
   school_subject_id: string;
-  school_term: SchoolTerm;
   reports: SchoolReportRequestType[];
 };
 
@@ -35,18 +41,8 @@ class RegisterSchoolReportsService {
 
   public async execute({
     school_subject_id,
-    school_term,
     reports,
   }: RegisterSchoolReportsRequest): Promise<SchoolReport[]> {
-    if (!['FIRST', 'SECOND', 'THIRD', 'FOURTH'].includes(school_term)) {
-      throw new AppError('invalid school term');
-    }
-
-    const reportsObject = reports.reduce<Record<string, number>>(
-      (acc, item) => ({ ...acc, [item.enroll_id]: item.average * 100 }),
-      {},
-    );
-
     const schoolSubject = await this.schoolSubjectsRepository.findByid(
       school_subject_id,
     );
@@ -61,6 +57,25 @@ class RegisterSchoolReportsService {
       gradeSchoolSubject => gradeSchoolSubject.grade_id,
     );
 
+    const reportsObject = reports.reduce<
+      Record<string, SchoolReportRequestType['averages']>
+    >((acc, item) => {
+      const enrollAverages = Object.entries(item.averages).reduce<
+        SchoolReportRequestType['averages']
+      >(
+        (accAverages, [key, value]) => ({
+          ...accAverages,
+          [key]: Math.round(value * 100),
+        }),
+        {},
+      );
+
+      return {
+        ...acc,
+        [item.enroll_id]: enrollAverages,
+      };
+    }, {});
+
     const enrollIds = Object.keys(reportsObject);
     const enrolls = await this.enrollsRepository.findAllByIds(enrollIds);
 
@@ -73,19 +88,71 @@ class RegisterSchoolReportsService {
     const currentSchoolReports = await this.schoolReportsRepository.findAll({
       enroll_id: enrollIds,
       school_subject_id,
-      school_term,
     });
 
     const newSchoolReports = currentSchoolReports.map(schoolReport => {
-      const requestAverage = reportsObject[schoolReport.enroll_id];
-      if (requestAverage === undefined) return schoolReport;
+      const requestAverages = reportsObject[schoolReport.enroll_id];
 
-      return Object.assign(schoolReport, {
-        average: requestAverage,
-      });
+      const newSchoolReport = this.assignSchoolReport(
+        schoolReport,
+        requestAverages,
+      );
+
+      const finalAverage = this.calcFinalAverage(newSchoolReport);
+      newSchoolReport.final_average = finalAverage;
+
+      return newSchoolReport;
     });
 
     return this.schoolReportsRepository.updateMany(newSchoolReports);
+  }
+
+  private assignSchoolReport(
+    target: SchoolReport,
+    source: SchoolReportRequestType['averages'],
+  ): SchoolReport {
+    const keys = [
+      'first',
+      'second',
+      'first_rec',
+      'third',
+      'fourth',
+      'second_rec',
+      'exam',
+    ];
+    const filteredObject = Object.entries(source)
+      .filter(([key, value]) => {
+        if (!keys.includes(key)) return false;
+        return value !== undefined;
+      })
+      .reduce((acc, item) => {
+        const [key, value] = item;
+        return { ...acc, [key]: value };
+      }, {});
+
+    return Object.assign(target, filteredObject);
+  }
+
+  private calcFinalAverage(schoolReport: SchoolReport): number {
+    const first = schoolReport.first || 0;
+    const second = schoolReport.second || 0;
+    const third = schoolReport.third || 0;
+    const fourth = schoolReport.fourth || 0;
+    const first_rec = schoolReport.first_rec || 0;
+    const second_rec = schoolReport.second_rec || 0;
+    // const exam = schoolReport.exam || 0;
+
+    let firstSemAverage = (first + second) / 2;
+    firstSemAverage =
+      firstSemAverage >= first_rec ? firstSemAverage : first_rec;
+
+    let secondSemAverage = (third + fourth) / 2;
+    secondSemAverage =
+      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
+
+    const finalAverage = (firstSemAverage + secondSemAverage) / 2;
+
+    return Math.round(finalAverage);
   }
 }
 

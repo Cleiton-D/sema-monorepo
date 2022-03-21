@@ -40,7 +40,7 @@ export const Wrapper = styled.div<WrapperProps>`
     ${disabled &&
     css`
       * {
-        pointer-events: none !important;
+        /* pointer-events: none !important; */
       }
     `}
 
@@ -51,6 +51,21 @@ export const Wrapper = styled.div<WrapperProps>`
       : css`
           ${wrapperInputModifiers[size]}
         `}
+  `}
+`;
+
+type ContainerProps = {
+  hasClickableIcon: boolean;
+};
+export const Container = styled.div<ContainerProps>`
+  ${({ hasClickableIcon }) => css`
+    height: 100%;
+
+    ${hasClickableIcon &&
+    css`
+      display: grid;
+      grid-template-columns: 1fr 4rem;
+    `}
   `}
 `;
 
@@ -213,5 +228,20 @@ export const ErrorMessage = styled.span`
   ${({ theme }) => css`
     font-size: ${theme.font.sizes.xsmall};
     color: ${theme.colors.red};
+  `}
+`;
+
+export const IconButton = styled.button.attrs({ type: 'button' })`
+  ${({ theme }) => css`
+    cursor: pointer;
+    height: 100%;
+    background-color: ${theme.colors.white};
+    border: none;
+    outline: 0;
+    height: 95%;
+    margin: 0.2rem;
+    margin-left: 0;
+    color: ${theme.colors.primary};
+    stroke-width: 2;
   `}
 `;

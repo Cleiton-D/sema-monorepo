@@ -6,6 +6,6 @@ const teachersRouter = Router();
 
 const teachersController = new TeachersController();
 
-teachersRouter.post('/', teachersController.create);
+teachersRouter.get('/', teachersController.index);
 
 export default teachersRouter;

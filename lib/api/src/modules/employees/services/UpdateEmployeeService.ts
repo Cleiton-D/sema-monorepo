@@ -1,14 +1,16 @@
 import { inject, injectable } from 'tsyringe';
 
 import { ContactType } from '@modules/contacts/infra/typeorm/entities/Contact';
-import { Gender } from '@modules/persons/infra/typeorm/entities/Person';
-import { DocumentType } from '@modules/persons/infra/typeorm/entities/PersonDocument';
+import UpdateAddressService from '@modules/address/services/UpdateAddressService';
+import CreateContactService from '@modules/contacts/services/CreateContactService';
+import RemoveContactService from '@modules/contacts/services/RemoveContactService';
 
 import AppError from '@shared/errors/AppError';
+import { Gender } from '@shared/infra/typeorm/enums/Gender';
 
-import UpdatePersonService from '@modules/persons/services/UpdatePersonService';
 import Employee from '../infra/typeorm/entities/Employee';
 import IEmployeesRepository from '../repositories/IEmployeesRepository';
+import IEmployeeContactsRepository from '../repositories/IEmployeeContactsRepository';
 
 type AddressData = {
   street: string;
@@ -16,11 +18,6 @@ type AddressData = {
   city: string;
   district: string;
   region: string;
-};
-
-type DocumentData = {
-  document_number: string;
-  document_type: DocumentType;
 };
 
 type ContactData = {
@@ -36,9 +33,10 @@ type UpdateEmployeeRequest = {
   gender: Gender;
   birth_date: Date;
   address: AddressData;
-  documents: DocumentData[];
   contacts: ContactData[];
   pis_pasep: string;
+  cpf: string;
+  rg?: string;
   education_level: string;
 };
 
@@ -47,7 +45,11 @@ class UpdateEmployeeService {
   constructor(
     @inject('EmployeesRepository')
     private employeesRepository: IEmployeesRepository,
-    private updatePerson: UpdatePersonService,
+    @inject('EmployeeContactsRepository')
+    private employeeContactsRepository: IEmployeeContactsRepository,
+    private createContactService: CreateContactService,
+    private removeContactService: RemoveContactService,
+    private updateAddressService: UpdateAddressService,
   ) {}
 
   public async execute({
@@ -57,11 +59,12 @@ class UpdateEmployeeService {
     dad_name,
     birth_date,
     gender,
-    documents,
-    address,
-    contacts,
+    address: addressData,
+    contacts: contactsData,
     education_level,
     pis_pasep,
+    cpf,
+    rg,
   }: UpdateEmployeeRequest): Promise<Employee> {
     const employee = await this.employeesRepository.findOne({
       id: employee_id,
@@ -77,41 +80,52 @@ class UpdateEmployeeService {
       throw new AppError('Already exists an employee with this PIS/PASEP');
     }
 
-    const email = contacts.find(contact => contact.type === 'email');
+    const email = contactsData.find(contact => contact.type === 'email');
     if (!email || !email.description) {
       throw new AppError('Email cannot be empty');
     }
 
-    const newDocuments: DocumentData[] = [
-      ...documents,
-      { document_type: 'PIS-PASEP', document_number: pis_pasep },
-    ];
-
-    const cpf = newDocuments.find(document => document.document_type === 'CPF');
-    if (!cpf || !cpf.document_number) {
+    if (!cpf) {
       throw new AppError('CPF cannot be empty');
     }
 
-    const person = await this.updatePerson.execute({
-      person_id: employee.person_id,
+    const contacts = await this.createContactService.execute(contactsData);
+    await this.employeeContactsRepository.removeMany(
+      employee.employee_contacts,
+    );
+
+    const employeeContacts = contacts.map(contact => ({ contact }));
+    const oldContacts = employee.employee_contacts.map(({ contact_id }) => ({
+      contact_id,
+    }));
+
+    const { street, house_number, city, district, region } = addressData;
+    await this.updateAddressService.execute({
+      address_id: employee.address_id,
+      street,
+      house_number,
+      city,
+      district,
+      region,
+    });
+
+    Object.assign(employee, {
       name,
       mother_name,
       dad_name,
       birth_date,
       gender,
-      documents: newDocuments,
-      address,
-      contacts,
-    });
-
-    Object.assign(employee, {
-      person,
-      person_id: person.id,
       education_level,
       pis_pasep,
+      cpf,
+      rg,
+      employee_contacts: employeeContacts,
     });
 
-    return this.employeesRepository.update(employee);
+    const updatedEmployee = await this.employeesRepository.update(employee);
+    await this.removeContactService.execute(oldContacts);
+
+    return updatedEmployee;
   }
 }
 

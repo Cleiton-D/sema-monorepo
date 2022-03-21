@@ -5,7 +5,7 @@ import {
   useRef,
   useImperativeHandle
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -36,7 +36,7 @@ const AddAccesslevelModal: ForwardRefRenderFunction<
   AddAccesslevelModalProps
 > = ({ refetchFn }, ref) => {
   const modalRef = useRef<ModalRef>(null);
-  const [session] = useSession();
+  const { data: session } = useSession();
   const mutation = useAddAccessLevelMutation(modalRef, session);
 
   const formRef = useRef<FormHandles>(null);

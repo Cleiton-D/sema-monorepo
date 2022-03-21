@@ -22,7 +22,7 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
 
   public async findAll(): Promise<SchoolSubject[]> {
     const schoolSubject = await this.ormRepository.find({
-      order: { created_at: 'DESC' },
+      order: { index: 'ASC' },
     });
     return schoolSubject;
   }
@@ -35,10 +35,12 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
   public async create({
     description,
     additional_description,
+    index,
   }: CreateSchoolSubjectDTO): Promise<SchoolSubject> {
     const schoolSubject = this.ormRepository.create({
       description,
       additional_description,
+      index,
     });
     await this.ormRepository.save(schoolSubject);
 

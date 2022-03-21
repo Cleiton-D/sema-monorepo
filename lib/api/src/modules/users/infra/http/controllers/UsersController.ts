@@ -7,9 +7,10 @@ import ShowUserService from '@modules/users/services/ShowUserService';
 import ListUsersService from '@modules/users/services/ListUsersService';
 import CreateUserService from '@modules/users/services/CreateUserService';
 import DeleteUserService from '@modules/users/services/DeleteUserService';
+import CountUsersService from '@modules/users/services/CountUsersService';
+import ResetPasswordService from '@modules/users/services/ResetPasswordService';
 
 import privateRoute from '@shared/decorators/privateRoute';
-import CountUsersService from '@modules/users/services/CountUsersService';
 
 class UsersController {
   @privateRoute()
@@ -78,6 +79,23 @@ class UsersController {
 
     const deleteUser = container.resolve(DeleteUserService);
     await deleteUser.execute({ user_id, auth_user_id: authenticated_user });
+
+    return response.status(204).send();
+  }
+
+  @privateRoute()
+  public async reset_password(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { user_id } = request.body;
+    const { id: authenticated_user } = request.user;
+
+    const changePassword = container.resolve(ResetPasswordService);
+    await changePassword.execute({
+      user_id,
+      authenticated_user,
+    });
 
     return response.status(204).send();
   }

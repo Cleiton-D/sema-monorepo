@@ -1,26 +1,29 @@
 import {
   useMemo,
   useState,
-  useEffect,
   useRef,
   useCallback,
   useImperativeHandle,
   forwardRef
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { FormHandles as UnformHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
 import Select from 'components/Select';
+import EnrollSchoolReportForm from 'components/EnrollSchoolReportForm';
+import TextInput from 'components/TextInput';
 
 import { EnrollFormData } from 'models/Enroll';
 import { FormHandles } from 'models/Form';
 import { School } from 'models/School';
-import { ClassPeriod } from 'models/ClassPeriod';
 
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassrooms } from 'requests/queries/classrooms';
+import { useListClassPeriods } from 'requests/queries/class-periods';
+
+import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import { enrollSchema } from './rules/schema';
 
@@ -36,19 +39,22 @@ const EnrollForm: React.ForwardRefRenderFunction<
   EnrollFormProps
 > = ({ jotaiState, school }, ref) => {
   const [selectedGrade, setSelectedGrade] = useState<string>();
-  const [selectedClassPeriod, setSelectedClassPeriod] = useState<ClassPeriod>();
+  const [selectedClassPeriod, setSelectedClassPeriod] = useState<string>();
 
   const formRef = useRef<UnformHandles>(null);
+  const schoolReportsFormRef = useRef<UnformHandles>(null);
 
   const [state, setState] = useAtom(jotaiState);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: grades } = useListGrades(session);
   const { data: classrooms, isLoading } = useListClassrooms(session, {
     school_id: school.id,
     grade_id: selectedGrade,
-    class_period: selectedClassPeriod
+    class_period_id: selectedClassPeriod
   });
+  const { data: classPeriods, isLoading: isLoadingClassPeriods } =
+    useListClassPeriods(session);
 
   const gradesOptions = useMemo(() => {
     if (!grades) return [];
@@ -58,23 +64,6 @@ const EnrollForm: React.ForwardRefRenderFunction<
       value: id
     }));
   }, [grades]);
-
-  const classPeriodsOptions = useMemo(() => {
-    return [
-      {
-        value: 'MORNING',
-        label: 'Matutino'
-      },
-      {
-        value: 'EVENING',
-        label: 'Vespertino'
-      },
-      {
-        value: 'NOCTURNAL',
-        label: 'Noturno'
-      }
-    ];
-  }, []);
 
   const classroomsOptions = useMemo(() => {
     if (isLoading) return [{ value: '', label: 'Carregando...' }];
@@ -86,11 +75,22 @@ const EnrollForm: React.ForwardRefRenderFunction<
     }));
   }, [classrooms, isLoading]);
 
-  useEffect(() => {
-    const { grade_id, class_period } = state;
-    setSelectedGrade(grade_id);
-    setSelectedClassPeriod(class_period);
-  }, [state]);
+  const classPeriodsOptions = useMemo(() => {
+    if (isLoadingClassPeriods) return [{ value: '', label: 'Carregando...' }];
+    if (!classPeriods) return [];
+
+    return classPeriods.map(({ id, description }) => ({
+      label: translateDescription(description),
+      value: id
+    }));
+  }, [classPeriods, isLoadingClassPeriods]);
+
+  const originOptions = useMemo(() => {
+    return [
+      { label: 'Novo', value: 'NEW' },
+      { label: 'Repetente', value: 'REPEATING' }
+    ];
+  }, []);
 
   const handleSubmit = useCallback(
     async (values: EnrollFormData) => {
@@ -121,35 +121,74 @@ const EnrollForm: React.ForwardRefRenderFunction<
 
   const submitForm = useCallback(async () => {
     const values = formRef.current?.getData() as EnrollFormData;
-    await handleSubmit(values);
+    const schoolReports = schoolReportsFormRef.current?.getData() as Record<
+      string,
+      Record<string, string>
+    >;
+
+    const normalizedSchoolReports = Object.entries(schoolReports).reduce<
+      Record<string, Record<string, number>>
+    >((acc, item) => {
+      const [key, reports] = item;
+      const newReports = Object.entries(reports).reduce<Record<string, number>>(
+        (target, [schoolTerm, report]) => {
+          if (report === '') return target;
+
+          const parsedReport = Number(report);
+          if (isNaN(parsedReport)) return target;
+
+          return { ...target, [schoolTerm]: parsedReport };
+        },
+        {}
+      );
+
+      return { ...acc, [key]: newReports };
+    }, {});
+
+    await handleSubmit({ ...values, schoolReports: normalizedSchoolReports });
   }, [handleSubmit]);
 
   useImperativeHandle(ref, () => ({ submitForm }));
 
   return (
-    <S.Wrapper>
-      <S.SectionTitle>Associar estudante à uma turma</S.SectionTitle>
-      <S.Form onSubmit={handleSubmit} initialData={state} ref={formRef}>
-        <Select
-          name="grade_id"
-          label="Série"
-          options={gradesOptions}
-          onChange={(value) => setSelectedGrade(value)}
+    <>
+      <S.Wrapper>
+        <S.SectionTitle>Matrícula</S.SectionTitle>
+        <S.Form onSubmit={handleSubmit} initialData={state} ref={formRef}>
+          <TextInput name="unique_code" label="Código único" />
+          <TextInput label="Data de matrícula" name="enroll_date" mask="date" />
+          <Select
+            name="origin"
+            label="Novo/Repetente"
+            options={originOptions}
+          />
+          <Select
+            name="grade_id"
+            label="Série"
+            options={gradesOptions}
+            onChange={(value) => setSelectedGrade(value)}
+          />
+          <Select
+            name="class_period_id"
+            label="Período"
+            options={classPeriodsOptions}
+            onChange={(value) => setSelectedClassPeriod(value)}
+          />
+          <Select
+            name="classroom_id"
+            label="Turma"
+            options={classroomsOptions}
+            disabled={!selectedGrade || !selectedClassPeriod}
+          />
+        </S.Form>
+      </S.Wrapper>
+      {selectedGrade && (
+        <EnrollSchoolReportForm
+          gradeId={selectedGrade}
+          ref={schoolReportsFormRef}
         />
-        <Select
-          name="class_period"
-          label="Período"
-          options={classPeriodsOptions}
-          onChange={(value) => setSelectedClassPeriod(value)}
-        />
-        <Select
-          name="classroom_id"
-          label="Turma"
-          options={classroomsOptions}
-          disabled={!selectedGrade || !selectedClassPeriod}
-        />
-      </S.Form>
-    </S.Wrapper>
+      )}
+    </>
   );
 };
 

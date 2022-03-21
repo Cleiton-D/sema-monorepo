@@ -1,26 +1,24 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
 import { SchoolReport } from 'models/SchoolReport';
-import { SchoolTerm } from 'models/SchoolTerm';
 
-import { initializeApi, useMutation } from 'services/api';
+import { useApi, useMutation } from 'services/api';
 
 type RegisterSchoolReportsFormData = {
   school_subject_id: string;
-  school_term: SchoolTerm;
-  reports: Array<{ enroll_id: string; average: number }>;
+  reports: Array<{ enroll_id: string; averages: Record<string, number> }>;
 };
 
 export function useRegisterSchoolReports() {
-  const [session] = useSession();
+  const { data: session } = useSession();
+
+  const api = useApi(session);
 
   const registerSchoolReports = useCallback(
     async (values: RegisterSchoolReportsFormData) => {
-      const api = initializeApi(session);
-
       const { data: responseData } = await api.put<SchoolReport[]>(
         `/enrolls/reports`,
         values
@@ -28,7 +26,7 @@ export function useRegisterSchoolReports() {
 
       return responseData;
     },
-    [session]
+    [api]
   );
 
   return useMutation('register-school-reports', registerSchoolReports, {

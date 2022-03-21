@@ -66,6 +66,15 @@ class School {
   @JoinColumn({ name: 'vice_director_id' })
   vice_director: Employee;
 
+  @Column()
+  creation_decree: string;
+
+  @Column()
+  recognition_opinion: string;
+
+  @Column()
+  authorization_ordinance: string;
+
   @CreateDateColumn()
   created_at: Date;
 

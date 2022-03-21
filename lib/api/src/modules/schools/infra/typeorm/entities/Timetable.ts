@@ -1,10 +1,16 @@
+import SchoolSubject from '@modules/education_core/infra/typeorm/entities/SchoolSubject';
+import Employee from '@modules/employees/infra/typeorm/entities/Employee';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import Classroom from './Classroom';
 
 export type DayOfWeek =
   | 'SUNDAY'
@@ -23,8 +29,23 @@ class Timetable {
   @Column()
   classroom_id: string;
 
+  @ManyToOne(() => Classroom)
+  @JoinColumn({ name: 'classroom_id' })
+  classroom: Classroom;
+
   @Column()
   school_subject_id: string;
+
+  @ManyToOne(() => SchoolSubject)
+  @JoinColumn({ name: 'school_subject_id' })
+  school_subject: SchoolSubject;
+
+  @Column()
+  employee_id: string;
+
+  @ManyToOne(() => Employee)
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
 
   @Column({
     type: 'enum',

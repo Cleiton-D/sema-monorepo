@@ -1,14 +1,16 @@
 import { inject, injectable } from 'tsyringe';
 
-import UpdatePersonService from '@modules/persons/services/UpdatePersonService';
 import { ContactType } from '@modules/contacts/infra/typeorm/entities/Contact';
 import { Gender } from '@modules/persons/infra/typeorm/entities/Person';
-import { DocumentType } from '@modules/persons/infra/typeorm/entities/PersonDocument';
+import CreateContactService from '@modules/contacts/services/CreateContactService';
+import RemoveContactService from '@modules/contacts/services/RemoveContactService';
+import UpdateAddressService from '@modules/address/services/UpdateAddressService';
 
 import AppError from '@shared/errors/AppError';
 
 import Student from '../infra/typeorm/entities/Student';
 import IStudentsRepository from '../repositories/IStudentsRepository';
+import IStudentContactsRepository from '../repositories/IStudentContactsRepository';
 
 type AddressData = {
   street: string;
@@ -18,26 +20,30 @@ type AddressData = {
   region: string;
 };
 
-type DocumentData = {
-  document_number: string;
-  document_type: DocumentType;
-};
-
 type ContactData = {
   description: string;
   type: ContactType;
 };
 
 type UpdateStudentRequest = {
-  student_id: string;
+  id: string;
   name: string;
   mother_name: string;
   dad_name?: string;
   gender: Gender;
-  birth_date: Date;
+  birth_date: string;
   address: AddressData;
-  documents: DocumentData[];
   contacts: ContactData[];
+  cpf?: string;
+  rg?: string;
+  nis?: string;
+  birth_certificate?: string;
+  breed: string;
+  naturalness: string;
+  naturalness_uf: string;
+  identity_document: string;
+  nationality: string;
+  unique_code: string;
 };
 
 @injectable()
@@ -45,41 +51,79 @@ class UpdateStudentService {
   constructor(
     @inject('StudentsRepository')
     private studentsRepository: IStudentsRepository,
-    private updatePerson: UpdatePersonService,
+    @inject('StudentContactsRepository')
+    private studentContactsRepository: IStudentContactsRepository,
+    private createContactService: CreateContactService,
+    private removeContactService: RemoveContactService,
+    private updateAddressService: UpdateAddressService,
   ) {}
 
   public async execute({
-    student_id,
+    id,
     name,
     mother_name,
     dad_name,
     birth_date,
     gender,
-    documents,
-    address,
-    contacts,
+    address: addressData,
+    contacts: contactsData,
+    cpf,
+    rg,
+    nis,
+    birth_certificate,
+    breed,
+    identity_document,
+    unique_code,
+    nationality,
+    naturalness,
+    naturalness_uf,
   }: UpdateStudentRequest): Promise<Student> {
-    const student = await this.studentsRepository.findById(student_id);
+    const student = await this.studentsRepository.findById(id);
     if (!student) {
       throw new AppError('Student not found');
     }
 
-    const person = await this.updatePerson.execute({
-      person_id: student.person.id,
+    const contacts = await this.createContactService.execute(contactsData);
+    await this.studentContactsRepository.removeMany(student.student_contacts);
+
+    const studentContacts = contacts.map(contact => ({ contact }));
+    const oldContacts = student.student_contacts.map(({ contact_id }) => ({
+      contact_id,
+    }));
+
+    const { street, house_number, city, district, region } = addressData;
+    await this.updateAddressService.execute({
+      address_id: student.address_id,
+      street,
+      house_number,
+      city,
+      district,
+      region,
+    });
+
+    Object.assign(student, {
       name,
       mother_name,
       dad_name,
       birth_date,
       gender,
-      documents,
-      address,
-      contacts,
+      cpf,
+      rg,
+      nis,
+      student_contacts: studentContacts,
+      birth_certificate,
+      breed,
+      identity_document,
+      unique_code,
+      nationality,
+      naturalness,
+      naturalness_uf,
     });
 
-    Object.assign(student, { person, person_id: person.id });
-    await this.studentsRepository.update(student);
+    const updatedStudent = await this.studentsRepository.update(student);
+    await this.removeContactService.execute(oldContacts);
 
-    return student;
+    return updatedStudent;
   }
 }
 

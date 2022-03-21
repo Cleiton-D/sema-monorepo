@@ -1,5 +1,7 @@
 import { container } from 'tsyringe';
 
+import './providers';
+
 import IContactsRepository from '@modules/contacts/repositories/IContactsRepository';
 import ContactsRepository from '@modules/contacts/infra/typeorm/repositories/ContactsRepository';
 
@@ -17,6 +19,9 @@ import PersonContactsRepository from '@modules/persons/infra/typeorm/repositorie
 
 import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepository';
 import EmployeesRepository from '@modules/employees/infra/typeorm/repositories/EmployeesRepository';
+
+import IEmployeeContactsRepository from '@modules/employees/repositories/IEmployeeContactsRepository';
+import EmployeeContactsRepository from '@modules/employees/infra/typeorm/repositories/EmployeeContactsRepository';
 
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
@@ -45,6 +50,9 @@ import SchoolsRepository from '@modules/schools/infra/typeorm/repositories/Schoo
 import IStudentsRepository from '@modules/students/repositories/IStudentsRepository';
 import StudentsRepository from '@modules/students/infra/typeorm/repositories/StudentsRepository';
 
+import IStudentContactsRepository from '@modules/students/repositories/IStudentContactsRepository';
+import StudentContactsRepository from '@modules/students/infra/typeorm/repositories/StudentContactsRepository';
+
 import ISchoolYearsRepository from '@modules/education_core/repositories/ISchoolYearsRepository';
 import SchoolYearsRepository from '@modules/education_core/infra/typeorm/repositories/SchoolYearsRepository';
 
@@ -56,6 +64,9 @@ import TeachersRepository from '@modules/teachers/infra/typeorm/repositories/Tea
 
 import IClassroomsRepository from '@modules/schools/repositories/IClassroomsRepository';
 import ClassroomsRepository from '@modules/schools/infra/typeorm/repositories/ClassroomsRepository';
+
+import IClassPeriodsRepository from '@modules/education_core/repositories/IClassPeriodsRepository';
+import ClassPeriodsRepository from '@modules/education_core/infra/typeorm/repositories/ClassPeriodsRepository';
 
 import IGradeSchoolSubjectsRepository from '@modules/education_core/repositories/IGradeSchoolSubjectsRepository';
 import GradeSchoolSubjectsRepository from '@modules/education_core/infra/typeorm/repositories/GradeSchoolSubjectsRepository';
@@ -93,6 +104,18 @@ import EnrollClassroomsRepository from '@modules/enrolls/infra/typeorm/repositor
 import ISchoolContactsRepository from '@modules/schools/repositories/ISchoolContactsRepository';
 import SchoolContactsRepository from '@modules/schools/infra/typeorm/repositories/SchoolContactsRepository';
 
+import ITimetablesRepository from '@modules/schools/repositories/ITimetablesRepository';
+import TimetablesRepository from '@modules/schools/infra/typeorm/repositories/TimetablesRepository';
+
+import IMultigradesRepository from '@modules/schools/repositories/IMultigradesRepository';
+import MultigradesRepository from '@modules/schools/infra/typeorm/repositories/MultigradesRepository';
+
+import IMultigradesClassroomsRepository from '@modules/schools/repositories/IMultigradesClassroomsRepository';
+import MultigradesClassroomsRepository from '@modules/schools/infra/typeorm/repositories/MultigradesClassroomsRepository';
+
+import ISystemBackgroundsRepository from '@modules/admin/repositories/ISystemBackgroundsRepository';
+import SystemBackgroundsRepository from '@modules/admin/infra/typeorm/repositories/SystemBackgroundsRepository';
+
 container.registerSingleton<IContactsRepository>(
   'ContactsRepository',
   ContactsRepository,
@@ -121,6 +144,11 @@ container.registerSingleton<IPersonContactsRepository>(
 container.registerSingleton<IEmployeesRepository>(
   'EmployeesRepository',
   EmployeesRepository,
+);
+
+container.registerSingleton<IEmployeeContactsRepository>(
+  'EmployeeContactsRepository',
+  EmployeeContactsRepository,
 );
 
 container.registerSingleton<IUsersRepository>(
@@ -168,6 +196,11 @@ container.registerSingleton<IStudentsRepository>(
   StudentsRepository,
 );
 
+container.registerSingleton<IStudentContactsRepository>(
+  'StudentContactsRepository',
+  StudentContactsRepository,
+);
+
 container.registerSingleton<ISchoolYearsRepository>(
   'SchoolYearsRepository',
   SchoolYearsRepository,
@@ -186,6 +219,11 @@ container.registerSingleton<ITeachersRepository>(
 container.registerSingleton<IClassroomsRepository>(
   'ClassroomsRepository',
   ClassroomsRepository,
+);
+
+container.registerSingleton<IClassPeriodsRepository>(
+  'ClassPeriodsRepository',
+  ClassPeriodsRepository,
 );
 
 container.registerSingleton<IGradeSchoolSubjectsRepository>(
@@ -246,6 +284,26 @@ container.registerSingleton<IEnrollClassroomsRepository>(
 container.registerSingleton<ISchoolContactsRepository>(
   'SchoolContactsRepository',
   SchoolContactsRepository,
+);
+
+container.registerSingleton<ITimetablesRepository>(
+  'TimetablesRepository',
+  TimetablesRepository,
+);
+
+container.registerSingleton<IMultigradesRepository>(
+  'MultigradesRepository',
+  MultigradesRepository,
+);
+
+container.registerSingleton<IMultigradesClassroomsRepository>(
+  'MultigradesClassroomsRepository',
+  MultigradesClassroomsRepository,
+);
+
+container.registerSingleton<ISystemBackgroundsRepository>(
+  'SystemBackgroundsRepository',
+  SystemBackgroundsRepository,
 );
 
 container.registerSingleton<IHashProvider>('HashProvider', BCryptHashProvider);

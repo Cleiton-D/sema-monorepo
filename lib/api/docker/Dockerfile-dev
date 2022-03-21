@@ -1,7 +1,10 @@
-FROM node:lts-alpine
+FROM node:14-alpine
+
+RUN echo http://repository.fit.cvut.cz/mirrors/alpine/v3.11/main > /etc/apk/repositories; \
+    echo http://repository.fit.cvut.cz/mirrors/alpine/v3.11/community >> /etc/apk/repositories
 
 # RUN apk update
-RUN apk add --no-cache postgresql-client
+RUN apk add postgresql-client
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN mkdir app && chown -R appuser:appgroup ./app

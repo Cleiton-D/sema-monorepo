@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 
 import Button from 'components/Button';
@@ -26,7 +26,7 @@ const SchoolTeachersCard = ({ schoolId }: SchoolTeachersCardProps) => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schoolTeachers, isLoading, refetch } = useListSchoolTeachers(
     session,
     {
@@ -37,7 +37,7 @@ const SchoolTeachersCard = ({ schoolId }: SchoolTeachersCardProps) => {
 
   const handleRemove = async (schoolTeacher: SchoolTeacher) => {
     const confirm = window.confirm(
-      `Deseja remover o professor ${schoolTeacher.employee.person.name}?`
+      `Deseja remover o professor ${schoolTeacher.employee.name}?`
     );
 
     if (confirm) {
@@ -71,15 +71,15 @@ const SchoolTeachersCard = ({ schoolId }: SchoolTeachersCardProps) => {
                     {schoolTeachers.map((schoolTeacher) => (
                       <ListItem key={schoolTeacher.id}>
                         <S.ItemContent>
-                          <span>{schoolTeacher.employee.person.name}</span>
+                          <span>{schoolTeacher.employee.name}</span>
 
                           {canChangeSchoolTeacher && (
                             <S.ActionButton
-                              title={`Remover ${schoolTeacher.employee.person.name}`}
+                              title={`Remover ${schoolTeacher.employee.name}`}
                               onClick={() => handleRemove(schoolTeacher)}
                             >
                               <X
-                                title={`Remover ${schoolTeacher.employee.person.name}`}
+                                title={`Remover ${schoolTeacher.employee.name}`}
                               />
                             </S.ActionButton>
                           )}

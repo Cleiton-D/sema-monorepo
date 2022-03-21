@@ -33,6 +33,9 @@ type CreateSchoolResquest = {
   director_id: string;
   vice_director_id: string;
   address: AddressData;
+  creation_decree: string;
+  recognition_opinion: string;
+  authorization_ordinance: string;
   contacts: ContactData[];
   employees: Record<string, string[]>;
 };
@@ -54,6 +57,9 @@ class CreateSchoolService {
     inep_code,
     director_id,
     vice_director_id,
+    creation_decree,
+    recognition_opinion,
+    authorization_ordinance,
     address: addressData,
     contacts: contactsData,
     employees,
@@ -133,6 +139,9 @@ class CreateSchoolService {
       inep_code,
       director_id,
       vice_director_id,
+      creation_decree,
+      recognition_opinion,
+      authorization_ordinance,
       branch,
       address,
       contacts,

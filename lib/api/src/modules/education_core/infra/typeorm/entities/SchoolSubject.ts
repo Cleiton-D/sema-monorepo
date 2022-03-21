@@ -17,6 +17,9 @@ class SchoolSubject {
   @Column()
   additional_description: string;
 
+  @Column()
+  index: number;
+
   @CreateDateColumn()
   created_at: Date;
 

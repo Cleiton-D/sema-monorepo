@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -15,7 +15,7 @@ import { useCountUsers } from 'requests/queries/users';
 import * as S from './styles';
 
 const AdminDashboard = () => {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
     id: session?.configs.school_year_id
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
       <S.Wrapper>
         <Card
           description="Secretaria Municipal"
-          link="/administration/municipal-secretary"
+          link="/auth/administration/municipal-secretary"
           module="MUNICIPAL_SECRETARY"
           rule="READ"
         />
@@ -39,18 +39,23 @@ const AdminDashboard = () => {
         {/* Gambeta aqui para dar espaçamento */}
         <Card
           description="Níveis de acesso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-          link="/administration/access-levels"
+          link="/auth/administration/access-levels"
           module="ACCESS_LEVEL"
           rule="READ"
         />
 
-        <Card description="Usuários" link="/users" module="USER" rule="READ">
+        <Card
+          description="Usuários"
+          link="/auth/users"
+          module="USER"
+          rule="READ"
+        >
           {usersCount?.count}
         </Card>
 
         <Card
           description="Servidores"
-          link="/administration/employees"
+          link="/auth/administration/employees"
           module="EMPLOYEE"
           rule="READ"
         >
@@ -59,7 +64,7 @@ const AdminDashboard = () => {
 
         <Card
           description={`${schoolYear?.reference_year || 'não definido'}`}
-          link="/administration/school-year"
+          link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
           rule="READ"
         >
@@ -68,7 +73,7 @@ const AdminDashboard = () => {
 
         <Card
           description="Escolas"
-          link="/administration/schools"
+          link="/auth/administration/schools"
           module="SCHOOL"
           rule="READ"
         >
@@ -77,7 +82,7 @@ const AdminDashboard = () => {
 
         <Card
           description="Séries"
-          link="/administration/grades"
+          link="/auth/administration/grades"
           module="GRADE"
           rule="READ"
         >
@@ -86,13 +91,29 @@ const AdminDashboard = () => {
 
         <Card
           description="Disciplinas"
-          link="/administration/school-subjects"
+          link="/auth/administration/school-subjects"
           module="SCHOOL-SUBJECT"
           rule="READ"
         >
           {schoolSubjectsCount?.count}
         </Card>
 
+        <Card description="Aulas registradas" link="/auth/classes" />
+
+        <Card description="Ata" link="/auth/reports/ata" />
+        <Card
+          description="Livro de registros"
+          link="/auth/reports/registers-book"
+        />
+        <Card
+          description="Quadro de notas"
+          link="/auth/reports/school-report-board"
+        />
+        <Card
+          description="Total geral de faltas"
+          link="/auth/reports/total-attendances"
+        />
+        <Card description="Aulas registradas" link="/auth/classes" />
         <DatabaseDumpCard />
       </S.Wrapper>
     </Base>

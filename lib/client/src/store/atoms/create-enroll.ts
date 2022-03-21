@@ -2,15 +2,18 @@ import { atom } from 'jotai';
 import { atomWithReset, RESET } from 'jotai/utils';
 
 import { ContactFormData } from 'models/Contact';
-import { EnrollFormData, CompleteEnrollFormData } from 'models/Enroll';
-import { PersonBasicFormData } from 'models/Person';
+import {
+  EnrollFormData,
+  CompleteEnrollFormData,
+  EnrollDocumentsFormData
+} from 'models/Enroll';
+import { Student, StudentForm } from 'models/Student';
 
-export const personEnrollData = atomWithReset<PersonBasicFormData>(
-  {} as PersonBasicFormData
-);
+export const selectedStudent = atomWithReset<Student | undefined>(undefined);
 
-export const personEnrollContactsData = atomWithReset<ContactFormData[]>([]);
-
+export const basicEnrollData = atomWithReset<StudentForm>({} as StudentForm);
+export const enrollContactsData = atomWithReset<ContactFormData[]>([]);
+export const enrollDocumentsData = atomWithReset<EnrollDocumentsFormData>({});
 export const enrollData = atomWithReset<EnrollFormData>({} as EnrollFormData);
 
 export const createEnrollData = atom<
@@ -18,25 +21,31 @@ export const createEnrollData = atom<
   CompleteEnrollFormData | typeof RESET
 >(
   (get) => {
-    const personBasicData = get(personEnrollData);
-    const contacts = get(personEnrollContactsData);
+    const enrollBasicData = get(basicEnrollData);
+    const contacts = get(enrollContactsData);
+    const documents = get(enrollDocumentsData);
     const enroll = get(enrollData);
 
-    return { ...enroll, person: { ...personBasicData, contacts } };
+    return {
+      ...enroll,
+      student: { ...enrollBasicData, ...documents, contacts }
+    };
   },
   (_get, set, newValue) => {
     if (newValue === RESET) {
-      set(personEnrollData, RESET);
-      set(personEnrollContactsData, RESET);
+      set(basicEnrollData, RESET);
+      set(enrollContactsData, RESET);
+      set(enrollDocumentsData, RESET);
       set(enrollData, RESET);
       return;
     }
 
-    const { person, ...enroll } = newValue;
-    const { contacts, ...newPerson } = person;
+    const { student, ...enroll } = newValue;
+    const { contacts, cpf, rg, birth_certificate, ...newPerson } = student;
 
-    set(personEnrollData, newPerson);
-    set(personEnrollContactsData, contacts);
+    set(basicEnrollData, newPerson);
+    set(enrollContactsData, contacts);
+    set(enrollDocumentsData, { cpf, rg, birth_certificate });
     set(enrollData, enroll);
   }
 );

@@ -8,6 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
+
 import Employee from '@modules/employees/infra/typeorm/entities/Employee';
 import SchoolSubject from '@modules/education_core/infra/typeorm/entities/SchoolSubject';
 import Classroom from '@modules/schools/infra/typeorm/entities/Classroom';
@@ -44,16 +46,22 @@ class Class {
   taught_content: string;
 
   @Column()
+  period: string;
+
+  @Column()
+  date_start: Date;
+
+  @Column()
+  date_end: Date;
+
+  @Column()
   class_date: Date;
-
-  @Column({ type: 'time' })
-  time_start: string;
-
-  @Column({ type: 'time' })
-  time_end: string;
 
   @Column({ type: 'enum', enum: ['PROGRESS', 'DONE'] })
   status: ClassStatus;
+
+  @Column({ type: 'enum', enum: ['FIRST', 'SECOND', 'THIRD', 'FOURTH'] })
+  school_term: SchoolTerm;
 
   @CreateDateColumn()
   created_at: Date;

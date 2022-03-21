@@ -6,7 +6,8 @@ import Classroom from '../infra/typeorm/entities/Classroom';
 export default interface IClassroomsRepository {
   findById: (classroom_id: string) => Promise<Classroom | undefined>;
   findAll: (filters: FindClassroomsDTO) => Promise<Classroom[]>;
-  create: (data: CreateClassroomDTO) => Promise<Classroom>;
   count: (filters: FindClassroomsDTO) => Promise<CountResultDTO>;
+  create: (data: CreateClassroomDTO) => Promise<Classroom>;
+  update: (classroom: Classroom) => Promise<Classroom>;
   delete: (classroom: Classroom) => Promise<void>;
 }

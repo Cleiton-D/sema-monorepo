@@ -57,7 +57,7 @@ class Person {
   @Exclude()
   person_contacts: PersonContact[];
 
-  @Column('time without time zone')
+  @Column('timestamp')
   birth_date: Date;
 
   @CreateDateColumn()

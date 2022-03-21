@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/client';
-import { X } from '@styled-icons/feather';
+import { useSession } from 'next-auth/react';
 import debounce from 'lodash.debounce';
 
 import Table from 'components/Table';
@@ -43,16 +42,17 @@ const AccessModuleTable = ({
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: accessModules, refetch } = useListAccessModules(session, {
     access_level_id: accessLevel.id
   });
 
   const deleteAccessModule = useDeleteAccessModule();
 
-  const debouncedOnChange = useMemo(() => debounce(onChangeModule, 800), [
-    onChangeModule
-  ]);
+  const debouncedOnChange = useMemo(
+    () => debounce(onChangeModule, 800),
+    [onChangeModule]
+  );
 
   const handleChange = (
     accessModule: AccessModule,
@@ -72,9 +72,9 @@ const AccessModuleTable = ({
       [accessModule.app_module_id]: newItem
     };
 
-    const values = Object.entries(
-      accessModuleRef.current
-    ).map(([key, value]) => ({ module_id: key, ...value }));
+    const values = Object.entries(accessModuleRef.current).map(
+      ([key, value]) => ({ module_id: key, ...value })
+    );
 
     debouncedOnChange(values);
   };

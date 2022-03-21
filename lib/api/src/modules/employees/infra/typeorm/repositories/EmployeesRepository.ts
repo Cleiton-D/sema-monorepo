@@ -41,7 +41,6 @@ export default class EmployeesRepository implements IEmployeesRepository {
 
   public async findOne({
     id,
-    person_id,
     user_id,
     pis_pasep,
     education_level,
@@ -50,7 +49,6 @@ export default class EmployeesRepository implements IEmployeesRepository {
   }: FindEmployeeDTO): Promise<Employee | undefined> {
     const where: FindConditions<Employee> = {};
     if (id) where.id = id;
-    if (person_id) where.person_id = person_id;
     if (user_id) where.user_id = user_id;
     if (pis_pasep) where.pis_pasep = pis_pasep;
     if (education_level) where.education_level = education_level;
@@ -59,10 +57,9 @@ export default class EmployeesRepository implements IEmployeesRepository {
       join: {
         alias: 'employee',
         leftJoinAndSelect: {
-          person: 'employee.person',
-          person_contacts: 'person.person_contacts',
-          person_contacts_contact: 'person_contacts.contact',
-          person_address: 'person.address',
+          address: 'employee.address',
+          contacts: 'employee.employee_contacts',
+          contacts_contact: 'contacts.contact',
         },
       },
       where: (qb: WhereExpression) => {
@@ -85,7 +82,6 @@ export default class EmployeesRepository implements IEmployeesRepository {
 
   public async findAll({
     id,
-    person_id,
     user_id,
     pis_pasep,
     education_level,
@@ -94,7 +90,6 @@ export default class EmployeesRepository implements IEmployeesRepository {
   }: FindEmployeeDTO): Promise<Employee[]> {
     const where: FindConditions<Employee> = {};
     if (id) where.id = id;
-    if (person_id) where.person_id = person_id;
     if (user_id) where.user_id = user_id;
     if (pis_pasep) where.pis_pasep = pis_pasep;
     if (education_level) where.education_level = education_level;
@@ -103,12 +98,12 @@ export default class EmployeesRepository implements IEmployeesRepository {
       join: {
         alias: 'employee',
         leftJoinAndSelect: {
-          person: 'employee.person',
-          person_contacts: 'person.person_contacts',
-          person_contacts_contact: 'person_contacts.contact',
-          person_address: 'person.address',
+          address: 'employee.address',
+          contacts: 'employee.employee_contacts',
+          contacts_contact: 'contacts.contact',
         },
       },
+      order: { name: 'ASC' },
       where: (qb: WhereExpression) => {
         qb.where(where);
 
@@ -133,16 +128,34 @@ export default class EmployeesRepository implements IEmployeesRepository {
   }
 
   public async create({
-    person,
+    name,
+    mother_name,
+    dad_name,
+    gender,
+    birth_date,
+    address,
+    contacts,
     user,
     pis_pasep,
+    cpf,
+    rg,
     education_level,
   }: CreateEmployeeDTO): Promise<Employee> {
+    const employee_contacts = contacts.map(contact => ({ contact }));
+
     const employee = this.ormRepository.create({
-      person,
+      name,
+      mother_name,
+      dad_name,
+      gender,
+      birth_date,
+      address,
       user,
       pis_pasep,
+      cpf,
+      rg,
       education_level,
+      employee_contacts,
     });
     await this.ormRepository.save(employee);
     return employee;
@@ -151,5 +164,9 @@ export default class EmployeesRepository implements IEmployeesRepository {
   public async update(employee: Employee): Promise<Employee> {
     await this.ormRepository.save(employee);
     return employee;
+  }
+
+  public async delete(employee: Employee): Promise<void> {
+    await this.ormRepository.softRemove(employee);
   }
 }

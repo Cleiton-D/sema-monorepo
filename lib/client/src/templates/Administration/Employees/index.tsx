@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
-import { PlusCircle, Edit3 } from '@styled-icons/feather';
+import { useSession } from 'next-auth/react';
+import { PlusCircle, Edit, X, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -10,21 +10,41 @@ import Heading from 'components/Heading';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import Button from 'components/Button';
+import UserProfilesTable from 'components/UserProfilesTable';
+import CreateEmployeeUserProfileModal, {
+  CreateEmployeeUserProfileModalRef
+} from 'components/CreateEmployeeUserProfileModal';
 
 import { useAccess } from 'hooks/AccessProvider';
 
 import { Employee } from 'models/Employee';
 
 import { useListEmployees } from 'requests/queries/employee';
+import { useDeleteEmployee } from 'requests/mutations/employee';
 
 import * as S from './styles';
 
 const Employees = () => {
   const { enableAccess } = useAccess();
 
+  const employeeUserProfileModalRef =
+    useRef<CreateEmployeeUserProfileModalRef>(null);
+
   const router = useRouter();
-  const [session] = useSession();
-  const { data: employees } = useListEmployees(session);
+  const { data: session } = useSession();
+  const { data: employees, refetch } = useListEmployees(session);
+
+  const deleteEmployee = useDeleteEmployee(session);
+
+  const handleDelete = async (employee: Employee) => {
+    const confirmation = window.confirm(
+      `Deseja remover o servidor ${employee.name}?`
+    );
+    if (confirmation) {
+      await deleteEmployee.mutateAsync(employee);
+      refetch();
+    }
+  };
 
   const canEditEmployees = useMemo(
     () => enableAccess({ module: 'EMPLOYEE', rule: 'WRITE' }),
@@ -36,7 +56,7 @@ const Employees = () => {
       <Heading>Servidores</Heading>
       {canEditEmployees && (
         <S.AddButtonContainer>
-          <Link href={`/administration/employees/new`} passHref>
+          <Link href={`/auth/administration/employees/new`} passHref>
             <Button
               styleType="normal"
               size="medium"
@@ -57,10 +77,12 @@ const Employees = () => {
           items={employees || []}
           keyExtractor={(value) => value.id}
         >
-          <TableColumn label="Nome" tableKey="person.name" />
+          <TableColumn label="Nome" tableKey="name">
+            {({ user_id }: Employee) => <UserProfilesTable userId={user_id} />}
+          </TableColumn>
+          <TableColumn label="Grau de Instrução" tableKey="education_level" />
+          <TableColumn label="CPF" tableKey="cpf" />
           <TableColumn label="PIS / PASEP" tableKey="pis_pasep" />
-          <TableColumn label="Grau de Instrução" tableKey="education_level" />
-          <TableColumn label="Grau de Instrução" tableKey="education_level" />
           <TableColumn
             label="Ações"
             tableKey="id"
@@ -69,20 +91,43 @@ const Employees = () => {
             rule="WRITE"
             actionColumn
             render={(employee: Employee) => (
-              <S.ActionButton
-                color="primary"
-                type="button"
-                title={`Editar ${employee.person.name}`}
-                onClick={() =>
-                  router.push(`/administration/employees/edit/${employee.id}`)
-                }
-              >
-                <Edit3 size={20} />
-              </S.ActionButton>
+              <S.ActionButtons>
+                <S.ActionButton
+                  color="primary"
+                  type="button"
+                  title="Adicionar perfil de acesso"
+                  onClick={() =>
+                    employeeUserProfileModalRef.current?.openModal(employee)
+                  }
+                >
+                  <PlusSquare size={20} />
+                </S.ActionButton>
+                <S.ActionButton
+                  color="primary"
+                  type="button"
+                  title={`Alterar servidor`}
+                  onClick={() =>
+                    router.push(
+                      `/auth/administration/employees/edit/${employee.id}`
+                    )
+                  }
+                >
+                  <Edit title={`Alterar servidor`} size={20} />
+                </S.ActionButton>
+                <S.ActionButton
+                  color="red"
+                  type="button"
+                  title={`Excluir a servidor`}
+                  onClick={() => handleDelete(employee)}
+                >
+                  <X size={20} />
+                </S.ActionButton>
+              </S.ActionButtons>
             )}
           />
         </Table>
       </S.TableSection>
+      <CreateEmployeeUserProfileModal ref={employeeUserProfileModalRef} />
     </Base>
   );
 };

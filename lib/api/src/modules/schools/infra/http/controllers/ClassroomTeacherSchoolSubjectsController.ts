@@ -7,23 +7,31 @@ import DeleteClassroomTeacherSchoolSubjectService from '@modules/schools/service
 
 class ClassroomTeacherSchoolSubjectsController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { classroom_id, school_id } = request.params;
-    const { employee_id } = request.query;
+    const {
+      employee_id,
+      school_subject_id,
+      school_id,
+      classroom_id,
+    } = request.query;
 
     const listClassroomTeacherSchoolSubjects = container.resolve(
       ListClassroomTeacherSchoolSubjectsService,
     );
 
     const teacherSchoolSubjects = await listClassroomTeacherSchoolSubjects.execute(
-      { classroom_id, school_id, employee_id: employee_id as string },
+      {
+        classroom_id: classroom_id as string,
+        school_id: school_id as string,
+        employee_id: employee_id as string,
+        school_subject_id: school_subject_id as string,
+      },
     );
 
     return response.json(teacherSchoolSubjects);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const { classroom_id } = request.params;
-    const { teacher_school_subjects } = request.body;
+    const { teacher_school_subjects, classroom_id } = request.body;
 
     const linkClassroomTeacherSchoolSubjects = container.resolve(
       LinkClassroomTeacherSchoolSubjectsService,

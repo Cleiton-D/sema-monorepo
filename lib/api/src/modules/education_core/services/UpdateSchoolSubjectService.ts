@@ -9,6 +9,7 @@ type UpdateSchoolSubjectRequest = {
   id: string;
   description: string;
   additional_description: string;
+  index: number;
 };
 
 @injectable()
@@ -22,13 +23,18 @@ class UpdateSchoolSubjectService {
     id,
     description,
     additional_description,
+    index,
   }: UpdateSchoolSubjectRequest): Promise<SchoolSubject> {
     const schoolSubject = await this.schoolSubjectsRepository.findByid(id);
     if (!schoolSubject) {
       throw new AppError('School Subject not found.');
     }
 
-    Object.assign(schoolSubject, { description, additional_description });
+    Object.assign(schoolSubject, {
+      description,
+      additional_description,
+      index,
+    });
 
     return this.schoolSubjectsRepository.update(schoolSubject);
   }

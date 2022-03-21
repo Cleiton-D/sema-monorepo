@@ -1,100 +1,144 @@
 const municipalSecretary = [
   {
-    path: '/administration/school-year',
+    path: '/auth/administration/school-year',
     name: 'Ano Letivo'
   },
   {
-    path: '/administration/employees',
+    path: '/auth/administration/employees',
     name: 'Servidores'
   },
   {
-    path: '/administration/schools',
+    path: '/auth/administration/schools',
     name: 'Escolas'
   },
   {
-    path: '/administration/school-teachers',
+    path: '/auth/administration/school-teachers',
     name: 'Lotação de professores'
   },
   {
-    path: '/administration/grades',
+    path: '/auth/administration/grades',
     name: 'Séries'
   },
   {
-    path: '/administration/school-subjects',
+    path: '/auth/administration/school-subjects',
     name: 'Disciplinas'
   },
   {
-    path: '/enrolls',
-    name: 'Alunos ativos'
+    path: '/auth/class-periods',
+    name: 'Períodos e Horários'
+  },
+  {
+    path: '/auth/enrolls',
+    name: 'Matrículas'
+  },
+  {
+    path: '/auth/reports/ata',
+    name: 'Ata'
+  },
+  {
+    path: '/auth/reports/registers-book',
+    name: 'Livro de registros'
+  },
+  {
+    path: '/auth/reports/school-report-board',
+    name: 'Quadro de notas'
+  },
+  {
+    path: '/auth/reports/total-attendances',
+    name: 'Total geral de faltas'
   }
 ];
 
 const teacher = [
   {
-    path: '/administration/school-year',
+    path: '/auth/administration/school-year',
     name: 'Ano Letivo'
   },
   {
-    path: '/classes',
+    path: '/auth/classes',
     name: 'Aulas registradas'
   }
 ];
 
 const administrator = [
   {
-    path: '/administration/municipal-secretary',
+    path: '/auth/administration/municipal-secretary',
     name: 'Secretaria Municipal'
   },
   {
-    path: '/administration/access-levels',
+    path: '/auth/administration/access-levels',
     name: 'Níveis de acesso'
   },
   {
-    path: '/users',
+    path: '/auth/users',
     name: 'Usuários'
   },
   {
-    path: '/administration/employees',
+    path: '/auth/administration/employees',
     name: 'Servidores'
   },
   {
-    path: '/administration/school-year',
+    path: '/auth/administration/school-year',
     name: 'Ano Letivo'
   },
   {
-    path: '/administration/schools',
+    path: '/auth/administration/schools',
     name: 'Escolas'
   },
   {
-    path: '/administration/grades',
+    path: '/auth/administration/grades',
     name: 'Séries'
   },
   {
-    path: '/administration/school-subjects',
+    path: '/auth/administration/school-subjects',
     name: 'Disciplinas'
+  },
+  {
+    path: '/auth/class-periods',
+    name: 'Períodos e Horários'
+  },
+  {
+    path: '/auth/reports/ata',
+    name: 'Ata'
+  },
+  {
+    path: '/auth/reports/registers-book',
+    name: 'Livro de registros'
+  },
+  {
+    path: '/auth/reports/school-report-board',
+    name: 'Quadro de notas'
+  },
+  {
+    path: '/auth/reports/total-attendances',
+    name: 'Total geral de faltas'
   }
 ];
 
 export const schoolAdministration = [
   {
-    path: '/administration/school-year',
+    path: '/auth/administration/school-year',
     name: 'Ano Letivo'
   },
   {
-    path: '/enrolls?school_id=me',
-    name: 'Alunos ativos'
+    path: '/auth/enrolls?school_id=me',
+    name: 'Matrículas'
   },
   {
-    path: '/school/me/classrooms',
+    path: '/auth/school/me/classrooms',
     name: 'Turmas'
   },
+  // {
+  //   path: '/auth/school/me/teacher-school-subjects',
+  //   name: 'Professores'
+  // },
   {
-    path: '/school/me/teacher-school-subjects',
-    name: 'Professores'
+    path: '/auth/school/me/classroom-teacher',
+    name: 'Turmas x Professores'
   },
   {
-    path: '/school/me/classroom-teacher',
-    name: 'Turmas x Professores'
+    path: '/auth/school/me/timetables',
+    name: 'Horários'
   }
 ];
 

@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PlusCircle, Edit, X } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -24,7 +24,7 @@ import * as S from './styles';
 const SchoolSubjects = () => {
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schoolSubjects, refetch } = useListSchoolsSubjects(session);
 
   const modalRef = useRef<SchoolSubjectModalRef>(null);
@@ -69,7 +69,9 @@ const SchoolSubjects = () => {
           <h4>Disciplinas</h4>
         </S.SectionTitle>
       </S.TableSection>
+
       <Table items={schoolSubjects || []} keyExtractor={(item) => item.id}>
+        <TableColumn label="#" tableKey="index" />
         <TableColumn label="Nome" tableKey="description" />
         <TableColumn
           label="Descrição da disciplina"
@@ -105,6 +107,7 @@ const SchoolSubjects = () => {
           )}
         />
       </Table>
+
       <AddSchoolSubjectModal refetchFn={refetch} ref={modalRef} />
     </Base>
   );

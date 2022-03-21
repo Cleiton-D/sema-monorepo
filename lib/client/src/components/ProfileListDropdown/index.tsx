@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { signIn, useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
+import { signIn, useSession } from 'next-auth/react';
 
 import { useListUserProfiles } from 'requests/queries/user-profile';
 
@@ -8,7 +9,8 @@ import * as S from './styles';
 const ProfileListDropdown = () => {
   const [open, setOpen] = useState(false);
 
-  const [session] = useSession();
+  const { push } = useRouter();
+  const { data: session } = useSession();
   const { data: userProfiles } = useListUserProfiles(session, {
     user_id: session?.id
   });
@@ -36,6 +38,7 @@ const ProfileListDropdown = () => {
       token: session?.jwt,
       redirect: false
     });
+    push('/auth');
 
     setOpen(false);
   };

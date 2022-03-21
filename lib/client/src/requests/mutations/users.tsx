@@ -72,3 +72,25 @@ export function useDeleteUserMutation(session?: Session | null) {
       `Usuário ${deletedUser.username} removido com sucesso`
   });
 }
+
+type ResetPasswordRequest = {
+  user_id: string;
+};
+export function useResetPassword(session?: Session | null) {
+  const resetPassword = useCallback(
+    async ({ user_id }: ResetPasswordRequest) => {
+      const api = initializeApi(session);
+
+      return api.patch(`/users/reset-pass`, { user_id });
+    },
+    [session]
+  );
+
+  return useMutation('reset-password', resetPassword, {
+    renderLoading: function render() {
+      return <ToastContent showSpinner>Resetando senha...</ToastContent>;
+    },
+    renderError: () => `Falha ao resetar a senha`,
+    renderSuccess: () => `Senha resetada com sucesso`
+  });
+}

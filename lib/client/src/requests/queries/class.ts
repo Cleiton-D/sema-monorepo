@@ -23,10 +23,16 @@ export const useShowClass = (session: Session | null, id?: string) => {
   return { ...result, key };
 };
 
-type ListClassesFilters = {
+export type ListClassesFilters = {
   classroom_id?: string;
   school_subject_id?: string;
   employee_id?: string;
+  school_id?: string;
+  class_date?: string;
+  class_period_id?: string;
+  grade_id?: string;
+  status?: string;
+  taught_content?: string;
   limit?: number;
   sortBy?: string;
   order?: 'DESC' | 'ASC';

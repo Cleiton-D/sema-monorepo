@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -15,7 +15,7 @@ import SchoolTeachersCard from 'components/SchoolTeachersCard';
 const SchoolTeachers = () => {
   const [selectedSchool, setSelectedSchool] = useState<SchoolWithEnrollCount>();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schools } = useListSchools(session);
 
   const handleSelectSchool = (school: SchoolWithEnrollCount) => {

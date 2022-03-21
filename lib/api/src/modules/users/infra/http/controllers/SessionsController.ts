@@ -76,6 +76,14 @@ class SessionsController {
       token,
     });
   }
+
+  @privateRoute()
+  public async validate(
+    _request: Request,
+    response: Response,
+  ): Promise<Response> {
+    return response.json({ status: 'ok' });
+  }
 }
 
 export default SessionsController;

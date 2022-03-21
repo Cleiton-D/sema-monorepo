@@ -5,6 +5,7 @@ import SectionContent from 'components/SectionContent';
 export const Wrapper = styled.div`
   ${({ theme }) => css`
     margin-top: ${theme.spacings.small};
+    margin-bottom: ${theme.spacings.medium};
     display: grid;
     grid-template-columns: 1fr 30%;
     grid-column-gap: ${theme.spacings.medium};

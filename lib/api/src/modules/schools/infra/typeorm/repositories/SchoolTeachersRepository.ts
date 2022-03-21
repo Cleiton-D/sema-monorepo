@@ -25,7 +25,7 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
 
     const schoolTeachers = await this.ormRepository.findOne({
       where,
-      relations: ['employee', 'employee.person', 'school'],
+      relations: ['employee', 'school'],
     });
 
     return schoolTeachers;
@@ -42,7 +42,7 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
 
     const schoolTeachers = await this.ormRepository.find({
       where,
-      relations: ['employee', 'employee.person'],
+      relations: ['employee'],
     });
 
     return schoolTeachers;

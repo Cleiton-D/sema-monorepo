@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Edit3, X } from '@styled-icons/feather';
 
 import ListItem from 'components/ListItem';
@@ -26,7 +26,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data, isLoading, refetch } = useListGradeSchoolSubjects(session, {
     grade_id: gradeId
   });

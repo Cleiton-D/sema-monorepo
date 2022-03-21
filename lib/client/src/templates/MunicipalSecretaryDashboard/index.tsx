@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -14,7 +14,7 @@ import { useCountSchoolSubjects } from 'requests/queries/school-subjects';
 import * as S from './styles';
 
 const MunicipalSecretaryDashboard = () => {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
     id: session?.configs.school_year_id
@@ -30,7 +30,7 @@ const MunicipalSecretaryDashboard = () => {
       <S.Wrapper>
         <Card
           description={`${schoolYear?.reference_year || 'não definido'}`}
-          link="/administration/school-year"
+          link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
         >
           Ano Letivo
@@ -38,17 +38,21 @@ const MunicipalSecretaryDashboard = () => {
 
         <Card
           description="Secretaria Municipal"
-          link="/administration/municipal-secretary"
+          link="/auth/administration/municipal-secretary"
           module="MUNICIPAL_SECRETARY"
         />
 
-        <Card description="Alunos ativos" link="/enrolls" module="ENROLL">
+        <Card
+          description="Matrículas ativas"
+          link="/auth/enrolls"
+          module="ENROLL"
+        >
           {enrollCount?.count}
         </Card>
 
         <Card
           description="Servidores"
-          link="/administration/employees"
+          link="/auth/administration/employees"
           module="EMPLOYEE"
         >
           {employeesCount?.count}
@@ -56,29 +60,50 @@ const MunicipalSecretaryDashboard = () => {
 
         <Card
           description="Escolas"
-          link="/administration/schools"
+          link="/auth/administration/schools"
           module="SCHOOL"
         >
           {schoolsCount?.count}
         </Card>
 
-        <Card description="Séries" link="/administration/grades" module="GRADE">
+        <Card
+          description="Séries"
+          link="/auth/administration/grades"
+          module="GRADE"
+        >
           {gradesCount?.count}
         </Card>
 
         <Card
           description="Disciplinas"
-          link="/administration/school-subjects"
+          link="/auth/administration/school-subjects"
           module="SCHOOL-SUBJECT"
         >
           {schoolSubjectsCount?.count}
         </Card>
 
+        <Card description="Períodos e Horários" link="/auth/class-periods" />
+
         <Card
           description="Lotação de professores"
-          link="/administration/school-teachers"
+          link="/auth/administration/school-teachers"
           module="SCHOOL_TEACHER"
         />
+
+        <Card description="Ata" link="/auth/reports/ata" />
+        <Card
+          description="Livro de registros"
+          link="/auth/reports/registers-book"
+        />
+        <Card
+          description="Quadro de notas"
+          link="/auth/reports/school-report-board"
+        />
+        <Card
+          description="Total geral de faltas"
+          link="/auth/reports/total-attendances"
+        />
+        <Card description="Aulas registradas" link="/auth/classes" />
       </S.Wrapper>
     </Base>
   );

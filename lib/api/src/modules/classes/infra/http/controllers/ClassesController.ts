@@ -8,6 +8,7 @@ import ShowClassService from '@modules/classes/services/ShowClassService';
 import ListClassesService from '@modules/classes/services/ListClassesService';
 import FinishClassService from '@modules/classes/services/FinishClassService';
 import CountClassesService from '@modules/classes/services/CountClassesService';
+import { ClassStatus } from '../../typeorm/entities/Class';
 
 class ClassesController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -24,6 +25,12 @@ class ClassesController {
       classroom_id,
       employee_id,
       school_subject_id,
+      school_id,
+      class_date,
+      class_period_id,
+      grade_id,
+      status,
+      taught_content,
       limit,
       sortBy,
       order,
@@ -34,6 +41,12 @@ class ClassesController {
       classroom_id: classroom_id as string,
       employee_id: employee_id as string,
       school_subject_id: school_subject_id as string,
+      school_id: school_id as string,
+      class_date: class_date as string,
+      class_period_id: class_period_id as string,
+      grade_id: grade_id as string,
+      status: status as ClassStatus,
+      taught_content: taught_content as string,
       limit: limit ? Number(limit) : undefined,
       sortBy: sortBy as string,
       order: order as 'ASC' | 'DESC',
@@ -43,13 +56,19 @@ class ClassesController {
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
-    const { classroom_id, employee_id, school_subject_id } = request.query;
+    const {
+      classroom_id,
+      employee_id,
+      school_subject_id,
+      school_id,
+    } = request.query;
 
     const countClasses = container.resolve(CountClassesService);
     const countResult = await countClasses.execute({
       classroom_id: classroom_id as string,
       employee_id: employee_id as string,
       school_subject_id: school_subject_id as string,
+      school_id: school_id as string,
     });
 
     return response.json(countResult);
@@ -60,9 +79,10 @@ class ClassesController {
     const {
       classroom_id,
       school_subject_id,
+      period,
       class_date,
-      time_start,
       taught_content,
+      school_term,
     } = request.body;
     const user_id = request.user.id;
 
@@ -71,9 +91,10 @@ class ClassesController {
       user_id,
       classroom_id,
       school_subject_id,
+      period,
       class_date,
-      time_start,
       taught_content,
+      school_term,
     });
 
     return response.json(classEntity);

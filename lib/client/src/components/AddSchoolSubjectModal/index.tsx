@@ -6,7 +6,7 @@ import {
   useState,
   useImperativeHandle
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -42,7 +42,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
   const [schoolSubject, setSchoolSubject] = useState<SchoolSubject>();
 
   const modalRef = useRef<ModalRef>(null);
-  const [session] = useSession();
+  const { data: session } = useSession();
   const mutation = useAddSchoolSubjectMutation(modalRef, session);
 
   const formRef = useRef<FormHandles>(null);
@@ -93,6 +93,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
       <S.Wrapper>
         <S.Form onSubmit={handleSave} ref={formRef} initialData={schoolSubject}>
           <TextInput name="description" label="Nome da disciplina" />
+          <TextInput name="index" label="Ordem" type="number" />
           <TextInput
             name="additional_description"
             label="Descrição da disciplina"

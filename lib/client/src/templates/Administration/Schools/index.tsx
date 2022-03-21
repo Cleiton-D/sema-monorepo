@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PlusCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -22,13 +22,13 @@ import * as S from './styles';
 const Schools = () => {
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data } = useListSchools(session);
 
   const { push } = useRouter();
 
   const handleNewSchool = () => {
-    push('/administration/schools/new');
+    push('/auth/administration/schools/new');
   };
 
   const canChangeSchools = useMemo(
@@ -66,12 +66,14 @@ const Schools = () => {
             tableKey=""
             actionColumn
             render={(school: SchoolWithEnrollCount) => (
-              <Link href={`/school/${school.id}`} passHref>
+              <Link href={`/auth/school/${school.id}`} passHref>
                 <S.TableLink>{school.name}</S.TableLink>
               </Link>
             )}
           />
           <TableColumn label="INEP" tableKey="inep_code" />
+          <TableColumn label="Diretor" tableKey="director.name" />
+          <TableColumn label="Vice-Diretor" tableKey="vice_director.name" />
           <TableColumn
             label="Matrículas ativas"
             tableKey="enroll_count"

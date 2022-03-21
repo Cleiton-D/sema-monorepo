@@ -11,5 +11,6 @@ usersRouter.get('/me', usersController.show_me);
 usersRouter.get('/count', usersController.count);
 usersRouter.put('/:user_id/password', usersController.update_password);
 usersRouter.delete('/:user_id', usersController.delete);
+usersRouter.patch('/reset-pass', usersController.reset_password);
 
 export default usersRouter;

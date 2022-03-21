@@ -1,5 +1,6 @@
-import { useRef } from 'react';
-import { useSession } from 'next-auth/client';
+import { useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -7,11 +8,7 @@ import Heading from 'components/Heading';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import ClassroomTeachersTable from 'components/ClassroomTeachersTable';
-import LinkClassroomTeacherSchoolSubjectsModal, {
-  LinkClassroomTeacherSchoolSubjectsModalRef
-} from 'components/LinkClassroomTeacherSchoolSubjectsModal';
 
-import { School } from 'models/School';
 import { Classroom } from 'models/Classroom';
 
 import { useListClassrooms } from 'requests/queries/classrooms';
@@ -20,16 +17,20 @@ import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
 
-export type ClassroomTeacherProps = {
-  school: School;
-};
+const ClassroomTeacher = () => {
+  const { query } = useRouter();
 
-const ClassroomTeacher = ({ school }: ClassroomTeacherProps) => {
-  const modalRef = useRef<LinkClassroomTeacherSchoolSubjectsModalRef>(null);
+  const { data: session } = useSession();
 
-  const [session] = useSession();
+  const schoolId = useMemo(() => {
+    if (query.school_id === 'me') {
+      return session?.schoolId;
+    }
+    return query.school_id as string;
+  }, [query, session]);
+
   const { data: classrooms } = useListClassrooms(session, {
-    school_id: school.id
+    school_id: schoolId
   });
 
   return (
@@ -50,7 +51,7 @@ const ClassroomTeacher = ({ school }: ClassroomTeacherProps) => {
           </TableColumn>
           <TableColumn
             label="Período"
-            tableKey="class_period"
+            tableKey="class_period.description"
             render={(class_period) => translateDescription(class_period)}
           />
           <TableColumn
@@ -58,24 +59,8 @@ const ClassroomTeacher = ({ school }: ClassroomTeacherProps) => {
             tableKey="enroll_count"
             contentAlign="center"
           />
-          <TableColumn
-            label="Ações"
-            tableKey=""
-            contentAlign="center"
-            actionColumn
-            module="CLASSROOM_TEACHER"
-            rule="WRITE"
-            render={(classroom: Classroom) => (
-              <S.OpenModalButton
-                onClick={() => modalRef.current?.openModal(classroom)}
-              >
-                Alterar professores
-              </S.OpenModalButton>
-            )}
-          />
         </Table>
       </S.TableSection>
-      <LinkClassroomTeacherSchoolSubjectsModal ref={modalRef} />
     </Base>
   );
 };

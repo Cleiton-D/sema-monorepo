@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Edit, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -21,7 +21,7 @@ const MunicipalSecretary = () => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: branch } = useShowBranch(session, {
     type: 'MUNICIPAL_SECRETARY'
   });
@@ -51,7 +51,7 @@ const MunicipalSecretary = () => {
                   Secretário
                 </Heading>
                 {municipalSecretary ? (
-                  <span>{municipalSecretary?.person.name}</span>
+                  <span>{municipalSecretary?.name}</span>
                 ) : (
                   <>
                     {canEditMunicipalSecretary ? (

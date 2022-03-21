@@ -24,6 +24,7 @@ class CreateClassAttendancesService {
   }: CreateClassAttendancesRequest): Promise<Attendance[]> {
     const enrollClassrooms = await this.enrollClassroomsRepository.findAll({
       classroom_id: classEntity.classroom_id,
+      status: 'ACTIVE',
     });
 
     const createAttendances = enrollClassrooms.map(item => ({

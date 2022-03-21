@@ -1,10 +1,9 @@
-import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
-
 type FindSchoolReportDTO = {
   enroll_id?: string | string[];
   school_subject_id?: string;
-  average?: number;
-  school_term?: SchoolTerm;
+  school_year_id?: string;
+  student_id?: string;
+  enroll_as?: 'all' | 'last' | 'first';
 };
 
 export default FindSchoolReportDTO;

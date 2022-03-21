@@ -1,34 +1,71 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
-import { PlusCircle, Edit3 } from '@styled-icons/feather';
+import { useSession } from 'next-auth/react';
+import { PlusCircle, Edit3, Power } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
 import Badge from 'components/Badge';
 import Button from 'components/Button';
+import Table from 'components/Table';
+import TableColumn from 'components/TableColumn';
+import ChangeSchoolTermModal, {
+  ChangeSchoolTermModalRef
+} from 'components/ChangeSchoolTermModal';
+
+import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
 
 import { useAccess } from 'hooks/AccessProvider';
 
 import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
+import { useUpdateSchoolTermPeriod } from 'requests/mutations/school-term-periods';
 
 import * as S from './styles';
 
 const SchoolYear = () => {
+  const modalRef = useRef<ChangeSchoolTermModalRef>(null);
+
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
-  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session);
+  const { data: session } = useSession();
+  const { data: schoolYear, refetch } = useSchoolYearWithSchoolTerms(session);
+  const updateSchoolTermPeriod = useUpdateSchoolTermPeriod();
 
   const { push } = useRouter();
 
   const handleAddSchoolYear = () => {
     if (schoolYear?.status === 'PENDING') {
-      push(`/administration/school-year/${schoolYear.id}/edit`);
+      push(`/auth/administration/school-year/${schoolYear.id}/edit`);
       return;
     }
-    push('/administration/school-year/new');
+    push('/auth/administration/school-year/new');
+  };
+
+  const getActionTitle = (item: SchoolTermPeriod) => {
+    return {
+      ACTIVE: 'Encerrar',
+      FINISH: 'Reabrir',
+      PENDING: 'Iniciar'
+    }[item.status];
+  };
+
+  const updateSchoolTerm = async (item: SchoolTermPeriod) => {
+    const title = getActionTitle(item);
+    const confirm = window.confirm(`Deseja ${title} esse período?`);
+    if (!confirm) return;
+
+    const newStatus = {
+      ACTIVE: 'FINISH',
+      FINISH: 'ACTIVE',
+      PENDING: 'ACTIVE'
+    }[item.status];
+
+    await updateSchoolTermPeriod.mutateAsync({
+      id: item.id,
+      status: newStatus
+    });
+    refetch();
   };
 
   const canEditSchoolYear = useMemo(
@@ -84,116 +121,6 @@ const SchoolYear = () => {
                 )}
               </S.GridItem>
             </S.Grid>
-
-            {schoolYear?.schoolTermPeriods && (
-              <>
-                <S.Divider style={{ marginTop: 24 }} />
-                <S.Grid columns={4} gap={20} style={{ marginTop: 24 }}>
-                  {schoolYear.schoolTermPeriods.FIRST && (
-                    <S.SchoolTermContainer>
-                      <strong>1º Bimestre</strong>
-                      <div>
-                        <div>
-                          <strong>Início:</strong>
-                          <span>
-                            {
-                              schoolYear?.schoolTermPeriods.FIRST
-                                ?.formattedDateStart
-                            }
-                          </span>
-                        </div>
-                        <div>
-                          <strong>Fim:</strong>
-                          <span>
-                            {
-                              schoolYear?.schoolTermPeriods.FIRST
-                                ?.formattedDateEnd
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </S.SchoolTermContainer>
-                  )}
-                  {schoolYear.schoolTermPeriods.SECOND && (
-                    <S.SchoolTermContainer>
-                      <strong>2º Bimestre</strong>
-                      <div>
-                        <div>
-                          <strong>Início:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.SECOND
-                                .formattedDateStart
-                            }
-                          </span>
-                        </div>
-                        <div>
-                          <strong>Fim:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.SECOND
-                                .formattedDateEnd
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </S.SchoolTermContainer>
-                  )}
-
-                  {schoolYear.schoolTermPeriods.THIRD && (
-                    <S.SchoolTermContainer>
-                      <strong>3º Bimestre</strong>
-                      <div>
-                        <div>
-                          <strong>Início:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.THIRD
-                                .formattedDateStart
-                            }
-                          </span>
-                        </div>
-                        <div>
-                          <strong>Fim:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.THIRD
-                                .formattedDateEnd
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </S.SchoolTermContainer>
-                  )}
-
-                  {schoolYear.schoolTermPeriods.FOURTH && (
-                    <S.SchoolTermContainer>
-                      <strong>4º Bimestre</strong>
-                      <div>
-                        <div>
-                          <strong>Início:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.FOURTH
-                                .formattedDateStart
-                            }
-                          </span>
-                        </div>
-                        <div>
-                          <strong>Fim:</strong>
-                          <span>
-                            {
-                              schoolYear.schoolTermPeriods.FOURTH
-                                .formattedDateEnd
-                            }
-                          </span>
-                        </div>
-                      </div>
-                    </S.SchoolTermContainer>
-                  )}
-                </S.Grid>
-              </>
-            )}
           </>
         ) : (
           <>
@@ -205,6 +132,64 @@ const SchoolYear = () => {
           </>
         )}
       </S.Wrapper>
+
+      {schoolYear?.schoolTermPeriods && (
+        <S.TableSection>
+          <S.SectionTitle>
+            <h4>Períodos</h4>
+          </S.SectionTitle>
+          {/* <S.Divider style={{ marginTop: 24 }} /> */}
+
+          <Table
+            items={schoolYear.schoolTermPeriodsArray || []}
+            keyExtractor={(value) => value.id}
+          >
+            <TableColumn label="Descrição" tableKey="translatedDescription" />
+            <TableColumn label="Início" tableKey="formattedDateStart" />
+            <TableColumn label="Término" tableKey="formattedDateEnd" />
+            <TableColumn label="Status" tableKey="translatedStatus" />
+            <TableColumn
+              label="Ações"
+              tableKey="actions"
+              contentAlign="center"
+              actionColumn
+              module="SCHOOL_YEAR"
+              rule="WRITE"
+              render={(item: SchoolTermPeriod) => (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <S.ActionButton
+                    type="button"
+                    title="Alterar"
+                    style={{ right: 0 }}
+                    onClick={() => modalRef.current?.openModal(item)}
+                  >
+                    <Edit3 size={20} color="#0393BE" />
+                  </S.ActionButton>
+
+                  <S.ActionButton
+                    type="button"
+                    title={getActionTitle(item)}
+                    onClick={() => updateSchoolTerm(item)}
+                  >
+                    <Power
+                      size={20}
+                      color="#0393BE"
+                      title={getActionTitle(item)}
+                    />
+                  </S.ActionButton>
+                </div>
+              )}
+            />
+          </Table>
+        </S.TableSection>
+      )}
+      <ChangeSchoolTermModal ref={modalRef} />
     </Base>
   );
 };

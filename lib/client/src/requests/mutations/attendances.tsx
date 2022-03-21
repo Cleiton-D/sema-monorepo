@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
@@ -16,17 +16,15 @@ type RegisterAttendancesFormData = {
 };
 
 export function useRegisterAttendances() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const registerAttendances = useCallback(
     async (values: RegisterAttendancesFormData) => {
       const api = initializeApi(session);
 
-      const { class_id, ...requestData } = values;
-
       const { data: responseData } = await api.put<Attendance[]>(
-        `/classes/${class_id}/attendances`,
-        requestData
+        `/attendances`,
+        values
       );
 
       return responseData;

@@ -1,5 +1,5 @@
 import { useRef, useState, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PlusCircle, X } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -25,7 +25,7 @@ const Grades = () => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: grades } = useListGrades(session);
 
   const mutation = useDeleteGradeMutation(session);

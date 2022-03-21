@@ -1,8 +1,5 @@
-import CreateTeacherDTO from '../dtos/CreateTeacherDTO';
-import Teacher from '../infra/typeorm/entities/Teacher';
+import Employee from '@modules/employees/infra/typeorm/entities/Employee';
 
 export default interface ITeachersRepository {
-  findById: (teacher_id: string) => Promise<Teacher | undefined>;
-  findByEmployee: (employee_id: string) => Promise<Teacher | undefined>;
-  create: (data: CreateTeacherDTO) => Promise<Teacher>;
+  findAll: () => Promise<Employee[]>;
 }

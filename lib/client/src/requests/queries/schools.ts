@@ -3,9 +3,10 @@ import { QueryOptions, useQuery } from 'react-query';
 
 import { CompleteSchool, School, SchoolWithEnrollCount } from 'models/School';
 import { EnrollCountResponse } from 'models/Enroll';
+import { ClassroomsCountResponse } from 'models/Classroom';
+import { Multigrade } from 'models/Multigrade';
 
 import { initializeApi } from 'services/api';
-import { ClassroomsCountResponse } from 'models/Classroom';
 
 type GetSchoolFilters = {
   id?: string;
@@ -13,6 +14,18 @@ type GetSchoolFilters = {
 
 type CountSchoolsResponse = {
   count: number;
+};
+
+export const schoolKeys = {
+  all: 'schools' as const,
+  lists: () => [...schoolKeys.all, 'list'] as const,
+  list: (filters: string) => [...schoolKeys.lists(), { filters }] as const,
+  shows: () => [...schoolKeys.all, 'shows'] as const,
+  show: (filters: string) => [...schoolKeys.shows(), { filters }] as const,
+  details: () => [...schoolKeys.all, 'details'] as const,
+  detail: (filters: string) => [...schoolKeys.details(), { filters }] as const,
+  counts: () => [...schoolKeys.all, 'counts'] as const,
+  count: (filters: string) => [...schoolKeys.counts(), { filters }] as const
 };
 
 export const listSchools = (session?: Session | null) => {
@@ -41,20 +54,28 @@ export const getSchoolDetail = async (id: string, session?: Session | null) => {
 
   const school = await getSchool(session, { id });
 
-  const [enrollsCountResponse, classroomsCountResponse] = await Promise.all([
-    api.get<EnrollCountResponse>(`/enrolls/count`, {
-      params: { school_id: school.id, status: 'ACTIVE' }
-    }),
-    api.get<ClassroomsCountResponse>(`/schools/${school.id}/classrooms/count`)
-  ]);
+  const [enrollsCountResponse, classroomsCountResponse, multigradesResponse] =
+    await Promise.all([
+      api.get<EnrollCountResponse>(`/enrolls/count`, {
+        params: { school_id: school.id, status: 'ACTIVE' }
+      }),
+      api.get<ClassroomsCountResponse>(`/classrooms/count`, {
+        params: { school_id: school.id }
+      }),
+      api.get<Multigrade[]>(`/multigrades`, {
+        params: { school_id: school.id }
+      })
+    ]);
 
   const enroll_count = enrollsCountResponse.data.count;
   const classrooms_count = classroomsCountResponse.data.count;
+  const multigrades_count = multigradesResponse.data.length;
 
   return {
     ...school,
     enroll_count,
-    classrooms_count
+    classrooms_count,
+    multigrades_count
   };
 };
 
@@ -72,7 +93,7 @@ export const useListSchools = (
   queryOptions: QueryOptions<SchoolWithEnrollCount[]> = {}
 ) => {
   return useQuery<SchoolWithEnrollCount[]>(
-    'get-schools',
+    schoolKeys.list(JSON.stringify({})),
     () => listSchools(session),
     queryOptions
   );
@@ -82,19 +103,20 @@ export const useGetSchool = (
   session?: Session | null,
   filters: GetSchoolFilters = {}
 ) => {
-  return useQuery<School>(`get-school${JSON.stringify(filters)}`, () =>
+  return useQuery<School>(schoolKeys.show(JSON.stringify(filters)), () =>
     getSchool(session, filters)
   );
 };
 
 export const useGetSchoolDetail = (id: string, session?: Session | null) => {
-  return useQuery<CompleteSchool>(`school_detail-${id}`, () =>
-    getSchoolDetail(id, session)
+  return useQuery<CompleteSchool>(
+    schoolKeys.detail(JSON.stringify({ id })),
+    () => getSchoolDetail(id, session)
   );
 };
 
 export const useCountSchools = (session?: Session | null) => {
-  const key = 'count-schools';
-
-  return useQuery(key, () => countSchools(session));
+  return useQuery(schoolKeys.count(JSON.stringify({})), () =>
+    countSchools(session)
+  );
 };

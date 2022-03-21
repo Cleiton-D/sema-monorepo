@@ -3,12 +3,18 @@ import { container } from 'tsyringe';
 
 import privateRoute from '@shared/decorators/privateRoute';
 
-import CreateClassroomService from '@modules/schools/services/CreateClassroomService';
+import CreateClassroomService, {
+  CreateClassroomRequest,
+} from '@modules/schools/services/CreateClassroomService';
 import CountClassroomsService from '@modules/schools/services/CountClassroomsService';
-import ListClassroomsService from '@modules/schools/services/ListClassroomsService';
+import ListClassroomsService, {
+  ListClassroomsRequest,
+} from '@modules/schools/services/ListClassroomsService';
 import DeleteClassroomService from '@modules/schools/services/DeleteClassroomService';
 import ShowClassroomService from '@modules/schools/services/ShowClassroomService';
-import { ClassPeriodType } from '../../typeorm/entities/Classroom';
+import UpdateClassroomService, {
+  UpdateClassroomRequest,
+} from '@modules/schools/services/UpdateClassroomService';
 
 class ClassroomsController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -22,36 +28,52 @@ class ClassroomsController {
 
   @privateRoute({ module: 'CLASSROOM' })
   public async index(request: Request, response: Response): Promise<Response> {
-    const { school_id } = request.params;
-    const { grade_id, class_period } = request.query;
+    const {
+      grade_id,
+      class_period_id,
+      employee_id,
+      school_id,
+      with_in_multigrades,
+      with_multigrades,
+    } = request.query;
 
-    const listClassrooms = container.resolve(ListClassroomsService);
-    if (school_id === 'me') {
-      const { branch_id } = request.profile;
-      const classrooms = await listClassrooms.execute({
-        branch_id,
-        grade_id: grade_id as string,
-        class_period: class_period as ClassPeriodType,
-      });
-      return response.json(classrooms);
+    const listClassroomsRequest: ListClassroomsRequest = {
+      grade_id: grade_id as string,
+      class_period_id: class_period_id as string,
+      employee_id: employee_id as string,
+    };
+
+    if (typeof with_in_multigrades !== 'undefined') {
+      listClassroomsRequest.with_in_multigrades = Boolean(+with_in_multigrades);
+    }
+    if (typeof with_multigrades !== 'undefined') {
+      listClassroomsRequest.with_multigrades = Boolean(+with_multigrades);
     }
 
-    const classrooms = await listClassrooms.execute({
-      school_id,
-      grade_id: grade_id as string,
-      class_period: class_period as ClassPeriodType,
-    });
+    if (school_id === 'me') {
+      const { branch_id } = request.profile;
+      listClassroomsRequest.branch_id = branch_id;
+    } else {
+      listClassroomsRequest.school_id = school_id as string;
+    }
+
+    const listClassrooms = container.resolve(ListClassroomsService);
+    const classrooms = await listClassrooms.execute(listClassroomsRequest);
     return response.json(classrooms);
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
-    const { school_id } = request.params;
-    const { class_period, grade_id, school_year_id } = request.query;
+    const {
+      class_period_id,
+      grade_id,
+      school_year_id,
+      school_id,
+    } = request.query;
 
     const countClassrooms = container.resolve(CountClassroomsService);
     const result = await countClassrooms.execute({
-      school_id,
-      class_period: class_period as ClassPeriodType,
+      school_id: school_id as string,
+      class_period_id: class_period_id as string,
       grade_id: grade_id as string,
       school_year_id: school_year_id as string,
     });
@@ -61,44 +83,77 @@ class ClassroomsController {
 
   @privateRoute({ module: 'CLASSROOM' })
   public async create(request: Request, response: Response): Promise<Response> {
-    const { school_id } = request.params;
     const {
       description,
-      class_period,
+      class_period_id,
       grade_id,
       school_year_id,
+      school_id,
+      capacity,
+      is_multigrade,
     } = request.body;
 
-    const createClassroom = container.resolve(CreateClassroomService);
+    const requestPayload: CreateClassroomRequest = {
+      description,
+      class_period_id,
+      grade_id,
+      school_year_id,
+      capacity,
+      is_multigrade,
+    };
+
     if (school_id === 'me') {
       const { branch_id } = request.profile;
-
-      const classroom = await createClassroom.execute({
-        description,
-        class_period,
-        grade_id,
-        branch_id,
-        school_year_id,
-      });
-
-      return response.json(classroom);
+      requestPayload.branch_id = branch_id;
+    } else {
+      requestPayload.school_id = school_id;
     }
-    const classroom = await createClassroom.execute({
-      description,
-      class_period,
-      grade_id,
-      school_id,
-      school_year_id,
-    });
 
+    const updateClassroom = container.resolve(CreateClassroomService);
+    const classroom = await updateClassroom.execute(requestPayload);
+    return response.json(classroom);
+  }
+
+  @privateRoute({ module: 'CLASSROOM' })
+  public async update(request: Request, response: Response): Promise<Response> {
+    const {
+      description,
+      class_period_id,
+      grade_id,
+      school_year_id,
+      school_id,
+      capacity,
+      is_multigrade,
+    } = request.body;
+    const { classroom_id } = request.params;
+
+    const requestPayload: UpdateClassroomRequest = {
+      id: classroom_id,
+      description,
+      class_period_id,
+      grade_id,
+      school_year_id,
+      capacity,
+      is_multigrade,
+    };
+
+    if (school_id === 'me') {
+      const { branch_id } = request.profile;
+      requestPayload.branch_id = branch_id;
+    } else {
+      requestPayload.school_id = school_id;
+    }
+
+    const createClassroom = container.resolve(UpdateClassroomService);
+    const classroom = await createClassroom.execute(requestPayload);
     return response.json(classroom);
   }
 
   public async delete(request: Request, response: Response): Promise<Response> {
-    const { school_id, classroom_id } = request.params;
+    const { classroom_id } = request.params;
 
     const deleteClassroom = container.resolve(DeleteClassroomService);
-    await deleteClassroom.execute({ classroom_id, school_id });
+    await deleteClassroom.execute({ classroom_id });
 
     return response.status(204).send();
   }

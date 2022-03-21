@@ -2,9 +2,8 @@ import { inject, injectable } from 'tsyringe';
 
 import { ContactType } from '@modules/contacts/infra/typeorm/entities/Contact';
 import { Gender } from '@modules/persons/infra/typeorm/entities/Person';
-import { DocumentType } from '@modules/persons/infra/typeorm/entities/PersonDocument';
-import CreatePersonService from '@modules/persons/services/CreatePersonService';
 import CreateUserService from '@modules/users/services/CreateUserService';
+import CreateAddressService from '@modules/address/services/CreateAddressService';
 
 import AppError from '@shared/errors/AppError';
 
@@ -19,11 +18,6 @@ type AddressData = {
   region: string;
 };
 
-type DocumentData = {
-  document_number: string;
-  document_type: DocumentType;
-};
-
 type ContactData = {
   description: string;
   type: ContactType;
@@ -36,9 +30,10 @@ type CreateEmployeeRequest = {
   gender?: Gender;
   birth_date?: Date;
   address?: AddressData;
-  documents: DocumentData[];
   contacts: ContactData[];
   pis_pasep: string;
+  cpf: string;
+  rg?: string;
   education_level: string;
 };
 
@@ -47,7 +42,7 @@ class CreateEmployeeService {
   constructor(
     @inject('EmployeesRepository')
     private employeesRepository: IEmployeesRepository,
-    private createPerson: CreatePersonService,
+    private createAddressService: CreateAddressService,
     private createUser: CreateUserService,
   ) {}
 
@@ -57,11 +52,12 @@ class CreateEmployeeService {
     dad_name,
     birth_date,
     gender,
-    documents,
-    address,
+    address: addressData,
     contacts,
     education_level,
     pis_pasep,
+    cpf,
+    rg,
   }: CreateEmployeeRequest): Promise<Employee> {
     const existsEmployee = await this.employeesRepository.findOne({
       pis_pasep,
@@ -71,43 +67,45 @@ class CreateEmployeeService {
       throw new AppError('Already exists an employee with this PIS/PASEP');
     }
 
-    const email = contacts.find(contact => contact.type === 'email');
-    if (!email || !email.description) {
-      throw new AppError('Email cannot be empty');
-    }
-
-    const newDocuments: DocumentData[] = [
-      ...documents,
-      { document_type: 'PIS-PASEP', document_number: pis_pasep },
-    ];
-
-    const cpf = newDocuments.find(document => document.document_type === 'CPF');
-    if (!cpf || !cpf.document_number) {
+    // const email = contacts.find(contact => contact.type === 'email');
+    // if (!email || !email.description) {
+    //   throw new AppError('Email cannot be empty');
+    // }
+    if (!cpf) {
       throw new AppError('CPF cannot be empty');
     }
 
-    const person = await this.createPerson.execute({
+    const parsedCpf = cpf.replace(/\D/g, '');
+
+    const user = await this.createUser.execute({
+      username: name,
+      login: parsedCpf,
+      password: '12345678',
+    });
+
+    const address = addressData
+      ? await this.createAddressService.execute({
+          city: addressData.city,
+          district: addressData.district,
+          house_number: addressData.house_number,
+          region: addressData.region,
+          street: addressData.street,
+        })
+      : undefined;
+
+    const employee = await this.employeesRepository.create({
       name,
       mother_name,
       dad_name,
       birth_date,
       gender,
-      documents: newDocuments,
-      address,
       contacts,
-    });
-
-    const user = await this.createUser.execute({
-      username: name,
-      login: email.description,
-      password: cpf.document_number,
-    });
-
-    const employee = await this.employeesRepository.create({
-      person,
+      address,
       user,
       education_level,
       pis_pasep,
+      cpf,
+      rg,
     });
 
     return employee;

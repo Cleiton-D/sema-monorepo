@@ -4,6 +4,7 @@ import { PrimitiveAtom, useAtom } from 'jotai';
 import { ValidationError } from 'yup';
 
 import TextInput from 'components/TextInput';
+import Select from 'components/Select';
 
 import { EmployeeBasicFormData } from 'models/Employee';
 import { FormHandles } from 'models/Form';
@@ -65,13 +66,21 @@ const EmployeeForm: React.ForwardRefRenderFunction<
       <S.Form onSubmit={handleSubmit} initialData={state} ref={formRef}>
         <S.FieldsContainer>
           <TextInput label="Nome" name="name" />
-          {/* <TextInput label="Data de nascimento" name="birth_date" mask="date" /> */}
-          {/* <TextInput label="Nome da mãe" name="mother_name" />
-          <TextInput label="Nome do pai" name="dad_name" /> */}
+          <TextInput label="Data de nascimento" name="birth_date" mask="date" />
+          <TextInput label="Nome da mãe" name="mother_name" />
+          <TextInput label="Nome do pai" name="dad_name" />
+          <Select
+            label="Sexo"
+            name="gender"
+            options={[
+              { label: 'Masculino', value: 'male' },
+              { label: 'Feminino', value: 'female' }
+            ]}
+          />
           <TextInput label="Grau de Instrução" name="education_level" />
         </S.FieldsContainer>
 
-        {/* <Scope path="address">
+        <Scope path="address">
           <S.SectionTitle style={{ marginTop: '2rem' }}>
             <h4>Endereço</h4>
           </S.SectionTitle>
@@ -83,7 +92,7 @@ const EmployeeForm: React.ForwardRefRenderFunction<
             <TextInput name="district" label="Bairro" />
             <TextInput name="region" label="Região" />
           </S.FieldsContainer>
-        </Scope> */}
+        </Scope>
       </S.Form>
     </S.Wrapper>
   );

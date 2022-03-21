@@ -1,4 +1,11 @@
-import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef
+} from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { LocaleUtils, DayPickerInputProps } from 'react-day-picker';
 import { X } from '@styled-icons/feather';
@@ -36,11 +43,13 @@ const DatePicker = ({
   month,
   value,
   disabled = false,
-  onChangeDay
+  onChangeDay = () => null
 }: DatePickerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [inputText, setInputText] = useState('');
   const [key, setKey] = useState(uuidv4());
+
+  const selectedDateRef = useRef<{ value?: Date }>({ value: undefined });
 
   const { registerField, fieldName, defaultValue, error } = useField(name);
 
@@ -101,9 +110,15 @@ const DatePicker = ({
   useEffect(() => {
     registerField({
       name: fieldName,
-      getValue: () => selectedDate
+      ref: selectedDateRef,
+      getValue: (ref) => ref.current.value,
+      setValue: (_, value: Date) => handleSelectDay(value)
     });
-  }, [registerField, fieldName, selectedDate]);
+  }, [registerField, fieldName, handleSelectDay]);
+
+  useEffect(() => {
+    selectedDateRef.current.value = selectedDate;
+  }, [selectedDate]);
 
   useEffect(() => {
     const newValue = value || defaultValue;

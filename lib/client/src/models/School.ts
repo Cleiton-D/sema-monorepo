@@ -15,11 +15,15 @@ export type School = {
   director: Employee;
   vice_director_id: string;
   vice_director: Employee;
+  creation_decree: string;
+  recognition_opinion: string;
+  authorization_ordinance: string;
 };
 
 export type CompleteSchool = School & {
   enroll_count: number;
   classrooms_count: number;
+  multigrades_count: number;
 };
 
 export type SchoolWithEnrollCount = Omit<School, 'address' | 'contacts'> & {
@@ -39,4 +43,7 @@ export type BasicSchoolFormType = {
   inep_code: string;
   director_id: Employee;
   vice_director_id: Employee;
+  creation_decree: string;
+  recognition_opinion: string;
+  authorization_ordinance: string;
 };

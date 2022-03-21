@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { getSession, useSession } from 'next-auth/client';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -24,7 +24,7 @@ type ChangePasswordFormData = {
 const ChangePassword = () => {
   const [loading, setLoading] = useState(false);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const api = useApi(session);
 
   const formRef = useRef<FormHandles>(null);
@@ -41,14 +41,20 @@ const ChangePassword = () => {
         password: values.newPassword
       });
 
+      await signIn('refresh', {
+        profileId: session?.profileId,
+        token: session?.jwt,
+        redirect: false
+      });
+
       // update session
-      await getSession({});
+      // await getSession({});
 
       toast.success('Senha criada com sucesso.', {
         position: toast.POSITION.TOP_RIGHT
       });
 
-      return push(`${query?.callbackUrl || ''}`);
+      return push(`${query?.callbackUrl || '/auth'}`);
     } catch (err) {
       if (err instanceof ValidationError) {
         const validationErrors: Record<string, string> = {};

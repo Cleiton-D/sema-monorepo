@@ -67,8 +67,8 @@ const DocumentsForm: React.ForwardRefRenderFunction<
         initialData={state}
         ref={formRef}
       >
-        <TextInput label="CPF" name="CPF" />
-        <TextInput label="RG" name="RG" />
+        <TextInput label="CPF" name="cpf" />
+        <TextInput label="RG" name="rg" />
         <TextInput label="PIS / PASEP" name="pis_pasep" />
       </S.Form>
     </S.Wrapper>

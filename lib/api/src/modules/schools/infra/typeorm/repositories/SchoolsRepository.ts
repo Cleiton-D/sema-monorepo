@@ -34,13 +34,7 @@ export default class SchoolsRepository implements ISchoolsRepository {
           contacts: 'school_contacts.contact',
         },
       },
-      relations: [
-        'address',
-        'director',
-        'director.person',
-        'vice_director',
-        'vice_director.person',
-      ],
+      relations: ['address', 'director', 'vice_director'],
     });
 
     return school;
@@ -53,6 +47,8 @@ export default class SchoolsRepository implements ISchoolsRepository {
 
   public async findWithEnrolls(): Promise<School[]> {
     const queryBuilder = this.ormRepository.createQueryBuilder('school');
+    queryBuilder.leftJoinAndSelect('school.director', 'director');
+    queryBuilder.leftJoinAndSelect('school.vice_director', 'vice_director');
     queryBuilder.loadRelationCountAndMap(
       'school.enroll_count',
       'school.enrolls',
@@ -80,6 +76,9 @@ export default class SchoolsRepository implements ISchoolsRepository {
     inep_code,
     director_id,
     vice_director_id,
+    creation_decree,
+    recognition_opinion,
+    authorization_ordinance,
     branch,
     address,
     contacts,
@@ -92,6 +91,9 @@ export default class SchoolsRepository implements ISchoolsRepository {
       branch,
       director_id,
       vice_director_id,
+      creation_decree,
+      recognition_opinion,
+      authorization_ordinance,
       address,
       school_contacts,
     });

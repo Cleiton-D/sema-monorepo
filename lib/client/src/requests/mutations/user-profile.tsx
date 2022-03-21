@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
@@ -21,7 +21,7 @@ type DeleteUserProfileData = {
 };
 
 export function useCreateUserProfile() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const createUserProfile = useCallback(
     async (values: CreateUserProfileForm) => {
@@ -49,7 +49,7 @@ type DeleteUserProfileOptions = {
 export function useDeleteUserProfile({
   showToasts = true
 }: DeleteUserProfileOptions = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteUserProfile = useCallback(
     async (values: DeleteUserProfileData) => {

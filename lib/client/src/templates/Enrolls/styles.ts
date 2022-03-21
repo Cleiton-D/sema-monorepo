@@ -3,10 +3,12 @@ import styled, { css } from 'styled-components';
 import SectionContent from 'components/SectionContent';
 
 export const TableSection = styled(SectionContent)`
-  margin-top: 2rem;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 1rem;
+  ${({ theme }) => css`
+    margin-top: ${theme.spacings.xlarge};
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 1rem;
+  `}
 `;
 
 export const SectionTitle = styled.div`
@@ -22,12 +24,4 @@ export const SectionTitle = styled.div`
 export const AddButtonContainer = styled.div`
   width: 25rem;
   align-self: flex-end;
-`;
-
-export const TableLink = styled.a`
-  ${({ theme }) => css`
-    color: ${theme.colors.primary};
-    font: inherit;
-    text-decoration: underline;
-  `}
 `;

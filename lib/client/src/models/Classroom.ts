@@ -6,6 +6,7 @@ import { SchoolYear } from './SchoolYear';
 export type Classroom = {
   id: string;
   description: string;
+  class_period_id?: string;
   class_period: ClassPeriod;
   school_id: string;
   school?: School;
@@ -16,6 +17,7 @@ export type Classroom = {
   created_at: Date;
   updated_at: Date;
   enroll_count?: number;
+  is_multigrade?: boolean;
 };
 
 export type ClassroomsCountResponse = {

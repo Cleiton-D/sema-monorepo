@@ -1,11 +1,10 @@
 import { inject, injectable } from 'tsyringe';
 
-import CreatePersonService from '@modules/persons/services/CreatePersonService';
-import UpdatePersonService from '@modules/persons/services/UpdatePersonService';
-
 import { ContactType } from '@modules/contacts/infra/typeorm/entities/Contact';
-import Person, { Gender } from '@modules/persons/infra/typeorm/entities/Person';
-import { DocumentType } from '@modules/persons/infra/typeorm/entities/PersonDocument';
+import CreateAddressService from '@modules/address/services/CreateAddressService';
+
+import { Gender } from '@shared/infra/typeorm/enums/Gender';
+
 import Student from '../infra/typeorm/entities/Student';
 import IStudentsRepository from '../repositories/IStudentsRepository';
 
@@ -17,26 +16,29 @@ type AddressData = {
   region: string;
 };
 
-type DocumentData = {
-  document_number: string;
-  document_type: DocumentType;
-};
-
 type ContactData = {
   description: string;
   type: ContactType;
 };
 
 type CreateStudentRequest = {
-  person_id?: string;
   name: string;
   mother_name: string;
   dad_name?: string;
   gender: Gender;
-  birth_date: Date;
+  birth_date: string;
   address: AddressData;
-  documents: DocumentData[];
   contacts: ContactData[];
+  cpf?: string;
+  rg?: string;
+  nis?: string;
+  birth_certificate?: string;
+  breed: string;
+  naturalness: string;
+  naturalness_uf: string;
+  identity_document: string;
+  nationality: string;
+  unique_code: string;
 };
 
 @injectable()
@@ -44,76 +46,59 @@ class CreateStudentService {
   constructor(
     @inject('StudentsRepository')
     private studentsRepository: IStudentsRepository,
-    private createPerson: CreatePersonService,
-    private updatePerson: UpdatePersonService,
+    private createAddressService: CreateAddressService,
   ) {}
 
   public async execute({
-    person_id,
     name,
     mother_name,
     dad_name,
     birth_date,
     gender,
-    documents,
-    address,
+    address: addressData,
     contacts,
+    cpf,
+    rg,
+    nis,
+    birth_certificate,
+    breed,
+    identity_document,
+    nationality,
+    naturalness,
+    naturalness_uf,
+    unique_code,
   }: CreateStudentRequest): Promise<Student> {
-    const person = await this.getPerson({
-      person_id,
+    const address = addressData
+      ? await this.createAddressService.execute({
+          city: addressData.city,
+          district: addressData.district,
+          house_number: addressData.house_number,
+          region: addressData.region,
+          street: addressData.street,
+        })
+      : undefined;
+
+    const student = await this.studentsRepository.create({
       name,
       mother_name,
       dad_name,
       birth_date,
       gender,
-      documents,
       address,
-      contacts,
+      cpf,
+      rg,
+      nis,
+      birth_certificate,
+      breed,
+      identity_document,
+      nationality,
+      naturalness,
+      naturalness_uf,
+      unique_code,
+      contacts: contacts || [],
     });
 
-    const student = await this.studentsRepository.create({ person });
     return student;
-  }
-
-  private async getPerson({
-    person_id,
-    name,
-    mother_name,
-    dad_name,
-    birth_date,
-    gender,
-    documents,
-    address,
-    contacts,
-  }: CreateStudentRequest): Promise<Person> {
-    if (person_id) {
-      const person = await this.updatePerson.execute({
-        person_id,
-        name,
-        mother_name,
-        dad_name,
-        birth_date,
-        gender,
-        documents,
-        address,
-        contacts,
-      });
-
-      return person;
-    }
-
-    const person = await this.createPerson.execute({
-      name,
-      mother_name,
-      dad_name,
-      birth_date,
-      gender,
-      documents,
-      address,
-      contacts,
-    });
-
-    return person;
   }
 }
 

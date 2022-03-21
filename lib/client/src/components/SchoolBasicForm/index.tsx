@@ -15,13 +15,30 @@ const SchoolBasicForm = () => {
   };
 
   return (
-    <S.Wrapper onSubmit={(values) => setState(values)} initialData={state}>
-      <TextInput name="name" label="Nome" onChange={handleChangeInput} />
-      <TextInput
-        name="inep_code"
-        label="Código do INEP"
-        onChange={handleChangeInput}
-      />
+    <S.Wrapper>
+      <S.Form onSubmit={(values) => setState(values)} initialData={state}>
+        <TextInput name="name" label="Nome" onChange={handleChangeInput} />
+        <TextInput
+          name="inep_code"
+          label="Código do INEP"
+          onChange={handleChangeInput}
+        />
+        <TextInput
+          name="creation_decree"
+          label="Decreto de criação"
+          onChange={handleChangeInput}
+        />
+        <TextInput
+          name="recognition_opinion"
+          label="Parecer de reconhecimento"
+          onChange={handleChangeInput}
+        />
+        <TextInput
+          name="authorization_ordinance"
+          label="Portaria de autorização"
+          onChange={handleChangeInput}
+        />
+      </S.Form>
     </S.Wrapper>
   );
 };

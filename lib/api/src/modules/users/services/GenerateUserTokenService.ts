@@ -30,9 +30,7 @@ class GenerateUserTokenService {
     user_id,
     user_profile_id,
   }: GenerateUserTokenRequest): Promise<GenerateUserTokenResponse> {
-    const userProfile = user_profile_id
-      ? await this.userProfilesRepository.findOne({ id: user_profile_id })
-      : await this.userProfilesRepository.findOne({ user_id, default: true });
+    const userProfile = await this.getUserProfile(user_id, user_profile_id);
 
     if (user_profile_id && !userProfile) {
       throw new AppError('Profile not found');
@@ -45,6 +43,27 @@ class GenerateUserTokenService {
     });
 
     return { token, profile: userProfile };
+  }
+
+  private async getUserProfile(
+    user_id: string,
+    user_profile_id?: string,
+  ): Promise<UserProfile | undefined> {
+    if (user_profile_id) {
+      return this.userProfilesRepository.findOne({ id: user_profile_id });
+    }
+
+    const userProfile = await this.userProfilesRepository.findOne({
+      user_id,
+      default: true,
+    });
+    if (userProfile) return userProfile;
+
+    const [firstUserProfile] = await this.userProfilesRepository.findAll({
+      user_id,
+    });
+
+    return firstUserProfile;
   }
 }
 

@@ -1,16 +1,16 @@
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { useResetAtom } from 'jotai/utils';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
-import Button from 'components/Button';
 
 import SchoolBasicForm from 'components/SchoolBasicForm';
 import AddressForm from 'components/AddressForm';
 import ContactsForm from 'components/ContactsForm';
 import SchoolAdministrationForm from 'components/SchoolAdministrationForm';
+import FormsGroup from 'components/FormsGroup';
 
 import {
   basicSchoolData,
@@ -26,7 +26,7 @@ import { useAddSchoolMutation } from 'requests/mutations/schools';
 import * as S from './styles';
 
 const NewSchool = () => {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const mutation = useAddSchoolMutation(session);
   const resetForm = useResetAtom(createSchoolData);
 
@@ -54,7 +54,7 @@ const NewSchool = () => {
       employees: employeesUsers
     });
 
-    await push('/administration/schools');
+    await push('/auth/administration/schools');
     resetForm();
   }, []);
 
@@ -64,18 +64,14 @@ const NewSchool = () => {
       <SchoolBasicForm />
 
       <S.FormsSection>
-        <AddressForm jotaiState={schoolAddressData} />
-        <ContactsForm jotaiState={schoolContactsData} />
-        <SchoolAdministrationForm
-          jotaiState={employeesSchoolData}
-          basicJotaiState={basicSchoolData}
-        />
-
-        <S.SectionButton>
-          <Button styleType="rounded" onClick={handleFinish}>
-            Finalizar
-          </Button>
-        </S.SectionButton>
+        <FormsGroup onFinish={handleFinish}>
+          <AddressForm jotaiState={schoolAddressData} />
+          <ContactsForm jotaiState={schoolContactsData} />
+          <SchoolAdministrationForm
+            jotaiState={employeesSchoolData}
+            basicJotaiState={basicSchoolData}
+          />
+        </FormsGroup>
       </S.FormsSection>
     </Base>
   );

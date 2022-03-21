@@ -37,8 +37,12 @@ class AttendancesRepository implements IAttendancesRepository {
     if (attendance) where.attendance = attendance;
     if (classroom_id) {
       andWhere.push({
-        condition: 'class.classroom_id = :classroomId',
+        condition: 'enroll_classroom.classroom_id = :classroomId',
         parameters: { classroomId: classroom_id },
+      });
+      andWhere.push({
+        condition: 'enroll_classroom.status = :enrollClassroomStatus',
+        parameters: { enrollClassroomStatus: 'ACTIVE' },
       });
     }
 
@@ -53,9 +57,11 @@ class AttendancesRepository implements IAttendancesRepository {
         alias: 'attendance',
         leftJoinAndSelect: {
           enroll: 'attendance.enroll',
-          person: 'enroll.person',
+          student: 'enroll.student',
           class: 'attendance.class',
           classroom: 'class.classroom',
+          enroll_classroom: 'enroll.enroll_classrooms',
+          schoolSubject: 'class.school_subject',
         },
       },
     });

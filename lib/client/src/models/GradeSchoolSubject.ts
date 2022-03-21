@@ -1,6 +1,5 @@
 import { Grade } from './Grade';
 import { SchoolSubject } from './SchoolSubject';
-import { SchoolYear } from './SchoolYear';
 
 export type GradeSchoolSubject = {
   id: string;

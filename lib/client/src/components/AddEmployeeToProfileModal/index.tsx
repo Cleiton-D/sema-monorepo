@@ -5,7 +5,7 @@ import {
   useMemo,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -37,7 +37,7 @@ const AddEmployeeToProfileModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading } = useListEmployees(session);
 
   const openModal = () => {
@@ -70,7 +70,7 @@ const AddEmployeeToProfileModal: React.ForwardRefRenderFunction<
 
     return employees.map((employee) => ({
       value: employee,
-      label: employee.person.name
+      label: employee.name
     }));
   }, [employees, isLoading]);
 

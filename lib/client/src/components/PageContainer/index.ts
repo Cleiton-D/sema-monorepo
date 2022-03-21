@@ -14,7 +14,7 @@ const PageContainer = styled.div`
   width: 100%;
   margin: 0 auto;
 
-  ${customMedia.greaterThan('small')`
+  /* ${customMedia.greaterThan('small')`
     max-width: 54rem;
   `}
 
@@ -28,7 +28,7 @@ const PageContainer = styled.div`
 
   ${customMedia.greaterThan('huge')`
     max-width: 110rem;
-  `}
+  `} */
 `;
 
 export default PageContainer;

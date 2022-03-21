@@ -30,8 +30,7 @@ export const ButtonsContainer = styled.div`
     justify-content: flex-end;
 
     button {
-      width: 17.1rem;
-      height: 4.6rem;
+      width: 15rem;
 
       & + button {
         margin-left: ${theme.spacings.xsmall};

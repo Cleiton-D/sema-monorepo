@@ -1,5 +1,5 @@
 import { useRef, forwardRef, useImperativeHandle, useState } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -47,7 +47,7 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schoolSubjects, isLoading } = useListSchoolsSubjects(session);
 
   const mutation = useMutateGradeSchoolSubject(modalRef);

@@ -7,6 +7,7 @@ import ISchoolSubjectsRepository from '../repositories/ISchoolSubjectsRepository
 type CreateSchoolSubjectRequest = {
   description: string;
   additional_description: string;
+  index: number;
 };
 
 @injectable()
@@ -19,10 +20,12 @@ class CreateSchoolSubjectService {
   public async execute({
     description,
     additional_description,
+    index,
   }: CreateSchoolSubjectRequest): Promise<SchoolSubject> {
     const schoolSubject = await this.schoolSubjectsRepository.create({
       description,
       additional_description,
+      index,
     });
 
     return schoolSubject;

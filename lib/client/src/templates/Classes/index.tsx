@@ -1,6 +1,6 @@
-import { useRef, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PlusCircle } from '@styled-icons/feather';
 import Link from 'next/link';
 
@@ -10,42 +10,43 @@ import Heading from 'components/Heading';
 import Button from 'components/Button';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
-import SelectTeacherClassroomModal, {
-  SelectTeacherClassroomModalRef
-} from 'components/SelectTeacherClassroomModal';
+import SearchClasses from 'components/SearchClasses';
 
 import { useAccess } from 'hooks/AccessProvider';
 
 import { FormattedClass } from 'models/Class';
 
-import { useListClasses } from 'requests/queries/class';
+import { ListClassesFilters, useListClasses } from 'requests/queries/class';
 
 import * as S from './styles';
 
-type HandleNewClassProps = {
-  classroomId: string;
-  schoolSubjectId: string;
-};
-
 const ClassesTemplate = () => {
-  const modalRef = useRef<SelectTeacherClassroomModalRef>(null);
+  const [filters, setFilters] = useState<ListClassesFilters>({});
 
   const { enableAccess } = useAccess();
 
   const router = useRouter();
 
-  const [session] = useSession();
-  const { data: classes } = useListClasses(session, {
-    employee_id: session?.user.employeeId
-  });
+  const { data: session } = useSession();
 
-  const handleNewClass = ({
-    classroomId,
-    schoolSubjectId
-  }: HandleNewClassProps) => {
-    router.push(
-      `/classes/new?classroom=${classroomId}&school_subject=${schoolSubjectId}`
-    );
+  const listClassesFilters = useMemo(() => {
+    const isTeacher = session?.accessLevel?.code === 'teacher';
+    if (!isTeacher) {
+      return { ...filters, sortBy: 'created_at' };
+    }
+
+    return {
+      ...filters,
+      employee_id: session?.user.employeeId,
+      school_id: session?.schoolId,
+      sortBy: 'created_at'
+    };
+  }, [session, filters]);
+
+  const { data: classes } = useListClasses(session, listClassesFilters);
+
+  const handleNewClass = () => {
+    router.push(`/auth/classes/new`);
   };
 
   const canChangeClass = useMemo(
@@ -62,12 +63,14 @@ const ClassesTemplate = () => {
             styleType="normal"
             size="medium"
             icon={<PlusCircle />}
-            onClick={() => modalRef.current?.openModal()}
+            onClick={handleNewClass}
           >
             Nova Aula
           </Button>
         </S.AddButtonContainer>
       )}
+
+      <SearchClasses handleSearch={setFilters} />
 
       <S.TableSection>
         <S.SectionTitle>
@@ -82,7 +85,7 @@ const ClassesTemplate = () => {
             tableKey="classroom.description"
             actionColumn
             render={(classEntity: FormattedClass) => (
-              <Link href={`/classes/${classEntity.id}`} passHref>
+              <Link href={`/auth/classes/${classEntity.id}`} passHref>
                 <S.TableLink title="Visualizar aula">
                   {classEntity.classroom.description}
                 </S.TableLink>
@@ -95,12 +98,10 @@ const ClassesTemplate = () => {
           />
           <TableColumn label="Status" tableKey="translatedStatus" />
           <TableColumn label="Data" tableKey="formattedClassDate" />
-          <TableColumn label="Início" tableKey="formattedTimeStart" />
-          <TableColumn label="Fim" tableKey="formattedTimeEnd" />
+          <TableColumn label="Horário" tableKey="period" />
           <TableColumn label="Conteúdo" tableKey="taught_content" ellipsis />
         </Table>
       </S.TableSection>
-      <SelectTeacherClassroomModal ref={modalRef} onSubmit={handleNewClass} />
     </Base>
   );
 };

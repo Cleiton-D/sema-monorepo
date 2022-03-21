@@ -1,6 +1,10 @@
-import Providers, { CredentialsProvider } from 'next-auth/providers';
+import CredentialsProvider, {
+  CredentialsProvider as CredentialsProviderProps
+} from 'next-auth/providers/credentials';
 
-const Refresh: CredentialsProvider = (options) => ({
+// import Providers, { CredentialsProvider } from 'next-auth/providers';
+
+const Refresh: CredentialsProviderProps = (options) => ({
   id: 'refresh',
   name: 'Refresh',
   type: 'credentials',
@@ -12,6 +16,6 @@ const Refresh: CredentialsProvider = (options) => ({
   ...options
 });
 
-const Credentials = Providers.Credentials;
+const Credentials = CredentialsProvider;
 
 export { Credentials, Refresh };

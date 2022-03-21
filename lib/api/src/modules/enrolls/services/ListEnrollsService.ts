@@ -5,14 +5,21 @@ import ISchoolsRepository from '@modules/schools/repositories/ISchoolsRepository
 
 import AppError from '@shared/errors/AppError';
 
-import Enroll from '../infra/typeorm/entities/Enroll';
+import Enroll, { EnrollStatus } from '../infra/typeorm/entities/Enroll';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
 
-type ListEnrollsRequest = {
+export type ListEnrollsRequest = {
   classroom_id?: string;
   school_id?: string;
   branch_id?: string;
   grade_id?: string;
+  status?: EnrollStatus;
+  class_period_id?: string;
+  student_name?: string;
+  student_cpf?: string;
+  student_nis?: string;
+  student_birth_certificate?: string;
+  order?: string | string[];
 };
 
 @injectable()
@@ -27,16 +34,31 @@ class ListEnrollsService {
     grade_id,
     school_id,
     branch_id,
+    class_period_id,
+    student_name,
+    student_cpf,
+    student_nis,
+    student_birth_certificate,
+    status,
+    order = [],
   }: ListEnrollsRequest): Promise<Enroll[]> {
     const schoolId =
       school_id || branch_id
-        ? await (await this.getSchool({ school_id, branch_id })).id
+        ? (await this.getSchool({ school_id, branch_id })).id
         : undefined;
 
+    const orderArray = Array.isArray(order) ? order : [order];
     const enrolls = await this.enrollsRepository.findAll({
       grade_id,
       school_id: schoolId,
       classroom_id,
+      class_period_id,
+      status,
+      student_name,
+      student_cpf,
+      student_nis,
+      student_birth_certificate,
+      order: orderArray,
     });
     return enrolls;
   }

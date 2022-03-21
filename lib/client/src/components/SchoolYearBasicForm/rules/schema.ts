@@ -15,6 +15,9 @@ export const schoolYearBasicSchema = Yup.object({
     FIRST: schoolTermSchema,
     SECOND: schoolTermSchema,
     THIRD: schoolTermSchema,
-    FOURTH: schoolTermSchema
+    FOURTH: schoolTermSchema,
+    'FIRST-REC': schoolTermSchema,
+    'SECOND-REC': schoolTermSchema,
+    EXAM: schoolTermSchema
   })
 }).defined();

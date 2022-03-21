@@ -13,10 +13,15 @@ import studentRouter from '@modules/students/infra/http/routes/student.routes';
 import educationAdminRouter from '@modules/education_core/infra/http/routes/education_admin.routes';
 import teachersRouter from '@modules/teachers/infra/http/routes/teachers.routes';
 import classesRouter from '@modules/classes/infra/http/routes/classes.routes';
+import attendancesRouter from '@modules/classes/infra/http/routes/attendances.routes';
 import enrollsRouter from '@modules/enrolls/infra/http/routes/enrolls.routes';
 import usersRouter from '@modules/users/infra/http/routes/users.routes';
 import personRouter from '@modules/persons/infra/http/routes/person.routes';
 import adminRouter from '@modules/admin/infra/http/routes/admin.routes';
+import timetablesRouter from '@modules/schools/infra/http/routes/timetables.routes';
+import classroomRouter from '@modules/schools/infra/http/routes/classrooms.routes';
+import classroomTeacherSchoolSubjectsRouter from '@modules/schools/infra/http/routes/classroom_teacher_school_subjects.routes';
+import multigradesRouter from '@modules/schools/infra/http/routes/multigrades.routes';
 
 import AppError from '@shared/errors/AppError';
 
@@ -37,8 +42,16 @@ app.use('/education/admin', educationAdminRouter);
 app.use('/admin', adminRouter);
 app.use('/teachers', teachersRouter);
 app.use('/classes', classesRouter);
+app.use('/attendances', attendancesRouter);
 app.use('/enrolls', enrollsRouter);
 app.use('/persons', personRouter);
+app.use('/timetables', timetablesRouter);
+app.use('/classrooms', classroomRouter);
+app.use('/multigrades', multigradesRouter);
+app.use(
+  '/classroom-teacher-school-subjects',
+  classroomTeacherSchoolSubjectsRouter,
+);
 
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   if (err instanceof AppError) {

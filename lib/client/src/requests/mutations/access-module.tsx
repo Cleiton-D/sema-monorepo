@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
@@ -54,7 +54,7 @@ const queryMutateAccessModule = (
 };
 
 export function useMutateAccessModules(accessLevel?: AccessLevel) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const queryFilter = useMemo(() => ({ access_level_id: accessLevel?.id }), [
     accessLevel
@@ -98,7 +98,7 @@ export function useMutateAccessModules(accessLevel?: AccessLevel) {
 }
 
 export function useDeleteAccessModule() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteAcessModule = useCallback(
     async (accessModule: AccessModule) => {

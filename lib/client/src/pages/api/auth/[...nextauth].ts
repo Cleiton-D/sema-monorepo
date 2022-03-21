@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import NextAuth from 'next-auth';
-import { AxiosInstance } from 'axios';
+import NextAuth, { NextAuthOptions, Session } from 'next-auth';
+import { CredentialInput } from 'next-auth/providers';
+import { AxiosError, AxiosInstance } from 'axios';
 
 import { Credentials, Refresh } from 'providers';
 
@@ -35,15 +36,18 @@ const getBranch = async (api: AxiosInstance, token?: string) => {
       headers: { authorization: token ? `Bearer ${token}` : '' }
     })
     .then((response) => response.data)
-    .catch(() => undefined);
+    .catch((err) => console.log(err));
 };
 
-const refreshProvider = Refresh({
+const refreshProvider = Refresh<Record<string, CredentialInput>>({
   name: 'refresh',
   credentials: {},
-  async authorize({ profileId, token }: Record<string, string>) {
-    const api = initializeApi();
+  async authorize(params) {
+    if (!params) return null;
 
+    const { profileId, token } = params;
+
+    const api = initializeApi();
     try {
       const response = await api.put(
         '/sessions',
@@ -81,10 +85,14 @@ const refreshProvider = Refresh({
   }
 });
 
-const signInProvider = Credentials({
+const signInProvider = Credentials<Record<string, CredentialInput>>({
   name: 'sign-in',
   credentials: {},
-  async authorize({ email, password }: Record<string, string>) {
+  async authorize(params) {
+    if (!params) return null;
+
+    const { email, password } = params;
+
     const api = initializeApi();
 
     try {
@@ -120,33 +128,43 @@ const signInProvider = Credentials({
   }
 });
 
-const options = {
+const options: NextAuthOptions = {
   jwt: {
-    signingKey: process.env.JWT_SIGNING_PRIVATE_KEY
+    secret: process.env.JWT_SIGNING_PRIVATE_KEY
   },
+  secret: 'Q0yLUJWJw+fsHG98mWLOZq/lxYMD8q1xDRxGJqROhTY=',
   pages: {
     signIn: '/sign-in'
   },
   providers: [signInProvider, refreshProvider],
   callbacks: {
-    session: async (session: any, user: any) => {
+    session: async (...args) => {
+      const { token, session } = args[0];
       const api = initializeApi();
 
-      const { data } = await api.get('/users/me', {
-        headers: { authorization: user.jwt ? `Bearer ${user.jwt}` : '' }
-      });
+      try {
+        await api.get('/sessions/validate', {
+          headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
+        });
+      } catch (err) {
+        const { response } = err as AxiosError;
+
+        if (response?.status === 401) {
+          return Promise.resolve({} as Session);
+        }
+      }
 
       const sessionConfigs: Record<string, string | undefined> = {};
 
       try {
-        const { data } = await api.get<SchoolYear>(
+        const { data: schoolYear } = await api.get<SchoolYear>(
           '/education/admin/school-years/current',
           {
-            headers: { authorization: user.jwt ? `Bearer ${user.jwt}` : '' }
+            headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
           }
         );
 
-        sessionConfigs.school_year_id = data?.id;
+        sessionConfigs.school_year_id = schoolYear?.id;
       } catch {
         sessionConfigs.school_year_id = undefined;
       }
@@ -159,13 +177,12 @@ const options = {
         branchId,
         branchType,
         ...rest
-      } = user;
+      } = token;
 
       session.jwt = jwt;
-      session.id = user.id;
+      session.id = token.id;
       session.user = {
-        ...rest,
-        changePassword: data.change_password
+        ...rest
       };
       session.profileId = profileId;
       session.accessLevel = accessLevel;
@@ -178,9 +195,11 @@ const options = {
 
       return Promise.resolve(session);
     },
-    jwt: async (token: any, user: any) => {
+    jwt: async (args) => {
+      const { token, user } = args;
       if (user) {
         token.id = user.id;
+        token.changePassword = user.change_password;
         token.email = user.login;
         token.jwt = user.jwt;
         token.profileId = user.profileId;

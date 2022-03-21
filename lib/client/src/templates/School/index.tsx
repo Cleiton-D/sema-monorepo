@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Edit3, Edit, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -31,7 +31,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { query } = useRouter();
 
   const { data: schoolDetail, refetch } = useGetSchoolDetail(
@@ -44,9 +44,10 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
     [enableAccess]
   );
 
-  const canAccessEnrolls = useMemo(() => enableAccess({ module: 'ENROLL' }), [
-    enableAccess
-  ]);
+  const canAccessEnrolls = useMemo(
+    () => enableAccess({ module: 'ENROLL' }),
+    [enableAccess]
+  );
 
   const canAccessClassrooms = useMemo(
     () => enableAccess({ module: 'CLASSROOM' }),
@@ -57,7 +58,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
     <Base>
       <Heading>Escola</Heading>
       {/* <S.AddButtonContainer>
-        <Link href={`/school/${query.school_id}/edit`} passHref>
+        <Link href={`/auth/school/${query.school_id}/edit`} passHref>
           <Button as="a" size="medium" styleType="normal" icon={<Edit3 />}>
             Alterar dados
           </Button>
@@ -74,7 +75,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
         <S.Details>
           <S.Grid>
             {canAccessEnrolls ? (
-              <Link href={`/enrolls?school_id=${query.school_id}`}>
+              <Link href={`/auth/enrolls?school_id=${query.school_id}`}>
                 <S.LinkGridItem>
                   <strong>Alunos ativos</strong>
                   <span>{schoolDetail?.enroll_count}</span>
@@ -88,17 +89,31 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
             )}
 
             {canAccessClassrooms ? (
-              <Link href={`/school/${query.school_id}/classrooms`}>
-                <S.LinkGridItem>
+              <>
+                <Link href={`/auth/school/${query.school_id}/classrooms`}>
+                  <S.LinkGridItem>
+                    <strong>Turmas</strong>
+                    <span>{schoolDetail?.classrooms_count}</span>
+                  </S.LinkGridItem>
+                </Link>
+                {/* <Link href={`/auth/school/${query.school_id}/multigrades`}>
+                  <S.LinkGridItem>
+                    <strong>Seriados</strong>
+                    <span>{schoolDetail?.multigrades_count}</span>
+                  </S.LinkGridItem>
+                </Link> */}
+              </>
+            ) : (
+              <>
+                <S.GridItem>
                   <strong>Turmas</strong>
                   <span>{schoolDetail?.classrooms_count}</span>
-                </S.LinkGridItem>
-              </Link>
-            ) : (
-              <S.GridItem>
-                <strong>Turmas</strong>
-                <span>{schoolDetail?.classrooms_count}</span>
-              </S.GridItem>
+                </S.GridItem>
+                <S.GridItem>
+                  <strong>Seriados</strong>
+                  <span>{schoolDetail?.multigrades_count}</span>
+                </S.GridItem>
+              </>
             )}
           </S.Grid>
           <S.Divider style={{ marginTop: 24 }} />
@@ -165,11 +180,11 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
           <S.Grid>
             <S.GridItem>
               <strong>Diretor(a)</strong>
-              <span>{schoolDetail?.director?.person.name}</span>
+              <span>{schoolDetail?.director?.name}</span>
             </S.GridItem>
             <S.GridItem>
               <strong>Vice-diretor(a)</strong>
-              <span>{schoolDetail?.vice_director?.person.name}</span>
+              <span>{schoolDetail?.vice_director?.name}</span>
             </S.GridItem>
           </S.Grid>
         </S.Section>

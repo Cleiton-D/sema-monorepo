@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useCallback,
   CSSProperties
 } from 'react';
 import { useField } from '@unform/core';
@@ -32,6 +33,7 @@ export type TextInputProps = InputHtmlProps & {
   error?: string;
   containerStyle?: CSSProperties;
   onChangeValue?: (value: string) => void;
+  onClickIcon?: () => void;
 };
 
 const TextInput: React.ForwardRefRenderFunction<
@@ -51,6 +53,7 @@ const TextInput: React.ForwardRefRenderFunction<
     unformRegister = true,
     disabled = false,
     onChangeValue,
+    onClickIcon,
     ...rest
   },
   ref
@@ -69,24 +72,46 @@ const TextInput: React.ForwardRefRenderFunction<
     onChangeValue && onChangeValue(masked);
   };
 
+  const setValue = useCallback(
+    (value?: string) => {
+      setFieldValue(() => {
+        if (value === undefined) return '';
+        const newValue = String(value || '');
+        const masked = mask ? masks[mask](newValue) : newValue;
+        return masked;
+      });
+    },
+    [mask]
+  );
+
   useEffect(() => {
     if (unformRegister) {
-      registerField<HTMLInputElement>({
+      registerField<string>({
         name: fieldName,
         ref: fieldRef,
-        getValue: (reference) => reference.current.value
+        getValue: (reference) => reference.current.value,
+        setValue: (_, value) => setValue(value)
       });
     }
-  }, [registerField, fieldName, unformRegister]);
+  }, [registerField, fieldName, unformRegister, setValue]);
 
   useEffect(() => {
-    if (value || defaultValue) {
-      const newValue = String(value || defaultValue);
-      const masked = mask ? masks[mask](newValue) : newValue;
+    const valueIsUndefined = typeof value === 'undefined';
+    const defaultIsUndefined = typeof defaultValue === 'undefined';
 
-      setFieldValue(masked);
+    if (!valueIsUndefined || !defaultIsUndefined) {
+      const newVlue = valueIsUndefined ? defaultValue : value;
+      setValue(newVlue);
+    } else {
+      setValue(undefined);
     }
-  }, [defaultValue, value, mask]);
+  }, [defaultValue, setValue, value]);
+
+  useEffect(() => {
+    if (fieldRef.current) {
+      fieldRef.current.value = fieldValue;
+    }
+  }, [fieldValue]);
 
   return (
     <S.Wrapper
@@ -95,24 +120,29 @@ const TextInput: React.ForwardRefRenderFunction<
       style={containerStyle}
       size={size}
     >
-      <S.Label hasValue={!!fieldValue} inputAs={as} isDisabled={disabled}>
-        <span>{label}</span>
-        <S.InputContainer size={size} hasIcon={!!icon}>
-          <S.Input
-            inputSize={size}
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore: Unreachable code error
-            onChange={handleChange}
-            as={as}
-            ref={mergeRefs([fieldRef, ref])}
-            name={fieldName}
-            disabled={disabled}
-            value={fieldValue}
-            {...rest}
-          />
-          {!!icon && icon}
-        </S.InputContainer>
-      </S.Label>
+      <S.Container hasClickableIcon={!!icon && !!onClickIcon}>
+        <S.Label hasValue={!!fieldValue} inputAs={as} isDisabled={disabled}>
+          <span>{label}</span>
+          <S.InputContainer size={size} hasIcon={!!icon}>
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
+            <S.Input
+              inputSize={size}
+              onChange={handleChange}
+              as={as}
+              ref={mergeRefs([fieldRef, ref])}
+              name={fieldName}
+              disabled={disabled}
+              // value={fieldValue}
+              {...rest}
+            />
+            {!!icon && !onClickIcon && <>{icon}</>}
+          </S.InputContainer>
+        </S.Label>
+        {!!icon && !!onClickIcon && (
+          <S.IconButton onClick={onClickIcon}>{icon}</S.IconButton>
+        )}
+      </S.Container>
       {(!!error || !!errorProp) && (
         <S.ErrorMessage>{error || errorProp}</S.ErrorMessage>
       )}

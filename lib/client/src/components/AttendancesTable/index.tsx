@@ -1,19 +1,20 @@
 import { useMemo, useRef, useState } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { format, parseISO } from 'date-fns';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import Checkbox from 'components/Checkbox';
 import Button from 'components/Button';
+import AttendancesTableLine from 'components/AttendancesTableline';
 
 import { useAccess } from 'hooks/AccessProvider';
 
+import { EnrollClassroom } from 'models/EnrollClassroom';
 import { Class } from 'models/Class';
-import { Enroll } from 'models/Enroll';
 
 import { useListAttendances } from 'requests/queries/attendances';
-import { useListEnrolls } from 'requests/queries/enrolls';
+import { useListEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 import { useListClasses } from 'requests/queries/class';
 import { useRegisterAttendances } from 'requests/mutations/attendances';
 
@@ -25,7 +26,7 @@ type AttendancesTableProps = {
   class?: Class;
 };
 
-type EnrollWithAttendances = Enroll & {
+type EnrollWithAttendances = EnrollClassroom & {
   attendances: Record<string, boolean>;
 };
 
@@ -40,7 +41,7 @@ export const AttendancesTable = ({
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: attendances } = useListAttendances(session, {
     class_id: 'all',
     classroom_id: classEntity?.classroom_id
@@ -50,14 +51,18 @@ export const AttendancesTable = ({
     classroom_id: classEntity?.classroom_id,
     school_subject_id: classEntity?.school_subject_id,
     limit: 6,
-    sortBy: 'time_start',
+    sortBy: 'date_start',
     order: 'DESC'
   });
 
-  const { data: enrolls } = useListEnrolls(session, {
-    classroom_id: classEntity?.classroom_id,
-    school_id: classEntity?.classroom.school_id
+  const { data: enrollClassrooms } = useListEnrollClassrooms(session, {
+    classroom_id: classEntity?.classroom_id
   });
+
+  // const { data: enrolls } = useListEnrolls(session, {
+  //   classroom_id: classEntity?.classroom_id,
+  //   school_id: classEntity?.classroom.school_id
+  // });
 
   const registerAttendances = useRegisterAttendances();
 
@@ -93,6 +98,7 @@ export const AttendancesTable = ({
       attendances: attendancesRequest
     };
 
+    // console.log(requestData);
     await registerAttendances.mutateAsync(requestData);
     setSaving(false);
   };
@@ -114,11 +120,13 @@ export const AttendancesTable = ({
   }, [oldClasses]);
 
   const enrollsWithAttendances = useMemo(() => {
-    if (!enrolls) return [];
+    if (!enrollClassrooms) return [];
 
-    return enrolls.map((enroll) => {
+    return enrollClassrooms.map((enrollClassroom) => {
       const enrollAttendances = attendances
-        ?.filter((attendance) => attendance.enroll_id === enroll.id)
+        ?.filter(
+          (attendance) => attendance.enroll_id === enrollClassroom.enroll.id
+        )
         .reduce<Record<string, boolean>>((acc, attendance) => {
           return {
             ...acc,
@@ -126,9 +134,9 @@ export const AttendancesTable = ({
           };
         }, {});
 
-      return { ...enroll, attendances: enrollAttendances || {} };
+      return { ...enrollClassroom, attendances: enrollAttendances || {} };
     });
-  }, [enrolls, attendances]);
+  }, [enrollClassrooms, attendances]);
 
   const canChangeAttendances = useMemo(
     () => enableAccess({ module: 'ATTENDANCE', rule: 'WRITE' }),
@@ -143,9 +151,14 @@ export const AttendancesTable = ({
       <Table<EnrollWithAttendances>
         items={enrollsWithAttendances}
         keyExtractor={(value) => value.id}
+        renderRow={(props) => <AttendancesTableLine {...props} />}
       >
         {[
-          <TableColumn key="name" label="Nome" tableKey="person.name" />,
+          <TableColumn
+            key="name"
+            label="Nome"
+            tableKey="enroll.student.name"
+          />,
           <TableColumn
             key="status"
             label="Situação"
@@ -155,20 +168,21 @@ export const AttendancesTable = ({
           ...classes.map((item) => (
             <TableColumn
               key={item.id}
-              label={item.date}
+              label={`${item.date} | ${item.period}`}
               tableKey={`attendances.${item.id}`}
               contentAlign="center"
               actionColumn
-              render={(enroll: EnrollWithAttendances) => (
+              render={(enrollClassroom: EnrollWithAttendances) => (
                 <Checkbox
-                  isChecked={!!enroll.attendances[item.id]}
+                  isChecked={!!enrollClassroom.attendances[item.id]}
                   disabled={
                     !canChangeAttendances ||
+                    enrollClassroom.status !== 'ACTIVE' ||
                     item.id !== classEntity?.id ||
                     classEntity?.status === 'DONE'
                   }
                   onCheck={(checked) =>
-                    handleCheck(enroll.id, item.id, checked)
+                    handleCheck(enrollClassroom.enroll.id, item.id, checked)
                   }
                 />
               )}
@@ -176,13 +190,13 @@ export const AttendancesTable = ({
           ))
         ]}
       </Table>
-      {canChangeAttendances && (
+      {canChangeAttendances && classEntity?.status === 'PROGRESS' && (
         <S.ButtonContainer>
           <Button
             styleType="normal"
             size="medium"
             onClick={handleSubmit}
-            disabled={saving || classEntity?.status === 'DONE'}
+            disabled={saving}
           >
             {saving ? 'Salvando...' : 'Salvar'}
           </Button>

@@ -1,17 +1,25 @@
 import { Address } from './Address';
-import { Person, PersonBasicFormData } from './Person';
+import { Contact } from './Contact';
+import { PersonBasicFormData } from './Person';
 
 export type Employee = {
   id: string;
-  person_id: string;
-  user_id: string;
-  pis_pasep: string;
+  name: string;
+  address_id?: string;
+  address: Address;
+  contacts: Contact[];
+  birth_date: string;
+  cpf: string;
+  dad_name?: string;
+  mother_name: string;
   education_level: string;
+  gender?: 'male' | 'female';
+  pis_pasep: string;
+  rg?: string;
+  user_id: string;
+  deleted_at?: string;
   created_at: string;
   updated_at: string;
-  person: Person & {
-    address: Address;
-  };
 };
 
 export type EmployeeBasicFormData = PersonBasicFormData & {

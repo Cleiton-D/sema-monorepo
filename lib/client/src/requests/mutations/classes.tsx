@@ -1,16 +1,27 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
 import { Class } from 'models/Class';
+import { SchoolTerm } from 'models/SchoolTerm';
+
+import { initializeApi, useMutation } from 'services/api';
+
+type CreateClassRequestData = {
+  classroom_id: string;
+  school_subject_id: string;
+  period: string;
+  class_date: Date | string;
+  taught_content: string;
+  school_term: SchoolTerm;
+};
 
 export function useCreateClass() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const createClass = useCallback(
-    async (values) => {
+    async (values: CreateClassRequestData) => {
       const api = initializeApi(session);
 
       const { data: responseData } = await api.post('/classes', values);
@@ -29,7 +40,7 @@ export function useCreateClass() {
 }
 
 export function useFinishClass() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const finishClass = useCallback(
     async (classEntity: Class) => {

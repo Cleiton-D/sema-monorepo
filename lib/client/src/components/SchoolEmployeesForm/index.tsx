@@ -64,7 +64,7 @@ const SchoolEmployeesForm = ({
         <S.List>
           {employees.map((employee) => (
             <li key={employee.id}>
-              <span>{employee.person.name}</span>
+              <span>{employee.name}</span>
               <S.ActionButton
                 onClick={() => handleRemoveEmployee(employee)}
                 title="Remover vinculo"

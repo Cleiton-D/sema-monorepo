@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Session } from 'next-auth';
+import { signOut } from 'next-auth/react';
 import axios from 'axios';
 import {
   MutationFunction,
@@ -9,6 +10,7 @@ import {
 } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
+// import { serverSignOut } from 'utils/serverSignOut';
 
 const isServer = typeof window === 'undefined';
 
@@ -23,6 +25,48 @@ const createApi = (session?: Session | null) => {
       authorization: jwt ? `Bearer ${jwt}` : ''
     }
   });
+
+  api.interceptors.request.use((config) => {
+    const params = config.params || {};
+    const newParams = Object.entries(params).reduce((acc, item) => {
+      const [key, value] = item;
+      const isTruthy =
+        value !== '' && typeof value !== 'undefined' && value !== null;
+
+      if (!isTruthy) return acc;
+
+      return { ...acc, [key]: value };
+    }, {});
+
+    config.params = newParams;
+    return config;
+  });
+
+  api.interceptors.response.use(
+    (res) => res,
+    (error) => {
+      if (error.response?.status !== 401) return Promise.reject(error);
+      if (!error.response?.data) return Promise.reject(error);
+      if (error.response.data.status !== 'error') return Promise.reject(error);
+
+      const isClient = typeof window !== 'undefined';
+      if (isClient) {
+        const isUnauthorized = String(error.response.data.message).match(
+          /invalid jwt token/i
+        );
+        if (isUnauthorized) {
+          signOut({
+            callbackUrl: '/sign-in',
+            redirect: true
+          });
+
+          return undefined;
+        }
+      }
+
+      return Promise.reject(error);
+    }
+  );
 
   return api;
 };
@@ -87,6 +131,8 @@ export function useMutation(
       return { previousQueriesData, toastKey };
     },
     onError: (err, data, context: any) => {
+      const ctx = context || {};
+
       if (options.renderError) {
         const toastObj = {
           type: toast.TYPE.ERROR,
@@ -94,19 +140,19 @@ export function useMutation(
           autoClose: 3000
         };
 
-        if (context.toastKey) {
-          toast.update(context.toastKey, {
+        if (ctx.toastKey) {
+          toast.update(ctx.toastKey, {
             ...toastObj,
             transition: Flip
           });
         } else {
           toast(toastObj);
         }
-      } else if (context.toastKey) {
-        toast.dismiss(context.toastKey);
+      } else if (ctx.toastKey) {
+        toast.dismiss(ctx.toastKey);
       }
 
-      Object.entries(context.previousQueriesData).forEach(([key, value]) =>
+      Object.entries(ctx.previousQueriesData || {}).forEach(([key, value]) =>
         queryClient.setQueryData(key, value)
       );
     },
@@ -143,7 +189,8 @@ export function useMutation(
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10000
+      staleTime: 10000,
+      refetchOnWindowFocus: false
     }
   }
 });

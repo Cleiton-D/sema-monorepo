@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/client';
-import { PlusCircle, PlusSquare, X } from '@styled-icons/feather';
+import { useSession } from 'next-auth/react';
+import { PlusCircle, PlusSquare, X, Unlock } from '@styled-icons/feather';
 import { useQuery } from 'react-query';
 
 import Base from 'templates/Base';
@@ -20,7 +20,10 @@ import { useAccess } from 'hooks/AccessProvider';
 import { FormattedUser, User } from 'models/User';
 
 import { listUsers } from 'requests/queries/users';
-import { useDeleteUserMutation } from 'requests/mutations/users';
+import {
+  useDeleteUserMutation,
+  useResetPassword
+} from 'requests/mutations/users';
 
 import * as S from './styles';
 
@@ -30,11 +33,12 @@ const Users = () => {
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data } = useQuery<FormattedUser[]>('get-users', () =>
     listUsers(session)
   );
   const mutation = useDeleteUserMutation(session);
+  const resetPass = useResetPassword(session);
 
   const handleOpenModal = () => {
     modalRef.current?.openModal();
@@ -44,6 +48,15 @@ const Users = () => {
     const confirm = window.confirm(`Deseja apagar o usuário ${user.username}?`);
     if (confirm) {
       mutation.mutate(user);
+    }
+  };
+
+  const handleResetPass = (user: User) => {
+    const confirm = window.confirm(
+      `Deseja resetar a senha do usuário ${user.username}?`
+    );
+    if (confirm) {
+      resetPass.mutate({ user_id: user.id });
     }
   };
 
@@ -107,7 +120,7 @@ const Users = () => {
                   <S.ActionButton
                     color="primary"
                     type="button"
-                    title={`Adicionar perfil`}
+                    title="Adicionar perfil de acesso"
                     onClick={() => userProfileModalRef.current?.openModal(user)}
                   >
                     <PlusSquare size={20} />
@@ -115,14 +128,24 @@ const Users = () => {
                 )}
 
                 {canChangeUsers && (
-                  <S.ActionButton
-                    color="red"
-                    type="button"
-                    title={`Remover ${user.username}`}
-                    onClick={() => handleDeleteUser(user)}
-                  >
-                    <X size={20} />
-                  </S.ActionButton>
+                  <>
+                    <S.ActionButton
+                      color="red"
+                      type="button"
+                      title={`Remover ${user.username}`}
+                      onClick={() => handleDeleteUser(user)}
+                    >
+                      <X size={20} />
+                    </S.ActionButton>
+                    <S.ActionButton
+                      color="primary"
+                      type="button"
+                      title="Resetar senha"
+                      onClick={() => handleResetPass(user)}
+                    >
+                      <Unlock size={20} />
+                    </S.ActionButton>
+                  </>
                 )}
               </S.ActionButtonsContainer>
             )}

@@ -5,7 +5,7 @@ import {
   useRef
 } from 'react';
 import mergeRef from 'react-merge-refs';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -27,7 +27,7 @@ type AddGradeFormData = {
 
 const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
   const modalRef = useRef<ModalRef>(null);
-  const [session] = useSession();
+  const { data: session } = useSession();
   const mutation = useAddGradeMutation(modalRef, session);
 
   const formRef = useRef<FormHandles>(null);

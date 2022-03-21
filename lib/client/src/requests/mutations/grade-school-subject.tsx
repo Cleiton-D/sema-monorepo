@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
@@ -15,7 +15,7 @@ import { initializeApi, useMutation } from 'services/api';
 export function useMutateGradeSchoolSubject(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const mutateGradeSchoolSubject = useCallback(
     async (values: CreateGradeSchoolSubjectsRequest) => {
@@ -46,7 +46,7 @@ export function useMutateGradeSchoolSubject(
 export function useUpdateGradeSchoolSubject(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const updateGradeSchoolSubject = useCallback(
     async (values: UpdateGradeSchoolSubjectsRequest) => {
@@ -75,7 +75,7 @@ export function useUpdateGradeSchoolSubject(
 }
 
 export function useDeleteGradeSchoolSubject() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteGradeSchoolSubject = useCallback(
     async (gradeSchoolSubject: GradeSchoolSubject) => {

@@ -22,7 +22,12 @@ const ContactsForm: React.ForwardRefRenderFunction<
   ContactsFormProps
 > = ({ jotaiState }, ref) => {
   const [state, setState] = useAtom(jotaiState);
+
   const modalRef = useRef<ModalRef>(null);
+
+  const handleOpenModal = () => {
+    modalRef.current?.openModal();
+  };
 
   const onSubmitModalForm = (values: Omit<ContactFormData, 'id'>) => {
     const item = { ...values, id: uuidv4() };
@@ -66,7 +71,7 @@ const ContactsForm: React.ForwardRefRenderFunction<
           </S.ContactItem>
         ))}
 
-        <S.AddNewItem onClick={() => modalRef.current?.openModal()}>
+        <S.AddNewItem onClick={handleOpenModal}>
           <PlusCircle size={20} />
           Adicionar contato
         </S.AddNewItem>

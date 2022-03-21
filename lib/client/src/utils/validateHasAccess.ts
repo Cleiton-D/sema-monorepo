@@ -24,5 +24,5 @@ export const validateHasAccess = (
     return false;
   }
 
-  return true;
+  return findedModule.read || findedModule.write;
 };

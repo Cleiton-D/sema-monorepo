@@ -1,7 +1,9 @@
 import { useMemo, useEffect } from 'react';
 import { GetServerSidePropsContext } from 'next';
 import { atom, PrimitiveAtom, Provider as JotaiProvider } from 'jotai';
+import { queryClientAtom } from 'jotai/query';
 import { RESET } from 'jotai/utils';
+import { useQueryClient } from 'react-query';
 import Cookies from 'js-cookie';
 
 import { parseCookies, setCookies } from 'utils/parseCookies';
@@ -90,6 +92,8 @@ export const AtomProvider = ({
   children,
   initialState = {}
 }: AtomProviderProps) => {
+  const queryClient = useQueryClient();
+
   const values = useMemo(
     () =>
       Object.entries(initialState).reduce<JotaiInitialValues>(
@@ -105,7 +109,11 @@ export const AtomProvider = ({
     [initialState]
   );
 
-  return <JotaiProvider initialValues={values}>{children}</JotaiProvider>;
+  return (
+    <JotaiProvider initialValues={[...values, [queryClientAtom, queryClient]]}>
+      {children}
+    </JotaiProvider>
+  );
 };
 
 export const AtomHydrator = ({
@@ -115,7 +123,12 @@ export const AtomHydrator = ({
   const updateAtom = useAtomCallback(
     async (_, set, item: [PrimitiveAtom<any>, unknown]) => {
       const [atom, value] = item;
-      set(atom, value);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (atom.write) {
+        set(atom, value);
+      }
     },
     []
   );

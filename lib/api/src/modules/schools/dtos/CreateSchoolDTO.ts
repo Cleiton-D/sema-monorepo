@@ -11,6 +11,9 @@ type CreateSchoolDTO = {
   inep_code: string;
   director_id: string;
   vice_director_id: string;
+  creation_decree: string;
+  recognition_opinion: string;
+  authorization_ordinance: string;
   address: Address;
   contacts: ContactData[];
   branch: Branch;

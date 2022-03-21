@@ -6,18 +6,31 @@ export type SchoolReport = {
   id: string;
   enroll_id: string;
   enroll: Enroll;
-  average: number | null;
-  school_term: SchoolTerm;
   school_subject_id: string;
   school_subject: SchoolSubject;
+  first?: number;
+  second?: number;
+  first_rec?: number;
+  third?: number;
+  fourth?: number;
+  second_rec?: number;
+  exam?: number;
+  final_average?: number;
   created_at: string;
   updated_at: string;
+};
+
+export type MappedAttendanceSchoolSubject = Record<
+  `attendances-${SchoolTerm}`,
+  number
+> & {
+  school_subject: string;
 };
 
 export type MappedSchoolReportSubject = Record<SchoolTerm, string> & {
   school_subject: string;
 };
 
-export type MappedSchoolReportEnroll = Record<SchoolTerm, string> & {
-  enroll: Enroll;
+export type MappedSchoolReport = SchoolReport & {
+  formattedAverages: Record<string, number | string>;
 };

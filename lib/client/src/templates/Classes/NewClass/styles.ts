@@ -7,6 +7,7 @@ export const Wrapper = styled(SectionContent)`
   ${({ theme }) => css`
     margin-top: ${theme.spacings.small};
     padding: ${theme.spacings.xsmall} !important;
+    padding-top: ${theme.spacings.xxsmall} !important;
     width: 80%;
   `}
 `;
@@ -71,5 +72,14 @@ export const SaveButtonContainer = styled.div`
     margin-top: ${theme.spacings.small};
     width: 20rem;
     align-self: flex-end;
+  `}
+`;
+
+export const SectionTitle = styled.div`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.large};
+    font-weight: ${theme.font.bold};
+    color: ${theme.colors.lightSilver};
+    margin-bottom: ${theme.spacings.xsmall} !important;
   `}
 `;

@@ -1,6 +1,7 @@
 import { Classroom } from './Classroom';
 import { Employee } from './Employee';
 import { SchoolSubject } from './SchoolSubject';
+import { SchoolTerm } from './SchoolTerm';
 
 export type Class = {
   id: string;
@@ -11,10 +12,12 @@ export type Class = {
   employee_id: string;
   employee: Employee;
   status: 'PROGRESS' | 'DONE';
+  school_term: SchoolTerm;
   taught_content: string;
   class_date: string;
-  time_start: string;
-  time_end?: string;
+  date_start: string;
+  date_end?: string;
+  period: string;
   created_at: string;
   updated_at: string;
 };
@@ -22,6 +25,6 @@ export type Class = {
 export type FormattedClass = Class & {
   translatedStatus: string;
   formattedClassDate: string;
-  formattedTimeStart: string;
-  formattedTimeEnd?: string;
+  // formattedTimeStart: string;
+  // formattedTimeEnd?: string;
 };

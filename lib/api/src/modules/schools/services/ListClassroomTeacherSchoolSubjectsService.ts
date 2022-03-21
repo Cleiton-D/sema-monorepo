@@ -7,6 +7,7 @@ type ListClassroomTeacherSchoolSubjectsRequest = {
   classroom_id?: string | 'all';
   school_id?: string;
   employee_id?: string;
+  school_subject_id?: string;
 };
 
 @injectable()
@@ -20,6 +21,7 @@ class ListClassroomTeacherSchoolSubjectsService {
     classroom_id,
     school_id,
     employee_id,
+    school_subject_id,
   }: ListClassroomTeacherSchoolSubjectsRequest): Promise<
     ClassroomTeacherSchoolSubject[]
   > {
@@ -28,6 +30,7 @@ class ListClassroomTeacherSchoolSubjectsService {
         classroom_id: classroom_id === 'all' ? undefined : classroom_id,
         school_id,
         employee_id,
+        school_subject_id,
       },
     );
 

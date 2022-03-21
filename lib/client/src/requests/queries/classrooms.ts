@@ -1,9 +1,8 @@
 import { Session } from 'next-auth';
-import { useQuery } from 'react-query';
+import { useQuery, QueryObserverOptions } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Classroom } from 'models/Classroom';
-import { ClassPeriod } from 'models/ClassPeriod';
 
 import { initializeApi } from 'services/api';
 
@@ -23,10 +22,13 @@ export const deleteClassroomQueryMutation = (
   );
 };
 
-type ListClassroomsFilters = {
+export type ListClassroomsFilters = {
   school_id?: string;
   grade_id?: string;
-  class_period?: ClassPeriod;
+  class_period_id?: string;
+  employee_id?: string;
+  with_in_multigrades?: boolean | number;
+  with_multigrades?: boolean | number;
 };
 
 export const listClassrooms = (
@@ -35,19 +37,30 @@ export const listClassrooms = (
 ) => {
   const api = initializeApi(session);
 
-  const { school_id, ...params } = filters;
+  const { ...params } = filters;
+  if (typeof filters.with_in_multigrades !== 'undefined') {
+    params.with_in_multigrades = Number(filters.with_in_multigrades);
+  }
+  if (typeof filters.with_multigrades !== 'undefined') {
+    params.with_multigrades = Number(filters.with_multigrades);
+  }
 
   return api
-    .get<Classroom[]>(`/schools/${school_id || 'me'}/classrooms`, { params })
+    .get<Classroom[]>(`/classrooms`, { params })
     .then((response) => response.data);
 };
 
 export const useListClassrooms = (
   session: Session | null,
-  filters: ListClassroomsFilters = {}
+  filters: ListClassroomsFilters = {},
+  queryOptions: QueryObserverOptions<Classroom[]> = {}
 ) => {
   const key = `list-classrooms-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => listClassrooms(session, filters));
+  const result = useQuery<Classroom[]>(
+    key,
+    () => listClassrooms(session, filters),
+    queryOptions
+  );
 
   return {
     ...result,
@@ -58,7 +71,6 @@ export const useListClassrooms = (
 };
 
 type ShowClassroomFilters = {
-  school_id?: string;
   id: string;
 };
 export const showClassroom = (
@@ -66,10 +78,10 @@ export const showClassroom = (
   filters: ShowClassroomFilters
 ) => {
   const api = initializeApi(session);
-  const { school_id, id } = filters;
+  const { id } = filters;
 
   return api
-    .get<Classroom>(`/schools/${school_id || 'me'}/classrooms/${id}`)
+    .get<Classroom>(`/classrooms/${id}`)
     .then((response) => response.data);
 };
 
@@ -88,16 +100,12 @@ type CountClassroomsResponse = {
 };
 export const countClassrooms = (
   session: Session | null,
-  filters: ListClassroomsFilters = {}
+  params: ListClassroomsFilters = {}
 ) => {
   const api = initializeApi(session);
-  const { school_id, ...params } = filters;
 
   return api
-    .get<CountClassroomsResponse>(
-      `/schools/${school_id || 'me'}/classrooms/count`,
-      { params }
-    )
+    .get<CountClassroomsResponse>(`/classrooms/count`, { params })
     .then((response) => response.data)
     .catch(() => undefined);
 };

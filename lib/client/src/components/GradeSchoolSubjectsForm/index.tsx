@@ -1,5 +1,5 @@
 import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { useAtomValue } from 'jotai/utils';
 import { X, PlusCircle } from '@styled-icons/feather';
 
@@ -26,7 +26,7 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
 
   const addGradeModalRef = useRef<ModalRef>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: grades } = useListGrades(session);
   const deleteGrade = useDeleteGradeMutation(session);
 

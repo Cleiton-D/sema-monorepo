@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { Session } from 'next-auth';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { initializeApi, useMutation } from 'services/api';
 
@@ -54,7 +54,7 @@ type UpdateSchoolResquest = {
 };
 
 export function useUpdateSchool(school: School, onMutate?: () => void) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const updateSchool = useCallback(
     async (values: UpdateSchoolResquest) => {

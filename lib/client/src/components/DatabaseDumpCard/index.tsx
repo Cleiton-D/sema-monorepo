@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,7 +15,7 @@ import { downloadFile } from 'utils/downloadFile';
 const DatabaseDumpCard = () => {
   const [loading, setLoading] = useState(false);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const handleGetDump = async () => {
     if (loading) return;

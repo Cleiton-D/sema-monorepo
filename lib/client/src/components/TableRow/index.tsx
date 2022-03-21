@@ -16,15 +16,21 @@ import * as S from './styles';
 
 type RenderChildrenFunction = (item: any) => React.ReactNode;
 
-type TableRowProps = {
-  item: Record<string, any>;
+export type TableRowProps<T = Record<string, any>> = {
+  item: T;
   columns:
     | React.ReactElement<TableColumnProps & Partial<WithAccessOptions>>
     | React.ReactElement<TableColumnProps & Partial<WithAccessOptions>>[];
   rowKey: string;
+  className?: string;
 };
 
-const TableRow = ({ item, columns, rowKey }: TableRowProps): JSX.Element => {
+const TableRow = ({
+  item,
+  columns,
+  rowKey,
+  className
+}: TableRowProps): JSX.Element => {
   const [internalContent, setInternalContent] = useState<
     RenderChildrenFunction | React.ReactNode | null
   >();
@@ -55,7 +61,11 @@ const TableRow = ({ item, columns, rowKey }: TableRowProps): JSX.Element => {
 
   return (
     <>
-      <S.Wrapper key={rowKey} disabledItem={item.disabled}>
+      <S.Wrapper
+        key={rowKey}
+        disabledItem={item.disabled}
+        className={className}
+      >
         {childArray.map((columnProps) => (
           <TableCell
             key={`${rowKey}_${columnProps.tableKey}_${columnProps.label}`}

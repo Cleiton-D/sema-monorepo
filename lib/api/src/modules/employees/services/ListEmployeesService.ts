@@ -1,4 +1,5 @@
 import { inject, injectable } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import Employee from '../infra/typeorm/entities/Employee';
 import IEmployeesRepository from '../repositories/IEmployeesRepository';
@@ -23,7 +24,9 @@ class ListEmployeesService {
       accessCode,
       branch: branch_id,
     });
-    return employees;
+
+    const convertedEmployees = classToClass(employees);
+    return convertedEmployees;
   }
 }
 

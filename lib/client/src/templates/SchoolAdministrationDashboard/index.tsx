@@ -1,37 +1,29 @@
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
 
-import { School } from 'models/School';
-
 import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useEnrollCount } from 'requests/queries/enrolls';
 import { useCountClassrooms } from 'requests/queries/classrooms';
-import { useCountSchoolTeachers } from 'requests/queries/school-teachers';
+import { useGetSchool } from 'requests/queries/schools';
 
 import * as S from './styles';
 
-export type SchoolAdministrationDashboardProps = {
-  school: School;
-};
-const SchoolAdministrationDashboard = ({
-  school
-}: SchoolAdministrationDashboardProps) => {
-  const [session] = useSession();
+const SchoolAdministrationDashboard = () => {
+  const { data: session } = useSession();
+
+  const { data: school } = useGetSchool(session, { id: 'me' });
 
   const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
     id: session?.configs.school_year_id
   });
   const { data: enrollCount } = useEnrollCount(session, {
-    school_id: school.id
+    school_id: school?.id
   });
   const { data: classroomsCount } = useCountClassrooms(session, {
-    school_id: school.id
-  });
-  const { data: schoolTeachersCount } = useCountSchoolTeachers(session, {
-    school_id: school.id
+    school_id: school?.id
   });
 
   return (
@@ -39,15 +31,15 @@ const SchoolAdministrationDashboard = ({
       <S.Wrapper>
         <Card
           description={`${schoolYear?.reference_year || 'não definido'}`}
-          link="/administration/school-year"
+          link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
         >
           Ano Letivo
         </Card>
 
         <Card
-          description="Alunos ativos"
-          link={`/enrolls?school_id=${school.id}`}
+          description="Matrículas ativas"
+          link={`/auth/enrolls`}
           module="ENROLL"
         >
           {enrollCount?.count}
@@ -55,25 +47,28 @@ const SchoolAdministrationDashboard = ({
 
         <Card
           description="Turmas"
-          link={`/school/${school.id}/classrooms`}
+          link={`/auth/school/me/classrooms`}
           module="CLASSROOM"
         >
           {classroomsCount?.count}
         </Card>
 
-        <Card
+        {/* <Card
           description="Professores"
-          link={`/school/${school.id}/teacher-school-subjects`}
+          link={`/auth/school/${school.id}/teacher-school-subjects`}
           module="TEACHER_SCHOOL_SUBJECT"
         >
           {schoolTeachersCount?.count}
-        </Card>
+        </Card> */}
 
         <Card
           description="Turmas x Professores"
-          link={`/school/${school.id}/classroom-teacher`}
+          link={`/auth/school/me/classroom-teacher`}
           module="CLASSROOM_TEACHER"
         />
+
+        <Card description="Aulas registradas" link="/auth/classes" />
+        <Card description="Horários" link="/auth/school/me/timetables" />
       </S.Wrapper>
     </Base>
   );

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -11,11 +11,13 @@ import { useShowClass } from 'requests/queries/class';
 import { useFinishClass } from 'requests/mutations/classes';
 
 import * as S from './styles';
+import Tab from 'components/Tab';
+import ClassroomSchoolReportTable from 'components/ClassroomSchoolReportTable';
 
 const ClassTemplate = () => {
   const { query, push } = useRouter();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: classEntity } = useShowClass(session, query.class_id as string);
   const finishClass = useFinishClass();
 
@@ -23,7 +25,7 @@ const ClassTemplate = () => {
     if (!classEntity) return;
 
     await finishClass.mutateAsync(classEntity);
-    push('/classes');
+    push('/auth/classes');
   };
 
   return (
@@ -37,8 +39,8 @@ const ClassTemplate = () => {
               <span>{classEntity?.formattedClassDate}</span>
             </S.GridItem>
             <S.GridItem>
-              <strong>Hora de início: </strong>
-              <span>{classEntity?.formattedTimeStart}</span>
+              <strong>Horário: </strong>
+              <span>{classEntity?.period}</span>
             </S.GridItem>
             <S.GridItem>
               <strong>Turma: </strong>
@@ -50,7 +52,7 @@ const ClassTemplate = () => {
             </S.GridItem>
             <S.GridItem>
               <strong>Professor: </strong>
-              <span>{classEntity?.employee.person.name}</span>
+              <span>{classEntity?.employee.name}</span>
             </S.GridItem>
             <S.GridItem>
               <strong>Status: </strong>
@@ -65,7 +67,23 @@ const ClassTemplate = () => {
         )}
       </S.Wrapper>
 
-      <AttendancesTable class={classEntity} />
+      <Tab
+        items={[
+          {
+            title: 'Frequência',
+            element: <AttendancesTable class={classEntity} />
+          },
+          {
+            title: 'Notas',
+            element: (
+              <ClassroomSchoolReportTable
+                classroom={classEntity!.classroom}
+                schoolSubject={classEntity!.school_subject}
+              />
+            )
+          }
+        ]}
+      />
     </Base>
   );
 };

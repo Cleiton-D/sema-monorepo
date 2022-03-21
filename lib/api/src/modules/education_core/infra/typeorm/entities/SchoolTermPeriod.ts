@@ -12,6 +12,7 @@ import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
 
 import SchoolYear from './SchoolYear';
 
+export type TermPeriodStatus = 'ACTIVE' | 'FINISH' | 'PENDING';
 @Entity('school_term_periods')
 class SchoolTermPeriod {
   @PrimaryGeneratedColumn('uuid')
@@ -32,6 +33,9 @@ class SchoolTermPeriod {
 
   @Column()
   date_end: Date;
+
+  @Column({ type: 'enum', enum: ['ACTIVE', 'FINISH', 'PENDING'] })
+  status: TermPeriodStatus;
 
   @CreateDateColumn()
   created_at: Date;

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
@@ -9,11 +9,13 @@ import { Classroom } from 'models/Classroom';
 import { initializeApi, useMutation, ProcessQueryDataFn } from 'services/api';
 
 type CreateClassroomForm = {
+  id?: string;
   description: string;
   period: string;
   grade_id: string;
   school_id?: string;
   enroll_count: number;
+  is_multigrade?: boolean;
   grade: {
     description: string;
   };
@@ -21,7 +23,7 @@ type CreateClassroomForm = {
 };
 
 export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const addClassroom = useCallback(
     async (values: CreateClassroomForm) => {
@@ -29,7 +31,7 @@ export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
       const {
         enroll_count: _enroll_count,
         grade: _grade,
-        school_id,
+        id,
         ...data
       } = values;
 
@@ -37,10 +39,10 @@ export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
         ...data,
         school_year_id: session?.configs.school_year_id
       };
-      const { data: responseData } = await api.post(
-        `/schools/${school_id || 'me'}/classrooms`,
-        requestData
-      );
+
+      const { data: responseData } = id
+        ? await api.put(`/classrooms/${id}`, requestData)
+        : await api.post(`/classrooms`, requestData);
 
       return responseData;
     },
@@ -66,14 +68,14 @@ export function useAddClassroom(queries: Record<string, ProcessQueryDataFn>) {
 export function useDeleteClassroom(
   queries: Record<string, ProcessQueryDataFn>
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteClassroom = useCallback(
     async (classroom: Classroom) => {
       const api = initializeApi(session);
-      const { school_id, id } = classroom;
+      const { id } = classroom;
 
-      await api.delete(`/schools/${school_id || 'me'}/classrooms/${id}`);
+      await api.delete(`/classrooms/${id}`);
     },
     [session]
   );

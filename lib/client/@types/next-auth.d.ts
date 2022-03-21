@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
-import { RedirectableProvider } from 'next-auth/client';
+import { RedirectableProvider } from 'next-auth/react';
 
-import { AccessModule } from 'models/AccessModule';
 import { AccessLevel } from 'models/AccessLevel';
 
 declare module 'next-auth' {
@@ -16,7 +15,7 @@ declare module 'next-auth' {
     id: string;
     schoolId?: string;
     configs: {
-      school_year_id: string;
+      school_year_id?: string;
     };
 
     profileId?: string;
@@ -26,10 +25,42 @@ declare module 'next-auth' {
     };
     accessLevel?: AccessLevel;
   }
+
+  interface User {
+    id: string;
+    login: string;
+    jwt: string;
+    name: string;
+    email: string;
+    change_password: boolean;
+    profileId: string;
+    accessLevel: AccessLevel;
+    schoolId: string;
+    branchId: string;
+    branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';
+  }
 }
 
-declare module 'next-auth/client' {
-  export type CustomRedirectableProvider = RedirectableProvider | 'refresh';
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    login: string;
+    jwt: string;
+    name: string;
+    email: string;
+    changePassword: boolean;
+    profileId: string;
+    accessLevel: AccessLevel;
+    schoolId: string;
+    branchId: string;
+    branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';
+  }
+}
+declare module 'next-auth/react' {
+  export type CustomRedirectableProvider =
+    | RedirectableProvider
+    | 'refresh'
+    | 'manualsignout';
 
   export function signIn<P extends SignInProvider = undefined>(
     provider?: P,

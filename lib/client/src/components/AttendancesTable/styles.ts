@@ -5,7 +5,6 @@ import SectionContent from 'components/SectionContent';
 export const TableSection = styled(SectionContent)`
   display: flex;
   flex-direction: column;
-  margin-top: 2rem;
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 1rem;

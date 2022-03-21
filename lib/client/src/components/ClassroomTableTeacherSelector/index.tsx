@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 
-import { TeacherSchoolSubject } from 'models/TeacherSchoolSubject';
+import { SchoolTeacher } from 'models/SchoolTeacher';
 import { Employee } from 'models/Employee';
 
 import * as S from './styles';
 
 type ClassroomTableTeacherSelectorProps = {
-  teacherSchoolSubjects?: TeacherSchoolSubject[];
+  schoolTeachers?: SchoolTeacher[];
   selectedEmployee?: string;
   onChange?: (employee?: Employee) => void;
 };
 
 const ClassroomTableTeacherSelector = ({
-  teacherSchoolSubjects = [],
+  schoolTeachers = [],
   selectedEmployee,
   onChange = () => null
 }: ClassroomTableTeacherSelectorProps) => {
@@ -20,7 +20,7 @@ const ClassroomTableTeacherSelector = ({
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = event.target;
-    const selectedTeacherSchoolSubject = teacherSchoolSubjects.find(
+    const selectedTeacherSchoolSubject = schoolTeachers.find(
       ({ employee_id }) => employee_id === value
     );
     onChange(selectedTeacherSchoolSubject?.employee);
@@ -33,9 +33,9 @@ const ClassroomTableTeacherSelector = ({
   return (
     <S.Wrapper value={selectedOption} onChange={handleChange}>
       <option>&nbsp;</option>
-      {teacherSchoolSubjects?.map(({ employee }) => (
+      {schoolTeachers?.map(({ employee }) => (
         <option key={employee.id} value={employee.id}>
-          {employee.person.name}
+          {employee.name}
         </option>
       ))}
     </S.Wrapper>

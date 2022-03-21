@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { CardChecklist } from '@styled-icons/bootstrap';
 
 import Base from 'templates/Base';
@@ -10,10 +10,9 @@ import SelectTeacherClassroomModal, {
   SelectTeacherClassroomModalRef
 } from 'components/SelectTeacherClassroomModal';
 
-import { School } from 'models/School';
-
 import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useCountClasses } from 'requests/queries/class';
+import { useGetSchool } from 'requests/queries/schools';
 
 import * as S from './styles';
 
@@ -22,20 +21,21 @@ type HandleNavSchoolReportsProps = {
   schoolSubjectId: string;
 };
 
-export type TeacherDashboardProps = {
-  school: School;
-};
-const TeacherDashboard = ({ school }: TeacherDashboardProps) => {
+const TeacherDashboard = () => {
   const modalRef = useRef<SelectTeacherClassroomModalRef>(null);
 
   const router = useRouter();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
+
+  const { data: school } = useGetSchool(session, { id: 'me' });
+
   const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
     id: session?.configs.school_year_id
   });
   const { data: classesCount } = useCountClasses(session, {
-    employee_id: session?.user.employeeId
+    employee_id: session?.user.employeeId,
+    school_id: session?.schoolId
   });
 
   const handleClick = ({
@@ -43,7 +43,7 @@ const TeacherDashboard = ({ school }: TeacherDashboardProps) => {
     schoolSubjectId
   }: HandleNavSchoolReportsProps) => {
     router.push(
-      `/school/${school.id}/classrooms/${classroomId}/school-reports?school_subject=${schoolSubjectId}`
+      `/auth/school/${school?.id}/classrooms/${classroomId}/school-reports?school_subject=${schoolSubjectId}`
     );
   };
 
@@ -52,7 +52,7 @@ const TeacherDashboard = ({ school }: TeacherDashboardProps) => {
       <S.Wrapper>
         <Card
           description={`${schoolYear?.reference_year || 'não definido'}`}
-          link="/administration/school-year"
+          link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
         >
           Ano Letivo
@@ -60,7 +60,7 @@ const TeacherDashboard = ({ school }: TeacherDashboardProps) => {
 
         <Card
           description={`${classesCount?.count}`}
-          link="/classes"
+          link="/auth/classes"
           module="CLASS"
         >
           Aulas registradas
@@ -71,7 +71,8 @@ const TeacherDashboard = ({ school }: TeacherDashboardProps) => {
           module="SCHOOL_REPORT"
           icon={<CardChecklist />}
           iconAlign="right"
-          onClick={() => modalRef.current?.openModal()}
+          link="/auth/school-reports/by-classroom"
+          // onClick={() => modalRef.current?.openModal()}
         />
       </S.Wrapper>
       <SelectTeacherClassroomModal ref={modalRef} onSubmit={handleClick} />

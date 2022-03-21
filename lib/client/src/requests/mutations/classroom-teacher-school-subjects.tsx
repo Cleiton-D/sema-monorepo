@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
@@ -20,19 +20,22 @@ type LinkClassroomTeacherSchoolSubjectForm = {
 export function useLinkClassroomTeacherSchoolSubject(
   modalRef?: React.RefObject<ModalRef>
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const linkClassroomTeacherSchoolSubject = useCallback(
     async (values: LinkClassroomTeacherSchoolSubjectForm) => {
       const api = initializeApi(session);
 
       const { classroom, ...requestData } = values;
+
+      const requestBody = {
+        ...requestData,
+        classroom_id: classroom.id
+      };
+
       const { data: responseData } = await api.post<
         ClassroomTeacherSchoolSubject[]
-      >(
-        `/schools/${classroom.school_id}/classrooms/${classroom.id}/teacher-school-subjects`,
-        requestData
-      );
+      >(`/classroom-teacher-school-subjects`, requestBody);
 
       return responseData;
     },
@@ -54,22 +57,20 @@ export function useLinkClassroomTeacherSchoolSubject(
 }
 
 type DeleteClassroomTeacherSchoolSubjectProps = {
-  classroom: Classroom;
   classroomTeacherSchoolSubject: ClassroomTeacherSchoolSubject;
 };
 
 export function useDeleteClassroomTeacherSchoolSubject() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteClassroomTeacherSchoolSubject = useCallback(
     async ({
-      classroom,
       classroomTeacherSchoolSubject
     }: DeleteClassroomTeacherSchoolSubjectProps) => {
       const api = initializeApi(session);
 
       await api.delete(
-        `/schools/${classroom.school_id}/classrooms/${classroom.id}/teacher-school-subjects/${classroomTeacherSchoolSubject.id}`
+        `/classroom-teacher-school-subjects/${classroomTeacherSchoolSubject.id}`
       );
     },
     [session]

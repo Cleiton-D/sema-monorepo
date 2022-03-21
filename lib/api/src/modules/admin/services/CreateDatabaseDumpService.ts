@@ -25,15 +25,16 @@ class CreateDatabaseDumpService {
       now.getMonth() + 1
     }.${now.getDate()}.${now.getHours()}.${now.getMinutes()}`;
 
-    const fileName = `database-backup-${currentDate}.tar`;
+    const fileName = `database-backup-${currentDate}.sql`;
 
     const fileDir = path.join(
       storageConfig.storagePath,
-      `/temp/database-backup-${uuidv4()}.tar`,
+      `/temp/database-backup-${uuidv4()}.sql`,
     );
 
     shell.exec(
-      `PGPASSWORD="${pass}" pg_dump -U ${username} -h ${host} -p ${port} -s ${database} -f ${fileDir} -F t`,
+      `PGPASSWORD="${pass}" pg_dumpall -U ${username} -h ${host} -p ${port} -l ${database} -f ${fileDir} -O --column-inserts
+      `,
     );
 
     const file = fs.readFileSync(fileDir);

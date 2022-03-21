@@ -40,9 +40,11 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
     grade_id,
     school_subject_id,
     workload,
+    id,
   }: FindGradeSchoolSubjectDTO): Promise<GradeSchoolSubject | undefined> {
     const where: FindConditions<GradeSchoolSubject> = {};
 
+    if (id) where.id = id;
     if (grade_id) where.grade_id = grade_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
     if (workload) where.workload = workload;

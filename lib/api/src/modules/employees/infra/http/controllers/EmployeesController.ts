@@ -8,6 +8,8 @@ import CreateEmployeeService from '@modules/employees/services/CreateEmployeeSer
 import ListEmployeesService from '@modules/employees/services/ListEmployeesService';
 import ShowEmployeeService from '@modules/employees/services/ShowEmployeeService';
 import CountEmployeesService from '@modules/employees/services/CountEmployeesService';
+import UpdateEmployeeService from '@modules/employees/services/UpdateEmployeeService';
+import DeleteEmployeeService from '@modules/employees/services/DeleteEmployeeService';
 
 class EmployeesController {
   @privateRoute()
@@ -37,7 +39,7 @@ class EmployeesController {
       branch_id: branch_id as string,
     });
 
-    return response.json(classToClass(employees));
+    return response.json(employees);
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
@@ -54,11 +56,12 @@ class EmployeesController {
       dad_name,
       birth_date,
       gender,
-      documents,
       address,
       contacts,
       education_level,
       pis_pasep,
+      cpf,
+      rg,
     } = request.body;
 
     const createEmployee = container.resolve(CreateEmployeeService);
@@ -68,14 +71,65 @@ class EmployeesController {
       dad_name,
       birth_date,
       gender,
-      documents,
       address,
       contacts,
       education_level,
       pis_pasep,
+      cpf,
+      rg,
     });
 
     return response.json(classToClass(employee));
+  }
+
+  public async update(request: Request, response: Response): Promise<Response> {
+    const { employee_id } = request.params;
+
+    const {
+      name,
+      mother_name,
+      dad_name,
+      birth_date,
+      gender,
+      address,
+      contacts,
+      education_level,
+      pis_pasep,
+      cpf,
+      rg,
+    } = request.body;
+
+    const createEmployee = container.resolve(UpdateEmployeeService);
+    const employee = await createEmployee.execute({
+      employee_id,
+      name,
+      mother_name,
+      dad_name,
+      birth_date,
+      gender,
+      address,
+      contacts,
+      education_level,
+      pis_pasep,
+      cpf,
+      rg,
+    });
+
+    return response.json(classToClass(employee));
+  }
+
+  @privateRoute()
+  public async delete(request: Request, response: Response): Promise<Response> {
+    const { employee_id } = request.params;
+    const { id: authenticated_user } = request.user;
+
+    const deleteEmployee = container.resolve(DeleteEmployeeService);
+    await deleteEmployee.execute({
+      employee_id,
+      auth_user_id: authenticated_user,
+    });
+
+    return response.status(204).send();
   }
 }
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
@@ -12,7 +12,7 @@ type CreateEnrollForm = CompleteEnrollFormData & {
 };
 
 export function useCreateEnroll() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const createEnroll = useCallback(
     async (data: CreateEnrollForm) => {
@@ -33,11 +33,73 @@ export function useCreateEnroll() {
     renderLoading: function render(newEnroll) {
       return (
         <ToastContent showSpinner>
-          Salvando {newEnroll.person.name}...
+          Salvando {newEnroll.student.name}...
         </ToastContent>
       );
     },
     renderError: () => `Falha ao realizar a matrícula.`,
     renderSuccess: () => `Matrícula realizada com sucesso.`
+  });
+}
+
+export type UpdateEnrollData = Record<string, any> & {
+  enroll_id: string;
+};
+export function useUpdateEnroll() {
+  const { data: session } = useSession();
+
+  const updateEnroll = useCallback(
+    async (data: UpdateEnrollData) => {
+      const api = initializeApi(session);
+
+      const { enroll_id, ...requestData } = data;
+
+      const { data: responseData } = await api.put(
+        `/enrolls/${enroll_id}`,
+        requestData
+      );
+      return responseData;
+    },
+    [session]
+  );
+
+  return useMutation('update-enroll', updateEnroll, {
+    renderLoading: function render() {
+      return <ToastContent showSpinner>Salvando...</ToastContent>;
+    },
+    renderError: () => `Falha ao alterar a matrícula.`,
+    renderSuccess: () => `Matrícula alterada com sucesso.`
+  });
+}
+
+type RelocateEnrollData = {
+  enroll_id: string;
+  from: string;
+  to: string;
+};
+export function useRelocateEnroll() {
+  const { data: session } = useSession();
+
+  const relocateEnroll = useCallback(
+    async (data: RelocateEnrollData) => {
+      const api = initializeApi(session);
+
+      const { enroll_id, ...requestData } = data;
+
+      const { data: responseData } = await api.patch(
+        `/enrolls/${enroll_id}`,
+        requestData
+      );
+      return responseData;
+    },
+    [session]
+  );
+
+  return useMutation('relocate-enroll', relocateEnroll, {
+    renderLoading: function render() {
+      return <ToastContent showSpinner>Realocando...</ToastContent>;
+    },
+    renderError: () => `Falha ao realocar a matrícula.`,
+    renderSuccess: () => `Matrícula realocada com sucesso.`
   });
 }

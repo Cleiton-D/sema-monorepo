@@ -6,7 +6,7 @@ import {
   useMemo,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -34,21 +34,19 @@ export type CreateUserProfileModalRef = {
   openModal: (user: User) => void;
 };
 
-const CreateUserProfileModal: React.ForwardRefRenderFunction<CreateUserProfileModalRef> = (
-  _,
-  ref
-) => {
+const CreateUserProfileModal: React.ForwardRefRenderFunction<
+  CreateUserProfileModalRef
+> = (_, ref) => {
   const [user, setUser] = useState<User>();
 
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  const { data: accessLevels, isLoading: loadingAccess } = useListAccessLevels(
-    session
-  );
+  const { data: accessLevels, isLoading: loadingAccess } =
+    useListAccessLevels(session);
   const { data: branchs, isLoading: loadingBranchs } = useListBranchs(session);
 
   const createUserProfile = useCreateUserProfile();
@@ -92,7 +90,7 @@ const CreateUserProfileModal: React.ForwardRefRenderFunction<CreateUserProfileMo
         }
       }
     },
-    [createUserProfile, user, handleBack]
+    [createUserProfile, user, handleBack, queryClient]
   );
 
   const openModal = (user: User) => {
@@ -131,7 +129,12 @@ const CreateUserProfileModal: React.ForwardRefRenderFunction<CreateUserProfileMo
             name="access_level_id"
             options={accessLevelsOptions}
           />
-          <Select label="Unidade" name="branch_id" options={branchsOptions} />
+          <Select
+            label="Unidade"
+            name="branch_id"
+            emptyOption
+            options={branchsOptions}
+          />
 
           <S.ButtonsContainer>
             <Button

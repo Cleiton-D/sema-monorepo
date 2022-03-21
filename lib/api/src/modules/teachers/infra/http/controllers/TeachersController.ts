@@ -1,41 +1,14 @@
 import { Request, Response } from 'express';
 import { classToClass } from 'class-transformer';
 import { container } from 'tsyringe';
-
-import CreateTeacherService from '@modules/teachers/services/CreateTeacherService';
+import ListTeachersService from '@modules/teachers/services/ListTeachersService';
 
 class TeachersController {
-  public async create(request: Request, response: Response): Promise<Response> {
-    const {
-      person_id,
-      name,
-      mother_name,
-      dad_name,
-      gender,
-      birth_date,
-      address,
-      documents,
-      contacts,
-      pis_pasep,
-      education_level,
-    } = request.body;
+  public async index(request: Request, response: Response): Promise<Response> {
+    const listTeachers = container.resolve(ListTeachersService);
+    const teachers = await listTeachers.execute();
 
-    const createTeacher = container.resolve(CreateTeacherService);
-    const teacher = await createTeacher.execute({
-      person_id,
-      name,
-      mother_name,
-      dad_name,
-      gender,
-      birth_date,
-      address,
-      documents,
-      contacts,
-      pis_pasep,
-      education_level,
-    });
-
-    return response.json(classToClass(teacher));
+    return response.json(classToClass(teachers));
   }
 }
 

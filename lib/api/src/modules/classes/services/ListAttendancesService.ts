@@ -6,6 +6,7 @@ import IAttendancesRepository from '../repositories/IAttendancesRepository';
 type ListAttendancesRequest = {
   class_id?: string | 'all';
   classroom_id?: string;
+  enroll_id?: string;
 };
 
 @injectable()
@@ -18,10 +19,12 @@ class ListAttendancesService {
   public async execute({
     class_id,
     classroom_id,
+    enroll_id,
   }: ListAttendancesRequest): Promise<Attendance[]> {
     const attendances = await this.attendancesRepository.findAll({
       class_id: class_id === 'all' ? undefined : class_id,
       classroom_id,
+      enroll_id,
     });
     return attendances;
   }

@@ -299,6 +299,81 @@ const SchoolYearBasicForm: React.ForwardRefRenderFunction<FormHandles> = (
             </Scope>
           </section>
         </S.TermPeriodsContainer>
+
+        <S.TermPeriodsContainer>
+          <S.SectionTitle>Recuperações</S.SectionTitle>
+          <section>
+            <Scope path="school_terms">
+              <S.TermPeriod>
+                <legend>1º Semestre</legend>
+                <S.TermPeriodFields>
+                  <Scope path="FIRST-REC">
+                    <DatePicker
+                      name="date_start"
+                      label="Data de Início"
+                      fromDate={first.dateStart}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                    />
+                    <DatePicker
+                      name="date_end"
+                      label="Data de Término"
+                      fromDate={first.dateStart}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                    />
+                  </Scope>
+                </S.TermPeriodFields>
+              </S.TermPeriod>
+              <S.TermPeriod>
+                <legend>2º Semestre</legend>
+                <S.TermPeriodFields>
+                  <Scope path="SECOND-REC">
+                    <DatePicker
+                      name="date_start"
+                      label="Data de Início"
+                      fromDate={fourth.dateEnd}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                      initialMonth={fourth.dateEnd}
+                    />
+                    <DatePicker
+                      name="date_end"
+                      label="Data de Término"
+                      fromDate={fourth.dateEnd}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                      initialMonth={fourth.dateEnd}
+                    />
+                  </Scope>
+                </S.TermPeriodFields>
+              </S.TermPeriod>
+              <S.TermPeriod>
+                <legend>Exames</legend>
+                <S.TermPeriodFields>
+                  <Scope path="EXAM">
+                    <DatePicker
+                      name="date_start"
+                      label="Data de Início"
+                      fromDate={fourth.dateEnd}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                      initialMonth={fourth.dateEnd}
+                    />
+                    <DatePicker
+                      name="date_end"
+                      label="Data de Término"
+                      fromDate={fourth.dateEnd}
+                      toDate={schoolYear.dateEnd}
+                      month={month}
+                      initialMonth={fourth.dateEnd}
+                    />
+                  </Scope>
+                </S.TermPeriodFields>
+              </S.TermPeriod>
+            </Scope>
+          </section>
+        </S.TermPeriodsContainer>
       </Form>
     </S.Wrapper>
   );

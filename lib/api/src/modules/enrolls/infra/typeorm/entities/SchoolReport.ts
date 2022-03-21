@@ -8,8 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
-
 import SchoolSubject from '@modules/education_core/infra/typeorm/entities/SchoolSubject';
 import Enroll from './Enroll';
 
@@ -33,10 +31,28 @@ class SchoolReport {
   school_subject: SchoolSubject;
 
   @Column()
-  average: number;
+  first: number;
 
-  @Column({ type: 'enum', enum: ['FIRST', 'SECOND', 'THIRD', 'FOURTH'] })
-  school_term: SchoolTerm;
+  @Column()
+  second: number;
+
+  @Column()
+  first_rec: number;
+
+  @Column()
+  third: number;
+
+  @Column()
+  fourth: number;
+
+  @Column()
+  second_rec: number;
+
+  @Column()
+  exam: number;
+
+  @Column()
+  final_average: number;
 
   @CreateDateColumn()
   created_at: Date;

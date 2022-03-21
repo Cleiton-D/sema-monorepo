@@ -42,7 +42,7 @@ class TeacherSchoolSubjectsRepository
 
     const schoolSubjects = await this.ormRepository.find({
       where,
-      relations: ['employee', 'employee.person'],
+      relations: ['employee'],
     });
     return schoolSubjects;
   }

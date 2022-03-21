@@ -5,19 +5,19 @@ import ISchoolYearsRepository from '@modules/education_core/repositories/ISchool
 
 import AppError from '@shared/errors/AppError';
 
-import Classroom, {
-  ClassPeriodType,
-} from '../infra/typeorm/entities/Classroom';
+import Classroom from '../infra/typeorm/entities/Classroom';
 import IClassroomsRepository from '../repositories/IClassroomsRepository';
 import ISchoolsRepository from '../repositories/ISchoolsRepository';
 
-type CreateClassroomRequest = {
+export type CreateClassroomRequest = {
   description: string;
-  class_period: ClassPeriodType;
+  class_period_id: string;
   school_id?: string;
   branch_id?: string;
   grade_id: string;
   school_year_id: string;
+  capacity: number;
+  is_multigrade?: boolean;
 };
 
 @injectable()
@@ -33,11 +33,13 @@ class CreateClassroomService {
 
   public async execute({
     description,
-    class_period,
+    class_period_id,
     grade_id,
     school_id,
     school_year_id,
     branch_id,
+    capacity,
+    is_multigrade,
   }: CreateClassroomRequest): Promise<Classroom> {
     const school = await this.SchoolsRepository.findOne({
       id: school_id,
@@ -61,10 +63,12 @@ class CreateClassroomService {
 
     const classroom = await this.classroomsRepository.create({
       description,
-      class_period,
+      class_period_id,
       grade_id,
       school_id: school.id,
       school_year_id,
+      capacity,
+      is_multigrade,
     });
 
     return classroom;

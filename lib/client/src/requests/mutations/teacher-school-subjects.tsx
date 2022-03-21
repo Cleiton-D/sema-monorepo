@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
@@ -18,7 +18,7 @@ type AddTeacherToSchoolForm = {
 export function useAddTeacherToSchoolSubjectMutation(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const addTeacherToSchoolSubject = useCallback(
     async (values: AddTeacherToSchoolForm) => {
@@ -51,7 +51,7 @@ export function useAddTeacherToSchoolSubjectMutation(
 }
 
 export function useDeleteTeacherSchoolSubject() {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteTeacherSchoolSubject = useCallback(
     async (teacherSchoolSubject: TeacherSchoolSubject) => {
@@ -76,14 +76,14 @@ export function useDeleteTeacherSchoolSubject() {
       ) {
         return (
           <ToastContent showSpinner>
-            Removendo {deletedTeacherSchoolSubject.employee.person.name}...
+            Removendo {deletedTeacherSchoolSubject.employee.name}...
           </ToastContent>
         );
       },
       renderError: (deletedTeacherSchoolSubject: TeacherSchoolSubject) =>
-        `Falha ao remover ${deletedTeacherSchoolSubject.employee.person.name}`,
+        `Falha ao remover ${deletedTeacherSchoolSubject.employee.name}`,
       renderSuccess: (deletedTeacherSchoolSubject: TeacherSchoolSubject) =>
-        `${deletedTeacherSchoolSubject.employee.person.name} removido com sucesso.`
+        `${deletedTeacherSchoolSubject.employee.name} removido com sucesso.`
     }
   );
 }

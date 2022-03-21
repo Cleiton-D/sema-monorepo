@@ -8,19 +8,17 @@ import { initializeApi } from 'services/api';
 type ListAttendancesFilters = {
   class_id?: string;
   classroom_id?: string;
+  enroll_id?: string;
 };
 
 export const listAttendances = (
   session: Session | null,
-  filters: ListAttendancesFilters = {}
+  params: ListAttendancesFilters = {}
 ) => {
-  const { class_id, ...params } = filters;
-  if (!class_id) return [];
-
   const api = initializeApi(session);
 
   return api
-    .get<Attendance[]>(`/classes/${class_id}/attendances`, { params })
+    .get<Attendance[]>(`/attendances`, { params })
     .then((response) => response.data);
 };
 

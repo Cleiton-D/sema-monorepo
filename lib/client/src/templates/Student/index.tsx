@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -16,7 +16,7 @@ import * as S from './styles';
 
 const StudentPageTemplate = () => {
   const { query } = useRouter();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const { data: enroll } = useGetEnrollDetails(
     query.enroll_id as string,
@@ -25,33 +25,41 @@ const StudentPageTemplate = () => {
 
   return (
     <Base>
-      <Heading>Perfil do aluno</Heading>
+      <Heading>Detalhes do aluno</Heading>
       <S.Wrapper>
         <div>
           <S.StudentName size="md" color="primary">
-            {enroll?.person.name}
+            {enroll?.student.name}
           </S.StudentName>
           <S.LightText>
             Responsáveis:{' '}
-            {enroll?.person.dad_name && `${enroll.person.dad_name}, `}{' '}
-            {enroll?.person.mother_name}
+            {enroll?.student.dad_name && `${enroll.student.dad_name}, `}{' '}
+            {enroll?.student.mother_name}
           </S.LightText>
         </div>
         <S.Details>
           <S.Grid>
+            <S.GridItem>
+              <strong>Código único</strong>
+              <span>{enroll?.student?.unique_code}</span>
+            </S.GridItem>
+            <S.GridItem>
+              <strong>NIS</strong>
+              <span>{enroll?.student?.nis}</span>
+            </S.GridItem>
             <S.GridItem>
               <strong>Série</strong>
               <span>{enroll?.grade?.description}</span>
             </S.GridItem>
             <S.GridItem>
               <strong>Turma</strong>
-              <span>{enroll?.current_classroom.description}</span>
+              <span>{enroll?.current_classroom?.description}</span>
             </S.GridItem>
             <S.GridItem>
               <strong>Turno</strong>
               <span>
-                {enroll?.current_classroom.class_period &&
-                  translateDescription(enroll?.current_classroom.class_period)}
+                {enroll?.class_period &&
+                  translateDescription(enroll?.class_period.description)}
               </span>
             </S.GridItem>
             <S.GridItem>
@@ -65,37 +73,37 @@ const StudentPageTemplate = () => {
             <S.Grid>
               <S.GridItem>
                 <strong>Logradouro</strong>
-                <span>{enroll?.person.address?.street}</span>
+                <span>{enroll?.student.address?.street}</span>
               </S.GridItem>
 
               <S.GridItem>
                 <strong>Número</strong>
-                <span>{enroll?.person.address?.house_number}</span>
+                <span>{enroll?.student.address?.house_number}</span>
               </S.GridItem>
 
               <S.GridItem>
                 <strong>Bairro</strong>
-                <span>{enroll?.person.address?.district}</span>
+                <span>{enroll?.student.address?.district}</span>
               </S.GridItem>
 
               <S.GridItem>
                 <strong>Cidade</strong>
-                <span>{enroll?.person.address?.city}</span>
+                <span>{enroll?.student.address?.city}</span>
               </S.GridItem>
 
               <S.GridItem>
                 <strong>Região</strong>
-                <span>{enroll?.person.address?.region}</span>
+                <span>{enroll?.student.address?.region}</span>
               </S.GridItem>
             </S.Grid>
           </S.Section>
-          {enroll?.person.contacts.length !== 0 && (
+          {enroll?.student.contacts.length !== 0 && (
             <>
               <S.Section style={{ marginTop: 24 }}>
                 <h2>Contatos</h2>
               </S.Section>
               <S.Grid>
-                {enroll?.person.contacts.map((contact) => (
+                {enroll?.student.contacts.map((contact) => (
                   <S.GridItem key={contact.id}>
                     <strong>{translateContactType(contact.type)}</strong>
                     <span>{contact.description}</span>
@@ -111,7 +119,7 @@ const StudentPageTemplate = () => {
         <S.SectionTitle>
           <h4>Boletim</h4>
         </S.SectionTitle>
-        <SchoolReportTable enrollId={query.enroll_id as string} />
+        <SchoolReportTable enrollId={query.enroll_id as string} isMininal />
       </S.TableSection>
     </Base>
   );

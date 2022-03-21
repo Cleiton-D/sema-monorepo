@@ -61,6 +61,7 @@ export const Input = styled.input<InputProps>`
     }
     &:disabled {
       opacity: 0.6;
+      cursor: default;
     }
   `}
 `;
@@ -71,5 +72,6 @@ export const Label = styled.label<Pick<CheckboxProps, 'labelColor'>>`
     padding-left: ${theme.spacings.xxsmall};
     color: ${theme.colors[labelColor!]};
     line-height: 1.8rem;
+    user-select: none;
   `}
 `;

@@ -9,18 +9,27 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude, Expose } from 'class-transformer';
 
 import Grade from '@modules/education_core/infra/typeorm/entities/Grade';
 import SchoolYear from '@modules/education_core/infra/typeorm/entities/SchoolYear';
 import School from '@modules/schools/infra/typeorm/entities/School';
-import Person from '@modules/persons/infra/typeorm/entities/Person';
-
 import Classroom from '@modules/schools/infra/typeorm/entities/Classroom';
-import { Exclude, Expose } from 'class-transformer';
+import Student from '@modules/students/infra/typeorm/entities/Student';
+
+import ClassPeriod from '@modules/education_core/infra/typeorm/entities/ClassPeriod';
 import EnrollClassroom from './EnrollClassroom';
 
-export type EnrollStatus = 'ACTIVE' | 'INACTIVE' | 'TRANSFERRED';
+export type EnrollStatus =
+  | 'ACTIVE'
+  | 'INACTIVE'
+  | 'TRANSFERRED'
+  | 'QUITTER'
+  | 'DECEASED'
+  | 'APPROVED'
+  | 'DISAPPROVED';
 
+export type EnrollOrigin = 'NEW' | 'REPEATING';
 @Entity('enrolls')
 class Enroll {
   @PrimaryGeneratedColumn('uuid')
@@ -30,11 +39,11 @@ class Enroll {
   status: EnrollStatus;
 
   @Column()
-  person_id: string;
+  student_id: string;
 
-  @ManyToOne(() => Person)
-  @JoinColumn({ name: 'person_id' })
-  person: Person;
+  @ManyToOne(() => Student, { eager: true })
+  @JoinColumn({ name: 'student_id' })
+  student: Student;
 
   @Column()
   school_id: string;
@@ -64,6 +73,19 @@ class Enroll {
   @ManyToOne(() => SchoolYear)
   @JoinColumn({ name: 'school_year_id' })
   school_year: SchoolYear;
+
+  @Column({ type: 'enum', enum: ['NEW', 'REPEATING'] })
+  origin: EnrollOrigin;
+
+  @Column()
+  class_period_id: string;
+
+  @ManyToOne(() => ClassPeriod)
+  @JoinColumn({ name: 'class_period_id' })
+  class_period: ClassPeriod;
+
+  @Column({ default: 'now()' })
+  enroll_date: Date;
 
   @CreateDateColumn()
   created_at: Date;

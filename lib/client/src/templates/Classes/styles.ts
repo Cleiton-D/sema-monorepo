@@ -8,12 +8,13 @@ export const AddButtonContainer = styled.div`
 `;
 
 export const TableSection = styled(SectionContent)`
-  margin-top: 2rem;
-  padding-left: 0;
-  padding-right: 0;
-  padding-bottom: 1rem;
+  ${({ theme }) => css`
+    margin-top: ${theme.spacings.xlarge};
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 1rem;
+  `}
 `;
-
 export const SectionTitle = styled.div`
   ${({ theme }) => css`
     font-size: ${theme.font.sizes.large};

@@ -17,7 +17,15 @@ export default class CreateEnroll1617229935418 implements MigrationInterface {
           {
             name: 'status',
             type: 'enum',
-            enum: ['ACTIVE', 'INACTIVE', 'TRANSFERRED'],
+            enum: [
+              'ACTIVE',
+              'INACTIVE',
+              'TRANSFERRED',
+              'QUITTER',
+              'DECEASED',
+              'APPROVED',
+              'DISAPPROVED',
+            ],
           },
           {
             name: 'student_id',

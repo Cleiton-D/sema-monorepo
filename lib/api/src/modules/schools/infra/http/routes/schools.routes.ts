@@ -1,7 +1,5 @@
 import { Router } from 'express';
 
-import classroomsRouter from './classrooms.routes';
-
 import SchoolsController from '../controllers/SchoolsController';
 
 import schoolTeachersRouter from './school_teacher.routes';
@@ -17,7 +15,7 @@ schoolsRouter.get('/', schoolsController.index);
 schoolsRouter.post('/', schoolsController.create);
 schoolsRouter.put('/:school_id', schoolsController.update);
 
-schoolsRouter.use('/:school_id/classrooms', classroomsRouter);
+// schoolsRouter.use('/:school_id/classrooms', classroomsRouter);
 schoolsRouter.use('/:school_id/teachers', schoolTeachersRouter);
 schoolsRouter.use(
   '/:school_id/teacher-school-subjects',

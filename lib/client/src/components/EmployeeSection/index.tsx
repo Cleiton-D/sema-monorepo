@@ -1,5 +1,5 @@
 import { useRef, useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PlusSquare, X } from '@styled-icons/feather';
 
 import AddEmployeeToProfileModal, {
@@ -39,7 +39,7 @@ const EmployeeSection = ({
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading, refetch } = useListEmployees(session, {
     accessCode: profileCode,
     branch_id: branchId
@@ -64,7 +64,7 @@ const EmployeeSection = ({
   const handleDelete = useCallback(
     async (employee: Employee) => {
       const confirmation = window.confirm(
-        `Deseja remover o/a ${name} ${employee.person.name}?`
+        `Deseja remover o/a ${name} ${employee.name}?`
       );
       if (confirmation) {
         await deleteUserProfile.mutateAsync({
@@ -100,7 +100,7 @@ const EmployeeSection = ({
             <S.List>
               {employees.map((employee) => (
                 <li key={employee.id}>
-                  <span>{employee.person.name}</span>
+                  <span>{employee.name}</span>
 
                   {canEditEmployees && (
                     <S.ActionButton onClick={() => handleDelete(employee)}>

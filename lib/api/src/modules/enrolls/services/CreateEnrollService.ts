@@ -2,15 +2,14 @@ import { inject, injectable } from 'tsyringe';
 
 import { ContactType } from '@modules/contacts/infra/typeorm/entities/Contact';
 import { Gender } from '@modules/persons/infra/typeorm/entities/Person';
-import { DocumentType } from '@modules/persons/infra/typeorm/entities/PersonDocument';
 import IGradeSchoolSubjectsRepository from '@modules/education_core/repositories/IGradeSchoolSubjectsRepository';
-import CreatePersonService from '@modules/persons/services/CreatePersonService';
-import UpdatePersonService from '@modules/persons/services/UpdatePersonService';
 import ISchoolsRepository from '@modules/schools/repositories/ISchoolsRepository';
+import CreateStudentService from '@modules/students/services/CreateStudentService';
 
 import AppError from '@shared/errors/AppError';
 
-import Enroll from '../infra/typeorm/entities/Enroll';
+import UpdateStudentService from '@modules/students/services/UpdateStudentService';
+import Enroll, { EnrollOrigin } from '../infra/typeorm/entities/Enroll';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
 import CreateSchoolReportsToEnrollService from './CreateSchoolReportsToEnrollService';
 
@@ -22,35 +21,43 @@ type AddressData = {
   region: string;
 };
 
-type DocumentData = {
-  document_number: string;
-  document_type: DocumentType;
-};
-
 type ContactData = {
   description: string;
   type: ContactType;
 };
 
-type PersonData = {
-  person_id?: string;
+type StudentData = {
+  id?: string;
   name: string;
   mother_name: string;
   dad_name?: string;
   gender: Gender;
-  birth_date: Date;
+  birth_date: string;
   address: AddressData;
-  documents: DocumentData[];
   contacts: ContactData[];
+  cpf?: string;
+  rg?: string;
+  nis?: string;
+  birth_certificate?: string;
+  breed: string;
+  naturalness: string;
+  naturalness_uf: string;
+  identity_document: string;
+  nationality: string;
+  unique_code: string;
 };
 
 type CreateEnrollRequest = {
-  person: PersonData;
+  student: StudentData;
+  school_reports?: Record<string, Record<string, number>>;
   school_id?: string;
   branch_id?: string;
   grade_id: string;
-  classroom_id: string;
+  classroom_id?: string;
   school_year_id: string;
+  origin: EnrollOrigin;
+  class_period_id: string;
+  enroll_date: string;
 };
 
 @injectable()
@@ -61,23 +68,27 @@ class CreateEnrollService {
     private gradeSchoolSubjectsRepository: IGradeSchoolSubjectsRepository,
     @inject('SchoolsRepository') private schoolsRepository: ISchoolsRepository,
     private createSchoolReportsToEnrollService: CreateSchoolReportsToEnrollService,
-    private createPerson: CreatePersonService,
-    private updatePerson: UpdatePersonService,
+    private createStudent: CreateStudentService,
+    private updateStudent: UpdateStudentService,
   ) {}
 
   public async execute({
-    person: personData,
+    student: studentData,
     school_id,
     branch_id,
     grade_id,
     classroom_id,
     school_year_id,
+    origin,
+    school_reports,
+    class_period_id,
+    enroll_date,
   }: CreateEnrollRequest): Promise<Enroll> {
-    const { person_id, ...newPersonData } = personData;
+    const { id: student_id, ...newStudentData } = studentData;
 
-    const person = person_id
-      ? await this.updatePerson.execute({ ...newPersonData, person_id })
-      : await this.createPerson.execute(newPersonData);
+    const student = student_id
+      ? await this.updateStudent.execute({ ...newStudentData, id: student_id })
+      : await this.createStudent.execute(newStudentData);
 
     const school = await this.schoolsRepository.findOne({
       id: school_id,
@@ -92,8 +103,11 @@ class CreateEnrollService {
       grade_id,
       school_year_id,
       classroom_id,
-      person,
+      student,
       status: 'ACTIVE',
+      origin,
+      class_period_id,
+      enroll_date,
     });
 
     const gradeSchoolSubjects = await this.gradeSchoolSubjectsRepository.find({
@@ -106,6 +120,7 @@ class CreateEnrollService {
     await this.createSchoolReportsToEnrollService.execute({
       enroll_id: enroll.id,
       school_subject_id: schoolSubjects,
+      reports: school_reports,
     });
 
     return enroll;

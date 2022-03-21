@@ -22,7 +22,7 @@ class EnrollClassroom {
   @Column()
   classroom_id: string;
 
-  @ManyToOne(() => Classroom)
+  @ManyToOne(() => Classroom, { eager: true })
   @JoinColumn({ name: 'classroom_id' })
   classroom: Classroom;
 

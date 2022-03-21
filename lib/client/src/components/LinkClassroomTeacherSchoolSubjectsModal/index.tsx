@@ -5,7 +5,7 @@ import {
   forwardRef,
   useMemo
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 
 import Modal, { ModalRef } from 'components/Modal';
@@ -37,7 +37,7 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<Li
     modalRef
   );
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schoolSubjects } = useListSchoolsSubjects(session, {
     grade_id: classroom?.grade_id
   });
@@ -46,8 +46,7 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<Li
     data: classroomTeacherSchoolSubjects,
     refetch
   } = useListClassroomTeacherSchoolSubjects(session, {
-    classroom_id: classroom?.id,
-    school_id: classroom?.school_id
+    classroom_id: classroom?.id
   });
 
   const teacherSchoolSubjectsFilters = useMemo(() => {
@@ -82,7 +81,7 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<Li
             ({ school_subject_id }) => school_subject_id === schoolSubject.id
           )
           .map((item) => ({
-            label: item.employee.person.name,
+            label: item.employee.name,
             value: item.employee_id
           }));
 

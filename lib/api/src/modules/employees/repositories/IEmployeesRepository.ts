@@ -9,4 +9,5 @@ export default interface IEmployeesRepository {
   count: () => Promise<CountResultDTO>;
   create: (data: CreateEmployeeDTO) => Promise<Employee>;
   update: (data: Employee) => Promise<Employee>;
+  delete: (data: Employee) => Promise<void>;
 }

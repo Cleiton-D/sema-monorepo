@@ -6,7 +6,7 @@ import {
   forwardRef,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -37,7 +37,7 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading } = useListEmployees(session);
 
   const addTeacherToSchool = useAddTeacherToSchoolMutation(modalRef);
@@ -46,9 +46,9 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
     if (!employees) return [];
 
-    return employees.map(({ id, person }) => ({
+    return employees.map(({ id, name }) => ({
       value: id,
-      label: person.name
+      label: name
     }));
   }, [employees, isLoading]);
 

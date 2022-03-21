@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useMemo, useImperativeHandle } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { PrimitiveAtom, useAtom } from 'jotai';
 
 import Select from 'components/Select';
@@ -24,7 +24,7 @@ const SchoolAdministrationForm: React.ForwardRefRenderFunction<
 > = ({ jotaiState, basicJotaiState }, ref) => {
   const [state, setState] = useAtom(basicJotaiState);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading } = useListEmployees(session);
 
   const employeesOptions = useMemo(() => {
@@ -33,7 +33,7 @@ const SchoolAdministrationForm: React.ForwardRefRenderFunction<
 
     return employees.map((employee) => ({
       value: employee.id,
-      label: employee.person.name
+      label: employee.name
     }));
   }, [employees, isLoading]);
 

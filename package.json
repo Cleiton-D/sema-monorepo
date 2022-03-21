@@ -1,0 +1,7 @@
+{
+  "name": "sema",
+  "license": "MIT",
+  "scripts": {
+    "dev": "cd lib/api && yarn dev -d && cd ../client && yarn dev"
+  }
+}

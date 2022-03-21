@@ -2,7 +2,7 @@ import { QueryClient } from 'react-query';
 import { dehydrate } from 'react-query/hydration';
 
 type Query = {
-  key: string;
+  key: any;
   fetcher: () => unknown | Promise<unknown>;
 };
 

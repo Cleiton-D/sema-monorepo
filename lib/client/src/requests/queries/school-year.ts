@@ -1,11 +1,14 @@
-import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
 import { SchoolYear } from 'models/SchoolYear';
 import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { initializeApi } from 'services/api';
 
-import { mapSchoolTermPeriodsToObject } from 'utils/mappers/schoolTermPeriodMapper';
+import {
+  mapSchoolTermPeriodsToObject,
+  orderSchoolTerm,
+  schoolTermPeriodMapper
+} from 'utils/mappers/schoolTermPeriodMapper';
 import { schoolYearMapper } from 'utils/mappers/schoolYearMapper';
 
 import { listSchoolTermPeriods } from './school-term-periods';
@@ -35,8 +38,13 @@ export const getSchoolYearWithSchoolTerms = async (
       }).catch(() => [])
     : [];
 
+  const schoolTermPeriodsArray = schoolTermPeriodsResponse
+    .sort((a, b) => orderSchoolTerm(a.school_term, b.school_term))
+    .map(schoolTermPeriodMapper);
+
   return {
     ...(schoolYear ? schoolYearMapper(schoolYear) : {}),
+    schoolTermPeriodsArray: schoolTermPeriodsArray,
     schoolTermPeriods: mapSchoolTermPeriodsToObject(schoolTermPeriodsResponse)
   };
 };
@@ -45,7 +53,7 @@ export const useSchoolYearWithSchoolTerms = (
   session?: Session | null,
   filters: GetSchoolYearFilters = {}
 ) => {
-  return useQuery('show-school-year', () =>
+  return useQuery(['show-school-year'], () =>
     getSchoolYearWithSchoolTerms(session, filters)
   );
 };

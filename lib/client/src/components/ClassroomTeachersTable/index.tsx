@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,12 +15,12 @@ import { Employee } from 'models/Employee';
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
 
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
-import { useListTeacherSchoolSubjects } from 'requests/queries/teacher-school-subjects';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
 import {
   useDeleteClassroomTeacherSchoolSubject,
   useLinkClassroomTeacherSchoolSubject
 } from 'requests/mutations/classroom-teacher-school-subjects';
+import { useListSchoolTeachers } from 'requests/queries/school-teachers';
 
 import * as S from './styles';
 
@@ -37,43 +37,33 @@ type ClassroomTeachersTableData = {
 const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: schoolSubjects } = useListSchoolsSubjects(session, {
     grade_id: classroom.grade_id
   });
 
-  const {
-    data: classroomTeacherSchoolSubjects,
-    refetch
-  } = useListClassroomTeacherSchoolSubjects(session, {
-    classroom_id: classroom.id,
-    school_id: classroom.school_id
+  const { data: classroomTeacherSchoolSubjects, refetch } =
+    useListClassroomTeacherSchoolSubjects(session, {
+      classroom_id: classroom.id
+    });
+
+  const { data: schoolTeachers } = useListSchoolTeachers(session, {
+    school_id: classroom?.school_id
   });
 
-  const teacherSchoolSubjectsFilters = useMemo(() => {
-    if (!schoolSubjects) return {};
-
-    return {
-      school_id: classroom?.school_id,
-      school_subject_id: schoolSubjects.map(({ id }) => id)
-    };
-  }, [schoolSubjects, classroom]);
-
-  const { data: teacherSchoolSubjects } = useListTeacherSchoolSubjects(
-    session,
-    teacherSchoolSubjectsFilters
-  );
-
-  const deleteClassroomTeacherSchoolSubject = useDeleteClassroomTeacherSchoolSubject();
-  const linkClassroomTeacherSchoolSubjects = useLinkClassroomTeacherSchoolSubject();
+  const deleteClassroomTeacherSchoolSubject =
+    useDeleteClassroomTeacherSchoolSubject();
+  const linkClassroomTeacherSchoolSubjects =
+    useLinkClassroomTeacherSchoolSubject();
 
   const tableData = useMemo(() => {
     if (!schoolSubjects) return [];
 
     return schoolSubjects.map((schoolSubject) => {
-      const classroomTeacherSchoolSubject = classroomTeacherSchoolSubjects?.find(
-        (item) => item.school_subject_id === schoolSubject.id
-      );
+      const classroomTeacherSchoolSubject =
+        classroomTeacherSchoolSubjects?.find(
+          (item) => item.school_subject_id === schoolSubject.id
+        );
 
       return {
         key: uuidv4(),
@@ -84,15 +74,13 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
   }, [schoolSubjects, classroomTeacherSchoolSubjects]);
 
   const handleRemoveTeacher = async (item: ClassroomTeachersTableData) => {
-    const personName =
-      item.classroom_teacher_school_subject?.employee.person.name;
+    const personName = item.classroom_teacher_school_subject?.employee.name;
 
     const confirm = window.confirm(
       `Deseja remover o professor ${personName} da disciplina ${item.school_subject.description}?`
     );
     if (confirm) {
       await deleteClassroomTeacherSchoolSubject.mutateAsync({
-        classroom,
         classroomTeacherSchoolSubject: item.classroom_teacher_school_subject
       });
       refetch();
@@ -121,7 +109,7 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
 
     if (item.classroom_teacher_school_subject) {
       const confirm = window.confirm(
-        `Deseja substituir o professor ${item.classroom_teacher_school_subject?.employee.person.name} pelo professor ${newEmployee.person.name}?`
+        `Deseja substituir o professor ${item.classroom_teacher_school_subject?.employee.name} pelo professor ${newEmployee.name}?`
       );
 
       return confirm && sendRequest();
@@ -153,13 +141,10 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
               selectedEmployee={
                 item.classroom_teacher_school_subject?.employee_id
               }
-              teacherSchoolSubjects={teacherSchoolSubjects?.filter(
-                ({ school_subject_id }) =>
-                  school_subject_id === item.school_subject.id
-              )}
+              schoolTeachers={schoolTeachers}
             />
           ) : (
-            item.classroom_teacher_school_subject?.employee.person.name
+            item.classroom_teacher_school_subject?.employee.name
           )
         }
       />

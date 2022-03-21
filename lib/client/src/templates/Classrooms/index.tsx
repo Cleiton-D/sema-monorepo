@@ -1,6 +1,8 @@
-import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/client';
-import { PlusCircle, X } from '@styled-icons/feather';
+import { useRef, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import { PlusCircle, X, Edit } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -9,38 +11,53 @@ import Button from 'components/Button';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import ClassroomModal, { ClassroomModalRef } from 'components/ClassroomModal';
+import ClassroomEnrollsTable from 'components/ClassroomEnrollsTable';
+import ClassroomsSearch from 'components/ClassroomsSearch';
 
 import { useAccess } from 'hooks/AccessProvider';
 
 import { Classroom } from 'models/Classroom';
-import { School } from 'models/School';
 
-import { useListClassrooms } from 'requests/queries/classrooms';
+import {
+  ListClassroomsFilters,
+  useListClassrooms
+} from 'requests/queries/classrooms';
 import { useDeleteClassroom } from 'requests/mutations/classroom';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
 
-export type ClassroomsProps = {
-  school: School;
-};
+const Classrooms = () => {
+  const [filters, setFilters] = useState<ListClassroomsFilters>({});
 
-const Classrooms = ({ school }: ClassroomsProps) => {
   const modalRef = useRef<ClassroomModalRef>(null);
 
   const { enableAccess } = useAccess();
 
-  const [session] = useSession();
+  const { query } = useRouter();
+  const { data: session } = useSession();
+
+  const schoolId = useMemo(() => {
+    if (query.school_id === 'me') {
+      return session?.schoolId;
+    }
+    return query.school_id as string;
+  }, [query, session]);
+
+  const classroomsFilters = useMemo(() => {
+    return {
+      school_id: schoolId,
+      ...filters
+    };
+  }, [filters, schoolId]);
 
   const {
     data: classrooms,
     key,
     queryAddMutation,
     queryRemoveMutation
-  } = useListClassrooms(session, {
-    school_id: school.id
-  });
+  } = useListClassrooms(session, classroomsFilters);
 
   const deleteClassroomMutation = useDeleteClassroom({
     [key]: queryRemoveMutation
@@ -52,7 +69,7 @@ const Classrooms = ({ school }: ClassroomsProps) => {
 
   const handleDeleteClassroom = (classroom: Classroom) => {
     const confirmation = window.confirm(
-      `Deseja apagar a turma ${classroom.description}?`
+      `Deseja fechar a turma ${classroom.description}?`
     );
     if (confirmation) {
       deleteClassroomMutation.mutate(classroom);
@@ -67,7 +84,7 @@ const Classrooms = ({ school }: ClassroomsProps) => {
   return (
     <Base>
       <Heading>Turmas</Heading>
-      {canChangeClassroom && (
+      {canChangeClassroom && schoolId && (
         <S.AddButtonContainer>
           <Button
             styleType="normal"
@@ -80,6 +97,8 @@ const Classrooms = ({ school }: ClassroomsProps) => {
         </S.AddButtonContainer>
       )}
 
+      <ClassroomsSearch handleSearch={setFilters} />
+
       <S.TableSection>
         <S.SectionTitle>
           <h4>Turmas</h4>
@@ -88,21 +107,50 @@ const Classrooms = ({ school }: ClassroomsProps) => {
           items={classrooms || []}
           keyExtractor={(item) => item.id}
         >
-          <TableColumn label="Descrição" tableKey="description" />
-          <TableColumn
-            label="Série"
-            tableKey="grade"
-            render={(grade) => grade.description}
-          />
+          <TableColumn label="Descrição" tableKey="description">
+            {(classroom) => <ClassroomEnrollsTable classroom={classroom} />}
+          </TableColumn>
+
+          {!session?.schoolId && (
+            <TableColumn label="Escola" tableKey="school.name" />
+          )}
+
+          <TableColumn label="Série" tableKey="grade.description" />
           <TableColumn
             label="Período"
-            tableKey="class_period"
+            tableKey="class_period.description"
             render={(class_period) => translateDescription(class_period)}
+          />
+          <TableColumn
+            label="Lotação"
+            tableKey="capacity"
+            contentAlign="center"
           />
           <TableColumn
             label="Matriculas ativas"
             tableKey="enroll_count"
             contentAlign="center"
+          />
+          <TableColumn
+            label="Links"
+            tableKey=""
+            contentAlign="center"
+            actionColumn
+            render={(classroom: Classroom) => (
+              <Link
+                href={{
+                  pathname:
+                    '/auth/school/[school_id]/classrooms/[classroom_id]',
+                  query: {
+                    school_id: classroom.school_id,
+                    classroom_id: classroom.id
+                  }
+                }}
+                passHref
+              >
+                <S.TableLink>Ver turma</S.TableLink>
+              </Link>
+            )}
           />
           <TableColumn
             label="Ações"
@@ -111,23 +159,37 @@ const Classrooms = ({ school }: ClassroomsProps) => {
             actionColumn
             render={(classroom) => (
               <S.ActionButtons>
-                <S.ActionDeleteButton
+                {schoolId && (
+                  <S.ActionButton
+                    color="primary"
+                    type="button"
+                    title="Alterar turma"
+                    onClick={() => modalRef.current?.openModal(classroom)}
+                  >
+                    <Edit title={`Alterar servidor`} size={20} />
+                  </S.ActionButton>
+                )}
+
+                <S.ActionButton
+                  color="red"
                   type="button"
-                  title={`Excluir a turma ${classroom.description}`}
+                  title={`Fechar a turma ${classroom.description}`}
                   onClick={() => handleDeleteClassroom(classroom)}
                 >
-                  <X />
-                </S.ActionDeleteButton>
+                  <X title={`Fechar a turma ${classroom.description}`} />
+                </S.ActionButton>
               </S.ActionButtons>
             )}
           />
         </Table>
       </S.TableSection>
-      <ClassroomModal
-        ref={modalRef}
-        schoolId={school.id}
-        createQueries={{ [key]: queryAddMutation }}
-      />
+      {schoolId && (
+        <ClassroomModal
+          ref={modalRef}
+          schoolId={schoolId}
+          createQueries={{ [key]: queryAddMutation }}
+        />
+      )}
     </Base>
   );
 };

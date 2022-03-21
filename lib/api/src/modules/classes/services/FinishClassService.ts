@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import { format } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
@@ -24,7 +23,7 @@ class FinishClassService {
 
     const newClass = Object.assign(classEntity, {
       status: 'DONE',
-      time_end: format(new Date(), 'HH:mm'),
+      date_end: new Date(),
     });
     return this.classesRepository.update(newClass);
   }

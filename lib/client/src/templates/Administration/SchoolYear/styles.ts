@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { darken } from 'polished';
 
 import SectionContent from 'components/SectionContent';
 import * as BadgeStyles from 'components/Badge/styles';
@@ -52,47 +53,6 @@ export const GridItem = styled.article`
   `}
 `;
 
-export const SchoolTermContainer = styled.article`
-  ${({ theme }) => css`
-    > strong {
-      display: inline-block;
-      font-size: ${theme.font.sizes.medium};
-      font-weight: ${theme.font.bold};
-      color: #7b7f80;
-      margin-bottom: ${theme.spacings.xxsmall};
-    }
-
-    > div {
-      font-size: ${theme.font.sizes.small};
-
-      > div:not(:first-child) {
-        margin-top: calc(${theme.spacings.xxsmall} / 2);
-      }
-
-      strong {
-        color: ${theme.colors.lightSilver};
-        font-weight: ${theme.font.normal};
-        margin-right: calc(${theme.spacings.xxsmall} / 2);
-      }
-
-      span {
-        color: #7b7f80;
-      }
-    }
-  `}
-`;
-
-export const Divider = styled.hr`
-  ${({ theme }) => css`
-    width: 90%;
-    appearance: none;
-    content: '';
-    display: block;
-    box-shadow: 0rem 0rem 0rem 0.05rem ${theme.colors.lightSilver};
-    border: none;
-  `}
-`;
-
 export const TableSection = styled(SectionContent)`
   ${({ theme }) => css`
     margin-top: ${theme.spacings.medium};
@@ -130,6 +90,31 @@ export const Message = styled.p`
       color: ${theme.colors.primary};
       font: inherit;
       text-decoration: underline;
+    }
+  `}
+`;
+
+export const ActionButton = styled.button`
+  ${({ theme }) => css`
+    position: relative;
+    background: ${theme.colors.white};
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 3rem;
+    border: 0;
+    outline: 0;
+    stroke-width: 2;
+    color: ${theme.colors.red};
+    padding: 0.4rem;
+    transition: background 0.3s ease;
+
+    &:first-child {
+      margin-right: 1rem;
+    }
+
+    &:hover {
+      background: ${darken(0.05, theme.colors.white)};
     }
   `}
 `;

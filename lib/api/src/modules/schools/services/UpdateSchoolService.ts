@@ -36,6 +36,9 @@ type UpdateSchoolResquest = {
   contacts?: ContactData[];
   director_id?: string;
   vice_director_id?: string;
+  creation_decree?: string;
+  recognition_opinion?: string;
+  authorization_ordinance?: string;
 };
 
 @injectable()
@@ -60,6 +63,9 @@ class UpdateSchoolService {
     name,
     director_id,
     vice_director_id,
+    creation_decree,
+    recognition_opinion,
+    authorization_ordinance,
     address: addressData,
     contacts: contactsData,
   }: UpdateSchoolResquest): Promise<School> {
@@ -156,6 +162,9 @@ class UpdateSchoolService {
       director: undefined,
       vice_director_id,
       vice_director: undefined,
+      creation_decree,
+      recognition_opinion,
+      authorization_ordinance,
     });
 
     const updatedSchool = await this.schoolsRepository.update(newSchool);

@@ -21,8 +21,12 @@ class SchoolSubjectsController {
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
+    const { grade_id } = request.query;
+
     const listSchoolSubjects = container.resolve(ListSchoolSubjectService);
-    const schoolSubject = await listSchoolSubjects.execute();
+    const schoolSubject = await listSchoolSubjects.execute({
+      grade_id: grade_id as string,
+    });
 
     return response.json(schoolSubject);
   }
@@ -35,12 +39,13 @@ class SchoolSubjectsController {
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const { description, additional_description } = request.body;
+    const { description, additional_description, index } = request.body;
 
     const createSchoolSubject = container.resolve(CreateSchoolSubjectService);
     const schoolSubject = await createSchoolSubject.execute({
       description,
       additional_description,
+      index,
     });
 
     return response.json(schoolSubject);
@@ -48,13 +53,14 @@ class SchoolSubjectsController {
 
   public async update(request: Request, response: Response): Promise<Response> {
     const { school_subject_id } = request.params;
-    const { description, additional_description } = request.body;
+    const { description, additional_description, index } = request.body;
 
     const updateSchoolSubject = container.resolve(UpdateSchoolSubjectService);
     const schoolSubject = await updateSchoolSubject.execute({
       id: school_subject_id,
       description,
       additional_description,
+      index,
     });
 
     return response.json(schoolSubject);

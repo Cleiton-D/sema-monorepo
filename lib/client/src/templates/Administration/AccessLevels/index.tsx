@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { X, PlusCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -48,7 +48,7 @@ const AccessLevels = () => {
   const accessModuleModalRef = useRef<CreateAccessModuleRef>(null);
   const addAccessLevelModal = useRef<AccessLevelModalRef>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const { data: accessLevels, refetch } = useListAccessLevels(session);
 

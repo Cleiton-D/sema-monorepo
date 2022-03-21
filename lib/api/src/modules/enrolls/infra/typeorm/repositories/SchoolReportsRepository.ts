@@ -15,14 +15,11 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
   public async findAll({
     enroll_id,
     school_subject_id,
-    average,
-    school_term,
   }: FindSchoolReportDTO): Promise<SchoolReport[]> {
     const where: FindConditions<SchoolReport> = {};
 
     if (school_subject_id) where.school_subject_id = school_subject_id;
-    if (average) where.average = average;
-    if (school_term) where.school_term = school_term;
+
     if (enroll_id) {
       if (Array.isArray(enroll_id)) {
         where.enroll_id = In(enroll_id);
@@ -33,7 +30,7 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
 
     const schoolReports = await this.ormRepository.find({
       where,
-      relations: ['school_subject', 'enroll', 'enroll.person'],
+      relations: ['school_subject', 'enroll', 'enroll.student'],
     });
 
     return schoolReports;
@@ -50,11 +47,29 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
     data: CreateSchoolReportDTO[],
   ): Promise<SchoolReport[]> {
     const schoolReports = data.map(
-      ({ enroll_id, school_subject_id, school_term }) =>
+      ({
+        enroll_id,
+        school_subject_id,
+        first,
+        second,
+        first_rec,
+        third,
+        fourth,
+        second_rec,
+        exam,
+        final_average,
+      }) =>
         this.ormRepository.create({
           enroll_id,
           school_subject_id,
-          school_term,
+          first,
+          second,
+          first_rec,
+          third,
+          fourth,
+          second_rec,
+          exam,
+          final_average,
         }),
     );
 

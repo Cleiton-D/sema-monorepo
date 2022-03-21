@@ -5,7 +5,7 @@ import {
   forwardRef,
   useMemo
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 
@@ -53,7 +53,7 @@ const SelectTeacherClassroomModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const {
     data: classroomTeacherSchoolSubjects,
     isLoading

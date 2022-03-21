@@ -1,5 +1,6 @@
 import { Address, AddressFormData } from './Address';
 import { Contact } from './Contact';
+import { PersonDocument } from './PersonDocuments';
 
 export type Person = {
   id: string;
@@ -12,7 +13,7 @@ export type Person = {
   birth_date: string;
   created_at: string;
   updated_at: string;
-  documents: [];
+  documents?: PersonDocument[];
   contacts: Contact[];
 };
 

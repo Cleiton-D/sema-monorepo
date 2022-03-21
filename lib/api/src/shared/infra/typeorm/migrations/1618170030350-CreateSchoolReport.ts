@@ -31,7 +31,15 @@ export default class CreateSchoolReport1618170030350
           {
             name: 'school_term',
             type: 'enum',
-            enum: ['FIRST', 'SECOND', 'THIRD', 'FOURTH'],
+            enum: [
+              'FIRST',
+              'SECOND',
+              'THIRD',
+              'FOURTH',
+              'FIRST-REC',
+              'SECOND-REC',
+              'EXAM',
+            ],
           },
           {
             name: 'created_at',

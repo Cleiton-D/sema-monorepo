@@ -5,7 +5,7 @@ import {
   useMemo,
   useState
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -52,7 +52,7 @@ const SchoolDirectoryModal: React.ForwardRefRenderFunction<
     modalRef.current?.closeModal();
   };
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading } = useListEmployees(session);
   const updateSchool = useUpdateSchool(school, handleBack);
 
@@ -89,9 +89,9 @@ const SchoolDirectoryModal: React.ForwardRefRenderFunction<
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
     if (!employees) return [];
 
-    return employees.map(({ id, person }) => ({
+    return employees.map(({ id, name }) => ({
       value: id,
-      label: person.name
+      label: name
     }));
   }, [isLoading, employees]);
 

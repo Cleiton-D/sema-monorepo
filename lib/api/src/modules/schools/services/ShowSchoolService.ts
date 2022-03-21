@@ -19,7 +19,11 @@ class ShowSchoolService {
   public async execute({
     branch_id,
     school_id,
-  }: ShowSchoolRequest): Promise<School> {
+  }: ShowSchoolRequest): Promise<School | undefined> {
+    if (!branch_id && !school_id) {
+      throw new AppError('School not found');
+    }
+
     const school = await this.schoolsRepository.findOne({
       branch_id,
       id: school_id,

@@ -8,13 +8,13 @@ import ListAttendancesService from '@modules/classes/services/ListAttendancesSer
 
 class AttendancesController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { class_id } = request.params;
-    const { classroom_id } = request.query;
+    const { classroom_id, enroll_id, class_id } = request.query;
 
     const listAttendances = container.resolve(ListAttendancesService);
     const attendances = await listAttendances.execute({
-      class_id,
+      class_id: class_id as string,
       classroom_id: classroom_id as string,
+      enroll_id: enroll_id as string,
     });
 
     return response.json(attendances);
@@ -22,8 +22,7 @@ class AttendancesController {
 
   @privateRoute()
   public async update(request: Request, response: Response): Promise<Response> {
-    const { class_id } = request.params;
-    const { attendances } = request.body;
+    const { attendances, class_id } = request.body;
     const { id: user_id } = request.user;
 
     const registerClassAttendances = container.resolve(

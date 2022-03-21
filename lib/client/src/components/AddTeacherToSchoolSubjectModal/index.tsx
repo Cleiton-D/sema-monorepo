@@ -6,7 +6,7 @@ import {
   forwardRef,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -38,7 +38,7 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const { data: schoolTeachers, isLoading } = useListSchoolTeachers(session, {
     school_id: schoolId
@@ -54,7 +54,7 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
 
     return schoolTeachers.map(({ employee }) => ({
       value: employee.id,
-      label: employee.person.name
+      label: employee.name
     }));
   }, [schoolTeachers, isLoading]);
 

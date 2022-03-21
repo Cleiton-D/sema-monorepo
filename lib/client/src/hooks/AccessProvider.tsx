@@ -3,20 +3,22 @@ import {
   useMemo,
   useContext,
   useCallback,
-  useState,
-  useEffect,
   forwardRef
 } from 'react';
 import { GetServerSidePropsContext } from 'next';
 import { Session } from 'next-auth';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import Loading from 'templates/Loading';
 import NoAccessTemplate from 'templates/NoAccess';
 
 import { AccessModule } from 'models/AccessModule';
 
-import { listAccessModules } from 'requests/queries/access-modules';
+import {
+  acessModulesKeys,
+  listAccessModules,
+  useListAccessModules
+} from 'requests/queries/access-modules';
 
 import { validateHasAccess, WithAccessOptions } from 'utils/validateHasAccess';
 
@@ -32,24 +34,15 @@ type AccessProviderProps = {
   children: React.ReactNode;
 };
 const AccessProvider = ({ children, access }: AccessProviderProps) => {
-  const [accessModules, setAccessModules] = useState<AccessModule[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
 
-  const [session] = useSession();
-
-  useEffect(() => {
-    async function loadAccessModules() {
-      setLoading(true);
-      const response = await listAccessModules(session, {
-        access_level_id: session?.accessLevel?.id
-      }).catch(() => undefined);
-
-      setAccessModules(response || []);
-      setLoading(false);
-    }
-
-    loadAccessModules();
-  }, [session]);
+  const { data: accessModules = [], isLoading } = useListAccessModules(
+    session,
+    {
+      access_level_id: session?.accessLevel?.id
+    },
+    { refetchInterval: false, enabled: !!session?.accessLevel?.id }
+  );
 
   const modules = useMemo(() => {
     if (!session?.accessLevel?.id) return [];
@@ -70,7 +63,7 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
 
   return (
     <AccessContext.Provider value={{ modules, enableAccess }}>
-      {loading ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>{hasAccess ? children : <NoAccessTemplate />}</>
@@ -102,7 +95,9 @@ const withAccess = async (
 
   return {
     modules,
-    queryKey: `list-access-modules-${JSON.stringify(filters)}`
+    queryKey: acessModulesKeys.list(
+      JSON.stringify({ ...filters, token: session?.jwt })
+    )
   };
 };
 
@@ -131,7 +126,7 @@ function withAccessComponent<P>(
     }, [enableAccess, module, rule]);
 
     return hasAccess ? (
-      <Component {...((props as unknown) as P)} ref={ref} />
+      <Component {...(props as unknown as P)} ref={ref} />
     ) : null;
   };
 

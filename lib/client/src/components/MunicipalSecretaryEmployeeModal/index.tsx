@@ -6,7 +6,7 @@ import {
   useCallback,
   useState
 } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -44,7 +44,7 @@ const MunicipalSecretaryEmployeeModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { data: employees, isLoading } = useListEmployees(session);
 
   const createUserProfile = useCreateUserProfile();
@@ -103,9 +103,9 @@ const MunicipalSecretaryEmployeeModal: React.ForwardRefRenderFunction<
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
     if (!employees) return [];
 
-    return employees.map(({ user_id, person }) => ({
+    return employees.map(({ user_id, name }) => ({
       value: user_id,
-      label: person.name
+      label: name
     }));
   }, [employees, isLoading]);
 

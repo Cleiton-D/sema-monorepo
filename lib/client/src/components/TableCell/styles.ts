@@ -65,6 +65,7 @@ export const ExpandButton = styled.button`
     outline: 0;
     font: inherit;
     text-decoration: underline;
+    text-align: left;
   `}
 `;
 

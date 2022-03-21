@@ -9,4 +9,5 @@ export default interface IEnrollsRepository {
   findAll: (filters: FindEnrollDTO) => Promise<Enroll[]>;
   count: (filters: FindEnrollDTO) => Promise<EnrollCountResultDTO>;
   create: (data: CreateEnrollDTO) => Promise<Enroll>;
+  update: (enroll: Enroll) => Promise<Enroll>;
 }

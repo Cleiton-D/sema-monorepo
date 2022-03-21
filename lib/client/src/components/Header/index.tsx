@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import UserDropdown from 'components/UserDropdown';
 import ProfileListDropdown from 'components/ProfileListDropdown';
@@ -7,7 +7,7 @@ import ProfileListDropdown from 'components/ProfileListDropdown';
 import * as S from './styles';
 
 const Header = () => {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   return (
     <S.Wrapper>

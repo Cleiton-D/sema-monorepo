@@ -58,7 +58,6 @@ class ClassroomTeacherSchoolSubjectsRepository
         alias: 'classroom_teacher_school_subject',
         leftJoinAndSelect: {
           employee: 'classroom_teacher_school_subject.employee',
-          person: 'employee.person',
           classroom: 'classroom_teacher_school_subject.classroom',
           school_subject: 'classroom_teacher_school_subject.school_subject',
         },
@@ -102,7 +101,6 @@ class ClassroomTeacherSchoolSubjectsRepository
         alias: 'classroom_teacher_school_subject',
         leftJoinAndSelect: {
           employee: 'classroom_teacher_school_subject.employee',
-          person: 'employee.person',
           classroom: 'classroom_teacher_school_subject.classroom',
           school_subject: 'classroom_teacher_school_subject.school_subject',
         },

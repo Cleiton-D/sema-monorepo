@@ -1,9 +1,16 @@
+import { useMemo } from 'react';
 import { Session } from 'next-auth';
-import { useQuery } from 'react-query';
+import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { AccessModule } from 'models/AccessModule';
 
 import { initializeApi } from 'services/api';
+
+export const acessModulesKeys = {
+  all: 'acess-modules' as const,
+  lists: () => [...acessModulesKeys.all, 'list'],
+  list: (filters: string) => [...acessModulesKeys.lists(), { filters }]
+};
 
 type ListAccessModulesFilters = {
   access_level_id?: string;
@@ -17,16 +24,28 @@ export const listAccessModules = (
 
   return api
     .get<AccessModule[]>('/app/access-modules', { params: filters })
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch(() => undefined);
 };
 
 export const useListAccessModules = (
   session: Session | null,
-  filters: ListAccessModulesFilters = {}
+  filters: ListAccessModulesFilters = {},
+  queryOptions: QueryObserverOptions<AccessModule[] | undefined> = {}
 ) => {
-  const key = `list-access-modules-${JSON.stringify(filters)}`;
+  const key = useMemo(
+    () =>
+      acessModulesKeys.list(
+        JSON.stringify({ ...filters, token: session?.jwt })
+      ),
+    [filters, session]
+  );
 
-  const result = useQuery(key, () => listAccessModules(session, filters));
+  const result = useQuery<AccessModule[] | undefined>(
+    key,
+    () => listAccessModules(session, filters),
+    queryOptions
+  );
 
   return { ...result, key };
 };

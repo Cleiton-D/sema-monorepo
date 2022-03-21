@@ -5,6 +5,8 @@ import {
   css
 } from 'styled-components';
 
+import fonts from './fonts';
+
 type GlobalStyleProps = {
   i?: string;
 };
@@ -14,93 +16,17 @@ const GlobalStyles: GlobalStyleComponent<
   DefaultTheme
 > = createGlobalStyle`
 
-  @font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 300;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-300.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: italic;
-    font-weight: 300;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-300italic.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 400;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-regular.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: italic;
-    font-weight: 400;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-italic.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 500;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-500.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: italic;
-    font-weight: 500;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-500italic.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: normal;
-    font-weight: 600;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-600.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    font-style: italic;
-    font-weight: 600;
-    src: local(''),
-        url('/fonts/poppins/poppins-v15-latin-600italic.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 300;
-    src: local(''),
-        url('/fonts/inter/inter-v3-latin-300.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    src: local(''),
-        url('/fonts/inter/inter-v3-latin-regular.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 600;
-    src: local(''),
-        url('/fonts/inter/inter-v3-latin-600.woff2') format('woff2');
-  }
+  ${fonts.map(
+    (font) => css`
+      @font-face {
+        font-family: ${font.name};
+        font-style: ${font.style};
+        font-weight: ${font.weight};
+        font-display: ${font.display};
+        src: local(''), url('${font.url}') format('${font.format}');
+      }
+    `
+  )}
 
 
   * {
@@ -123,6 +49,7 @@ const GlobalStyles: GlobalStyleComponent<
       font-size: 1.6rem;
       height: 100vh;
       width: 100vw;
+      overflow: hidden;
     `}
   }
 

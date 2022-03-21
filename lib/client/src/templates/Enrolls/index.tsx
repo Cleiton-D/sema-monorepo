@@ -1,53 +1,60 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import { PlusCircle } from '@styled-icons/feather';
-import { useSession } from 'next-auth/client';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
 import Button from 'components/Button';
-import Table from 'components/Table';
-import TableColumn from 'components/TableColumn';
-import SchoolReportTable from 'components/SchoolReportTable';
+import SearchEnrolls from 'components/SearchEnrolls';
+import EnrollsTable from 'components/EnrollsTable';
 
 import { useAccess } from 'hooks/AccessProvider';
 
-import { Enroll } from 'models/Enroll';
-import { School } from 'models/School';
-
-import { useListEnrolls } from 'requests/queries/enrolls';
-
-import { translateStatus } from 'utils/translateStatus';
+import { EnrollFilters, useListEnrolls } from 'requests/queries/enrolls';
 
 import * as S from './styles';
 
-export type EnrollsProps = {
-  school?: School;
-};
+const Enrolls = () => {
+  const [filters, setFilters] = useState<EnrollFilters>({});
 
-const Enrolls = ({ school }: EnrollsProps) => {
   const { enableAccess } = useAccess();
 
   const { query } = useRouter();
 
-  const [session] = useSession();
-  const { data: enrolls } = useListEnrolls(session, {
-    school_id: school?.id
-  });
+  const { data: session } = useSession();
+
+  const schoolId = useMemo(() => {
+    if (!query.school_id || query.school_id === 'me') {
+      return session?.schoolId;
+    }
+    return query.school_id;
+  }, [query, session]);
+
+  const enrollsFilters = useMemo(() => {
+    return {
+      school_id: schoolId as string,
+      ...filters
+    };
+  }, [schoolId, filters]);
+
+  const { data: enrolls } = useListEnrolls(session, enrollsFilters);
 
   const canChangeEnroll = useMemo(
     () => enableAccess({ module: 'ENROLL', rule: 'WRITE' }),
     [enableAccess]
   );
 
+  console.log(enrolls);
+
   return (
     <Base>
       <Heading>Matrículas</Heading>
-      {canChangeEnroll && school && (
+      {canChangeEnroll && schoolId && (
         <S.AddButtonContainer>
-          <Link href={`/enrolls/new?school_id=${query.school_id}`} passHref>
+          <Link href={`/auth/enrolls/new?school_id=${schoolId}`} passHref>
             <Button
               styleType="normal"
               size="medium"
@@ -60,37 +67,13 @@ const Enrolls = ({ school }: EnrollsProps) => {
         </S.AddButtonContainer>
       )}
 
+      <SearchEnrolls handleSearch={setFilters} />
+
       <S.TableSection>
         <S.SectionTitle>
           <h4>Matrículas</h4>
         </S.SectionTitle>
-        <Table<Enroll> items={enrolls || []} keyExtractor={(value) => value.id}>
-          <TableColumn label="Nome" tableKey="person.name">
-            {({ id }: Enroll) => <SchoolReportTable enrollId={id} isMininal />}
-          </TableColumn>
-          <TableColumn
-            label="Escola"
-            tableKey="current_classroom.school.name"
-          />
-          <TableColumn label="Turma" tableKey="current_classroom.description" />
-          <TableColumn
-            label="Situação"
-            tableKey="status"
-            contentAlign="center"
-            render={(status) => translateStatus(status)}
-          />
-          <TableColumn
-            label="Ações"
-            tableKey=""
-            contentAlign="center"
-            actionColumn
-            render={(enroll: Enroll) => (
-              <Link href={`/student/${enroll.id}`} passHref>
-                <S.TableLink>Ver aluno</S.TableLink>
-              </Link>
-            )}
-          />
-        </Table>
+        <EnrollsTable enrolls={enrolls} showActions />
       </S.TableSection>
     </Base>
   );

@@ -7,6 +7,8 @@ import Document, {
 } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
+import fonts from 'styles/fonts';
+
 export default class MyDocument extends Document {
   static async getInitialProps(context: DocumentContext) {
     const sheet = new ServerStyleSheet();
@@ -37,7 +39,18 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="pt-BR">
-        <Head />
+        <Head>
+          {fonts.map(({ url, format, name, style, weight }) => (
+            <link
+              key={`${name}-${style}-${weight}`}
+              rel="preload"
+              href={url}
+              as="font"
+              type={`font/${format}`}
+              crossOrigin="anonymous"
+            />
+          ))}
+        </Head>
         <body>
           <Main />
           <NextScript />

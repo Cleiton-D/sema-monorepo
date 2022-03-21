@@ -5,7 +5,7 @@ import {
   useRef
 } from 'react';
 import mergeRef from 'react-merge-refs';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -28,7 +28,7 @@ type AddUserFormData = {
 
 const AddUserModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
   const modalRef = useRef<ModalRef>(null);
-  const [session] = useSession();
+  const { data: session } = useSession();
   const mutation = useAddUserMutation(modalRef, session);
 
   const formRef = useRef<FormHandles>(null);
@@ -71,12 +71,17 @@ const AddUserModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
       <S.Wrapper>
         <S.Form onSubmit={handleSave} ref={formRef}>
           <TextInput name="username" label="Nome" />
-          <TextInput name="login" label="Email" />
+          <TextInput name="login" label="Login" />
           <S.ButtonsContainer>
-            <Button styleType="outlined" onClick={handleBack} type="button">
+            <Button
+              styleType="outlined"
+              size="medium"
+              onClick={handleBack}
+              type="button"
+            >
               Voltar
             </Button>
-            <Button styleType="rounded" type="submit">
+            <Button styleType="rounded" size="medium" type="submit">
               Salvar
             </Button>
           </S.ButtonsContainer>
