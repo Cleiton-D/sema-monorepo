@@ -1,34 +1,57 @@
 import {
-  createConnection,
-  getConnectionOptions,
-  ConnectionOptions as TypeORMConnectionOptions,
+  DataSource,
+  DataSourceOptions as TypeORMConnectionOptions,
 } from 'typeorm';
+
+import { dataSource, waitDataSource } from '@config/data_source';
 
 type ConnectionOptions = TypeORMConnectionOptions & {
   seeds?: string[];
+  cli?: {
+    migrationsDir: string;
+    seedsDir: string;
+  };
 };
 
 async function migrations(): Promise<void> {
-  const options = await getConnectionOptions('default');
+  await waitDataSource;
 
-  const connection = await createConnection(options);
-  await connection.runMigrations();
-  await connection.close();
+  const options: ConnectionOptions = { ...dataSource.options };
+
+  const newOptions: TypeORMConnectionOptions = {
+    ...options,
+    migrations: [...(options.migrations as string[]), ...(options.seeds || [])],
+  };
+
+  const migrationsDataSource = new DataSource(newOptions);
+  await migrationsDataSource.initialize();
+  await migrationsDataSource.runMigrations({ transaction: 'each' });
+  await migrationsDataSource.destroy();
 }
 
 async function seeds(): Promise<void> {
-  const options: ConnectionOptions = await getConnectionOptions('default');
+  await waitDataSource;
 
-  const newOptions = { ...options, migrations: options.seeds };
+  const options: ConnectionOptions = { ...dataSource.options };
 
-  const connection = await createConnection(newOptions);
-  await connection.runMigrations();
-  await connection.close();
+  const newOptions = {
+    ...options,
+    migrations: options.seeds,
+    cli: { ...options.cli, migrationsDir: options.cli?.seedsDir },
+  };
+
+  const seedsDataSource = new DataSource(newOptions);
+
+  await seedsDataSource.initialize();
+  await seedsDataSource.runMigrations({ transaction: 'each' });
+  await seedsDataSource.destroy();
+
+  console.log('seeds finished');
 }
 
 async function initDB() {
   await migrations();
-  await seeds();
+  // await seeds();
 }
 
 initDB();

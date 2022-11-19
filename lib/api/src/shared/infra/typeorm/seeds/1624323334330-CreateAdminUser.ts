@@ -1,4 +1,6 @@
-import { getRepository, MigrationInterface } from 'typeorm';
+import { MigrationInterface } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import User from '@modules/users/infra/typeorm/entities/User';
 import UserProfile from '@modules/users/infra/typeorm/entities/UserProfile';
@@ -6,11 +8,12 @@ import BCryptHashProvider from '@modules/users/providers/HashProvider/implementa
 import AccessLevel from '@modules/authorization/infra/typeorm/entities/AccessLevel';
 
 export default class CreateAdminUser1624323334330
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(): Promise<void> {
-    const usersRepository = getRepository(User);
-    const accessLevelsRepository = getRepository(AccessLevel);
-    const userProfilesRepository = getRepository(UserProfile);
+    const usersRepository = dataSource.getRepository(User);
+    const accessLevelsRepository = dataSource.getRepository(AccessLevel);
+    const userProfilesRepository = dataSource.getRepository(UserProfile);
 
     const password = await new BCryptHashProvider().generateHash('admin');
     const user = usersRepository.create({

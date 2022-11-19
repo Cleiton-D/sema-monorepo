@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import CreateStudentService from '@modules/students/services/CreateStudentService';
 import ListStudentsService from '@modules/students/services/ListStudentsService';
 import ShowStudentService from '@modules/students/services/ShowStudentService';
+import UpdateStudentService from '@modules/students/services/UpdateStudentService';
 
 class StudentsController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -15,7 +16,7 @@ class StudentsController {
       studentId: id,
     });
 
-    return response.json(classToClass(student));
+    return response.json(instanceToInstance(student));
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
@@ -28,7 +29,7 @@ class StudentsController {
       rg: rg as string,
     });
 
-    return response.json(classToClass(students));
+    return response.json(instanceToInstance(students));
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
@@ -54,6 +55,54 @@ class StudentsController {
 
     const createStudent = container.resolve(CreateStudentService);
     const student = await createStudent.execute({
+      name,
+      mother_name,
+      dad_name,
+      birth_date,
+      gender,
+      address,
+      contacts,
+      cpf,
+      rg,
+      nis,
+      birth_certificate,
+      breed,
+      identity_document,
+      nationality,
+      naturalness,
+      unique_code,
+      naturalness_uf,
+    });
+
+    return response.json(student);
+  }
+
+  public async update(request: Request, response: Response): Promise<Response> {
+    const { student_id } = request.params;
+
+    const {
+      name,
+      mother_name,
+      dad_name,
+      birth_date,
+      gender,
+      address,
+      contacts,
+      cpf,
+      rg,
+      nis,
+      birth_certificate,
+      breed,
+      identity_document,
+      nationality,
+      unique_code,
+      naturalness,
+      naturalness_uf,
+    } = request.body;
+
+    const updateStudent = container.resolve(UpdateStudentService);
+    const student = await updateStudent.execute({
+      id: student_id,
       name,
       mother_name,
       dad_name,

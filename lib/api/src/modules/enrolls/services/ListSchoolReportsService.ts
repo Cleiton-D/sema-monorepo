@@ -82,11 +82,13 @@ class ListEnrollSchoolReportsService {
         });
         if (enroll) enrolls = Array.of(enroll);
       } else {
-        enrolls = await this.enrollsRepository.findAll({
+        const enrollsResponse = await this.enrollsRepository.findAll({
           student_id,
           grade_id,
           school_year_id,
         });
+
+        enrolls = enrollsResponse.items;
       }
     }
 

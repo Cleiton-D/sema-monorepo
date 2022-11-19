@@ -1,17 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 
-import AppError from '@shared/errors/AppError';
-
-import ClassPeriod, {
-  ClassPeriodType,
-} from '../infra/typeorm/entities/ClassPeriod';
+import ClassPeriod from '../infra/typeorm/entities/ClassPeriod';
 
 import IClassPeriodsRepository from '../repositories/IClassPeriodsRepository';
-import ISchoolYearsRepository from '../repositories/ISchoolYearsRepository';
 import CreateClassPeriodDTO from '../dtos/CreateClassPeriodDTO';
 
 type DefineClassPeriodRequest = {
-  [k in ClassPeriodType]: {
+  [k: string]: {
     time_start: string;
     time_end: string;
     class_time: string;
@@ -30,20 +25,11 @@ class DefineClassPeriodsService {
   constructor(
     @inject('ClassPeriodsRepository')
     private classPeriodsRepository: IClassPeriodsRepository,
-    @inject('SchoolYearsRepository')
-    private schoolYearsRepository: ISchoolYearsRepository,
   ) {}
 
   public async execute(
     periods: DefineClassPeriodRequest,
   ): Promise<ClassPeriod[]> {
-    const hasInvalidPeriod = Object.keys(periods).some(
-      period => !['MORNING', 'EVENING', 'NOCTURNAL'].includes(period),
-    );
-    if (hasInvalidPeriod) {
-      throw new AppError('invalid period');
-    }
-
     const existentClassPeriods = await this.classPeriodsRepository.findAll();
 
     const { newItems, updateItems } = Object.entries(
@@ -60,9 +46,11 @@ class DefineClassPeriodsService {
 
         const { newItems: nwItems, updateItems: upItems } = acc;
 
-        const classPeriod = existentClassPeriods.find(
-          existentClassPeriod => existentClassPeriod.description === key,
-        );
+        const classPeriod = existentClassPeriods.find(existentClassPeriod => {
+          return (
+            existentClassPeriod.description.toLowerCase() === key.toLowerCase()
+          );
+        });
         if (classPeriod) {
           const newClassPeriod = Object.assign(classPeriod, {
             time_start,
@@ -74,7 +62,7 @@ class DefineClassPeriodsService {
           upItems.push(newClassPeriod);
         } else {
           nwItems.push({
-            description: key as ClassPeriodType,
+            description: key,
             time_start,
             time_end,
             class_time,

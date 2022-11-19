@@ -41,11 +41,11 @@ export const createEnrollData = atom<
     }
 
     const { student, ...enroll } = newValue;
-    const { contacts, cpf, rg, birth_certificate, ...newPerson } = student;
+    const { contacts, cpf, rg, birth_certificate, nis, unique_code } = student;
 
-    set(basicEnrollData, newPerson);
+    set(basicEnrollData, student);
     set(enrollContactsData, contacts);
-    set(enrollDocumentsData, { cpf, rg, birth_certificate });
+    set(enrollDocumentsData, { cpf, rg, birth_certificate, nis, unique_code });
     set(enrollData, enroll);
   }
 );

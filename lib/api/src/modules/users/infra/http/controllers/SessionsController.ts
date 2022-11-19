@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import privateRoute from '@shared/decorators/privateRoute';
 
@@ -28,7 +28,7 @@ class SessionsController {
       });
 
       return response.json({
-        user: classToClass(user),
+        user: instanceToInstance(user),
         token,
         accessModules,
         profile,
@@ -36,7 +36,7 @@ class SessionsController {
     }
 
     return response.json({
-      user: classToClass(user),
+      user: instanceToInstance(user),
       accessModules: [],
       token,
     });
@@ -63,7 +63,7 @@ class SessionsController {
       });
 
       return response.json({
-        user: classToClass(user),
+        user: instanceToInstance(user),
         token,
         accessModules,
         profile,
@@ -71,7 +71,7 @@ class SessionsController {
     }
 
     return response.json({
-      user: classToClass(user),
+      user: instanceToInstance(user),
       accessModules: [],
       token,
     });

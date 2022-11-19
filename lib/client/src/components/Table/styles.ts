@@ -9,7 +9,7 @@ export const Wrapper = styled.div<WrapperProps>`
     overflow-x: auto;
 
     table {
-      border-collapse: collapse;
+      border-collapse: separate;
       width: inherit;
       border-spacing: 0;
 

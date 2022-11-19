@@ -97,7 +97,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.first}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.first`}
@@ -115,7 +115,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.second}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.second`}
@@ -133,7 +133,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.first_rec}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.first_rec`}
@@ -151,7 +151,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.third}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.third`}
@@ -169,7 +169,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.fourth}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.fourth`}
@@ -187,7 +187,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
                 <TextInput
                   label=""
                   size="medium"
-                  mask="school-report"
+                  mask="school-report-field"
                   value={item.reports.second_rec}
                   containerStyle={{ maxWidth: 80 }}
                   name={`${item.id}.second_rec`}

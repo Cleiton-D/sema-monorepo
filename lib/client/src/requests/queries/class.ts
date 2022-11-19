@@ -1,11 +1,23 @@
 import { Session } from 'next-auth';
-import { useQuery } from 'react-query';
+import { QueryObserverOptions, useQuery } from 'react-query';
 
-import { Class } from 'models/Class';
+import { Class, FormattedClass } from 'models/Class';
 
 import { initializeApi } from 'services/api';
 
 import { classMapper } from 'utils/mappers/classMapper';
+import { PaginatedHttpResponse } from 'models/app';
+import { SchoolTerm } from 'models/SchoolTerm';
+
+export const classesKeys = {
+  all: 'classes' as const,
+  lists: () => [...classesKeys.all, 'list'],
+  list: (filters: string) => [...classesKeys.lists(), { filters }],
+  shows: () => [...classesKeys.all, 'show'],
+  show: (filters: string) => [...classesKeys.shows(), { filters }],
+  counts: () => [...classesKeys.all, 'count'],
+  count: (filters: string) => [...classesKeys.counts(), { filters }]
+};
 
 export const showClass = (session: Session | null, id?: string) => {
   if (!id) return undefined;
@@ -17,7 +29,7 @@ export const showClass = (session: Session | null, id?: string) => {
 };
 
 export const useShowClass = (session: Session | null, id?: string) => {
-  const key = `show-class-${id}`;
+  const key = classesKeys.show(JSON.stringify({ id }));
   const result = useQuery(key, () => showClass(session, id));
 
   return { ...result, key };
@@ -33,9 +45,13 @@ export type ListClassesFilters = {
   grade_id?: string;
   status?: string;
   taught_content?: string;
+  school_term?: SchoolTerm;
   limit?: number;
   sortBy?: string;
   order?: 'DESC' | 'ASC';
+  before?: string;
+  page?: number;
+  size?: number;
 };
 export const listClasses = async (
   session: Session | null,
@@ -43,19 +59,30 @@ export const listClasses = async (
 ) => {
   const api = initializeApi(session);
 
-  const classes = await api
-    .get<Class[]>('/classes', { params: filters })
+  const response = await api
+    .get<PaginatedHttpResponse<Class>>('/classes', { params: filters })
     .then((response) => response.data);
 
-  return classes ? classes.map(classMapper) : [];
+  if (!response) return undefined;
+
+  const mappedClasses = response.items.map(classMapper);
+
+  return { ...response, items: mappedClasses };
 };
 
 export const useListClasses = (
   session: Session | null,
-  filters: ListClassesFilters
+  filters: ListClassesFilters,
+  queryOptions: QueryObserverOptions<
+    PaginatedHttpResponse<FormattedClass> | undefined
+  > = {}
 ) => {
-  const key = `list-classes-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => listClasses(session, filters));
+  const key = classesKeys.list(JSON.stringify(filters));
+  const result = useQuery<PaginatedHttpResponse<FormattedClass> | undefined>(
+    key,
+    () => listClasses(session, filters),
+    queryOptions
+  );
 
   return { ...result, key };
 };
@@ -78,7 +105,7 @@ export const useCountClasses = (
   session: Session | null,
   filters: ListClassesFilters
 ) => {
-  const key = `count-classes-${JSON.stringify(filters)}`;
+  const key = classesKeys.count(JSON.stringify(filters));
   const result = useQuery(key, () => countClasses(session, filters));
 
   return { ...result, key };

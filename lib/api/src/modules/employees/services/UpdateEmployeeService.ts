@@ -80,10 +80,10 @@ class UpdateEmployeeService {
       throw new AppError('Already exists an employee with this PIS/PASEP');
     }
 
-    const email = contactsData.find(contact => contact.type === 'email');
-    if (!email || !email.description) {
-      throw new AppError('Email cannot be empty');
-    }
+    // const email = contactsData.find(contact => contact.type === 'email');
+    // if (!email || !email.description) {
+    //   throw new AppError('Email cannot be empty');
+    // }
 
     if (!cpf) {
       throw new AppError('CPF cannot be empty');

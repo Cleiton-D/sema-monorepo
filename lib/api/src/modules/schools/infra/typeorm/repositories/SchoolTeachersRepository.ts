@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISchoolTeachersRepository from '@modules/schools/repositories/ISchoolTeachersRepository';
 import CreateSchoolTeacherDTO from '@modules/schools/dtos/CreateSchoolTeacherDTO';
@@ -11,38 +13,45 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
   private ormRepository: Repository<SchoolTeacher>;
 
   constructor() {
-    this.ormRepository = getRepository(SchoolTeacher);
+    this.ormRepository = dataSource.getRepository(SchoolTeacher);
   }
 
   public async findOne({
     id,
     school_id,
   }: FindSchoolTeacherDTO): Promise<SchoolTeacher | undefined> {
-    const where: FindConditions<SchoolTeacher> = {};
+    const where: FindOptionsWhere<SchoolTeacher> = {};
 
     if (id) where.id = id;
     if (school_id) where.school_id = school_id;
 
-    const schoolTeachers = await this.ormRepository.findOne({
+    const schoolTeacher = await this.ormRepository.findOne({
       where,
       relations: ['employee', 'school'],
     });
 
-    return schoolTeachers;
+    return schoolTeacher ?? undefined;
   }
 
   public async findAll({
     id,
     school_id,
   }: FindSchoolTeacherDTO): Promise<SchoolTeacher[]> {
-    const where: FindConditions<SchoolTeacher> = {};
+    const where: FindOptionsWhere<SchoolTeacher> = {};
 
     if (id) where.id = id;
     if (school_id) where.school_id = school_id;
 
     const schoolTeachers = await this.ormRepository.find({
       where,
-      relations: ['employee'],
+      order: {
+        employee: {
+          name: 'ASC',
+        },
+      },
+      relations: {
+        employee: true,
+      },
     });
 
     return schoolTeachers;
@@ -52,7 +61,7 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
     id,
     school_id,
   }: FindSchoolTeacherDTO): Promise<CountResultDTO> {
-    const where: FindConditions<SchoolTeacher> = {};
+    const where: FindOptionsWhere<SchoolTeacher> = {};
 
     if (id) where.id = id;
     if (school_id) where.school_id = school_id;

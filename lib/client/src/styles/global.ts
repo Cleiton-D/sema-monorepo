@@ -8,7 +8,7 @@ import {
 import fonts from './fonts';
 
 type GlobalStyleProps = {
-  i?: string;
+  theme?: DefaultTheme;
 };
 
 const GlobalStyles: GlobalStyleComponent<

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 
@@ -8,16 +8,27 @@ import Heading from 'components/Heading';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import TimetablesTeachersTable from 'components/TimetablesTeachersTable';
+import Paginator from 'components/Paginator';
 
 import { Classroom } from 'models/Classroom';
 
-import { useListClassrooms } from 'requests/queries/classrooms';
+import {
+  ListClassroomsFilters,
+  useListClassrooms
+} from 'requests/queries/classrooms';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
 
+const INITIAL_FILTERS = {
+  page: 1,
+  size: 20
+};
 const Timetables = () => {
+  const [filters, setFilters] =
+    useState<ListClassroomsFilters>(INITIAL_FILTERS);
+
   const { query } = useRouter();
   const { data: session } = useSession();
 
@@ -28,11 +39,16 @@ const Timetables = () => {
     return query.school_id as string;
   }, [query, session]);
 
-  const { data: classrooms } = useListClassrooms(session, {
-    school_id: schoolId,
-    with_in_multigrades: false,
-    with_multigrades: true
-  });
+  const classroomsFilters = useMemo(() => {
+    return {
+      school_id: schoolId,
+      with_in_multigrades: false,
+      with_multigrades: true,
+      ...filters
+    };
+  }, [filters, schoolId]);
+
+  const { data: classrooms } = useListClassrooms(session, classroomsFilters);
 
   return (
     <Base>
@@ -42,7 +58,7 @@ const Timetables = () => {
           <h4>Turmas</h4>
         </S.SectionTitle>
         <Table<Classroom>
-          items={classrooms || []}
+          items={classrooms?.items || []}
           keyExtractor={(value) => value.id}
         >
           <TableColumn label="Descrição" tableKey="description">
@@ -69,6 +85,19 @@ const Timetables = () => {
             contentAlign="center"
           /> */}
         </Table>
+        <S.PaginatorContainer>
+          <Paginator
+            total={classrooms?.total || 0}
+            currentPage={classrooms?.page || 1}
+            currentSize={classrooms?.size || 20}
+            onChangeSize={(size: number) =>
+              setFilters((current) => ({ ...current, size }))
+            }
+            onChangePage={(page: number) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
+        </S.PaginatorContainer>
       </S.TableSection>
     </Base>
   );

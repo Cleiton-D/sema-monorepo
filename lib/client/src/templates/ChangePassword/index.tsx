@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { useSession, signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -10,18 +10,25 @@ import Heading from 'components/Heading';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 
+import { SystemBackground } from 'models/SystemBackground';
+
 import { useApi } from 'services/api';
 
 import { changePasswordSchema } from './rules/schema';
 
 import * as S from './styles';
+import { isUrl } from 'utils/isUrl';
 
 type ChangePasswordFormData = {
   newPassword: string;
   passwordConfirmation: string;
 };
 
-const ChangePassword = () => {
+export type ChangePasswordProps = {
+  background?: SystemBackground;
+};
+
+const ChangePassword = ({ background }: ChangePasswordProps) => {
   const [loading, setLoading] = useState(false);
 
   const { data: session } = useSession();
@@ -41,20 +48,32 @@ const ChangePassword = () => {
         password: values.newPassword
       });
 
-      await signIn('refresh', {
+      const callbackUrl = isUrl((query?.callbackUrl as string) || '')
+        ? query?.callbackUrl
+        : `${window.location.origin}${query?.callbackUrl || '/auth'}`;
+
+      const result = await signIn('refresh', {
         profileId: session?.profileId,
         token: session?.jwt,
-        redirect: false
+        redirect: false,
+        callbackUrl
       });
 
-      // update session
-      // await getSession({});
+      if (result?.error) {
+        toast.error('Usuário ou senha inválidos!', {
+          position: toast.POSITION.TOP_RIGHT
+        });
+      }
 
-      toast.success('Senha criada com sucesso.', {
-        position: toast.POSITION.TOP_RIGHT
-      });
+      await getSession({});
 
-      return push(`${query?.callbackUrl || '/auth'}`);
+      if (result?.url) {
+        toast.success('Senha criada com sucesso.', {
+          position: toast.POSITION.TOP_RIGHT
+        });
+
+        return push(`${query?.callbackUrl || '/auth'}`);
+      }
     } catch (err) {
       if (err instanceof ValidationError) {
         const validationErrors: Record<string, string> = {};
@@ -77,7 +96,18 @@ const ChangePassword = () => {
   };
 
   return (
-    <S.Wrapper>
+    <S.Wrapper hasBackground={!!background}>
+      {background && (
+        <S.Background
+          src={background.image_url}
+          layout="fill"
+          objectFit="cover"
+          quality={80}
+          placeholder="blur"
+          blurDataURL={background.blurhash}
+        />
+      )}
+
       <S.Content>
         <S.UserContent>
           <Heading>Criar senha</Heading>

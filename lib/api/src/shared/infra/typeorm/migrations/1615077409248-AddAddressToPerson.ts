@@ -6,7 +6,8 @@ import {
 } from 'typeorm';
 
 export default class AddAddressToPerson1615077409248
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'persons',

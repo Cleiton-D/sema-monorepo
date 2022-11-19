@@ -1,27 +1,79 @@
-import { getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, In, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISchoolSubjectsRepository';
 import CreateSchoolSubjectDTO from '@modules/education_core/dtos/CreateSchoolSubjectDTO';
 
 import CountResultDTO from '@modules/classes/dtos/CountResultDTO';
+import FindSchoolSubjectDTO from '@modules/education_core/dtos/FindSchoolSubjectDTO';
 import SchoolSubject from '../entities/SchoolSubject';
 
 class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
   private ormRepository: Repository<SchoolSubject>;
 
   constructor() {
-    this.ormRepository = getRepository(SchoolSubject);
+    this.ormRepository = dataSource.getRepository(SchoolSubject);
   }
 
   public async findByid(
     school_subject_id: string,
   ): Promise<SchoolSubject | undefined> {
-    const schoolSubject = await this.ormRepository.findOne(school_subject_id);
-    return schoolSubject;
+    const schoolSubject = await this.ormRepository.findOne({
+      where: { id: school_subject_id },
+    });
+    return schoolSubject ?? undefined;
   }
 
-  public async findAll(): Promise<SchoolSubject[]> {
+  public async findOne(
+    filters: FindSchoolSubjectDTO = {},
+  ): Promise<SchoolSubject | undefined> {
+    const { id, is_multidisciplinary } = filters;
+
+    const where: FindOptionsWhere<SchoolSubject> = {};
+    if (id) {
+      if (Array.isArray(id)) {
+        where.id = In(id);
+      } else {
+        where.id = id;
+      }
+    }
+    if (is_multidisciplinary) {
+      where.is_multidisciplinary = true;
+    } else {
+      where.is_multidisciplinary = false;
+    }
+
+    const schoolSubject = await this.ormRepository.findOne({
+      where,
+      order: { index: 'ASC' },
+    });
+    return schoolSubject || undefined;
+  }
+
+  public async findAll(
+    filters: FindSchoolSubjectDTO = {},
+  ): Promise<SchoolSubject[]> {
+    const { id, is_multidisciplinary, include_multidisciplinary } = filters;
+
+    const where: FindOptionsWhere<SchoolSubject> = {};
+    if (id) {
+      if (Array.isArray(id)) {
+        where.id = In(id);
+      } else {
+        where.id = id;
+      }
+    }
+
+    if (
+      !include_multidisciplinary &&
+      typeof is_multidisciplinary !== 'undefined'
+    ) {
+      where.is_multidisciplinary = !!is_multidisciplinary;
+    }
+
     const schoolSubject = await this.ormRepository.find({
+      where,
       order: { index: 'ASC' },
     });
     return schoolSubject;
@@ -36,11 +88,13 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
     description,
     additional_description,
     index,
+    is_multidisciplinary,
   }: CreateSchoolSubjectDTO): Promise<SchoolSubject> {
     const schoolSubject = this.ormRepository.create({
       description,
       additional_description,
       index,
+      is_multidisciplinary,
     });
     await this.ormRepository.save(schoolSubject);
 

@@ -16,6 +16,7 @@ export type SchoolReport = {
   second_rec?: number;
   exam?: number;
   final_average?: number;
+  annual_average?: number;
   created_at: string;
   updated_at: string;
 };
@@ -27,10 +28,18 @@ export type MappedAttendanceSchoolSubject = Record<
   school_subject: string;
 };
 
-export type MappedSchoolReportSubject = Record<SchoolTerm, string> & {
+export type MappedSchoolReportSubject = Record<SchoolTerm, string | number> & {
   school_subject: string;
+  finalAverage: number | string;
+  annualAverage: number | string;
 };
 
 export type MappedSchoolReport = SchoolReport & {
   formattedAverages: Record<string, number | string>;
 };
+
+export type MappedSchoolReportSubjectWithAttendances =
+  MappedSchoolReportSubject &
+    Record<`attendances-${SchoolTerm}`, number> & {
+      totalAttendances: number;
+    };

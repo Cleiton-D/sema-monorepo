@@ -1,15 +1,18 @@
-import { getRepository, In, MigrationInterface, Not } from 'typeorm';
+import { In, MigrationInterface, Not } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import AccessLevel from '@modules/authorization/infra/typeorm/entities/AccessLevel';
 import AccessModule from '@modules/authorization/infra/typeorm/entities/AccessModule';
 import AppModule from '@modules/authorization/infra/typeorm/entities/AppModule';
 
 export default class SetAccessToProfiles1626625009454
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(): Promise<void> {
-    const accessLevelsRepository = getRepository(AccessLevel);
-    const appModulesRepository = getRepository(AppModule);
-    const accessModulesRepository = getRepository(AccessModule);
+    const accessLevelsRepository = dataSource.getRepository(AccessLevel);
+    const appModulesRepository = dataSource.getRepository(AppModule);
+    const accessModulesRepository = dataSource.getRepository(AccessModule);
 
     const accessLevels = await accessLevelsRepository.find({
       where: {
@@ -35,8 +38,8 @@ export default class SetAccessToProfiles1626625009454
   }
 
   public async down(): Promise<void> {
-    const accessLevelsRepository = getRepository(AccessLevel);
-    const accessModulesRepository = getRepository(AccessModule);
+    const accessLevelsRepository = dataSource.getRepository(AccessLevel);
+    const accessModulesRepository = dataSource.getRepository(AccessModule);
 
     const accessLevels = await accessLevelsRepository.find({
       where: {

@@ -46,12 +46,11 @@ class RelocateEnrollService {
       from,
     );
 
-    const alreadyEnrollClassroom = await this.enrollClassroomsRepository.findOne(
-      {
+    const alreadyEnrollClassroom =
+      await this.enrollClassroomsRepository.findOne({
         classroom_id: to,
         enroll_id: enroll.id,
-      },
-    );
+      });
     if (alreadyEnrollClassroom) {
       Object.assign(alreadyEnrollClassroom, {
         status: 'ACTIVE',
@@ -70,7 +69,11 @@ class RelocateEnrollService {
       await this.enrollClassroomsRepository.update(currentEnrollClassroom);
     }
 
-    const newEnroll = Object.assign(enroll, {
+    const reloadedEnroll = await this.enrollsRepository.findOne({
+      id: enroll.id,
+    });
+
+    const newEnroll = Object.assign(reloadedEnroll, {
       class_period_id: toClassroom.class_period_id,
       class_period: toClassroom.class_period,
     });
@@ -83,13 +86,12 @@ class RelocateEnrollService {
   ): Promise<EnrollClassroom | undefined> {
     if (!from) return undefined;
 
-    const currentEnrollClassroom = await this.enrollClassroomsRepository.findOne(
-      {
+    const currentEnrollClassroom =
+      await this.enrollClassroomsRepository.findOne({
         classroom_id: from,
         enroll_id,
         status: 'ACTIVE',
-      },
-    );
+      });
     if (!currentEnrollClassroom) {
       throw new AppError('from classroom not found to this enroll');
     }

@@ -9,6 +9,12 @@ export const TableLink = styled.a`
   `}
 `;
 
+export const ActionButtons = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const ActionButton = styled.button`
   ${({ theme }) => css`
     background: ${theme.colors.white};
@@ -23,6 +29,10 @@ export const ActionButton = styled.button`
     transition: background 0.3s ease;
     &:hover {
       background: ${darken(0.05, theme.colors.white)};
+    }
+
+    &:not(:last-child) {
+      margin-right: ${theme.spacings.xxsmall};
     }
   `}
 `;

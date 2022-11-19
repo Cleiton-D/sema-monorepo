@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import ChangePasswordService from '@modules/users/services/ChangePasswordService';
 import ShowUserService from '@modules/users/services/ShowUserService';
@@ -23,14 +23,14 @@ class UsersController {
     const showUser = container.resolve(ShowUserService);
     const user = await showUser.execute({ user_id: id });
 
-    return response.json(classToClass(user));
+    return response.json(instanceToInstance(user));
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
     const listUsers = container.resolve(ListUsersService);
     const users = await listUsers.execute();
 
-    return response.json(classToClass(users));
+    return response.json(instanceToInstance(users));
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
@@ -50,7 +50,7 @@ class UsersController {
       password: '12345678',
     });
 
-    return response.json(classToClass(user));
+    return response.json(instanceToInstance(user));
   }
 
   @privateRoute()
@@ -69,7 +69,7 @@ class UsersController {
       password,
     });
 
-    return response.json(classToClass(user));
+    return response.json(instanceToInstance(user));
   }
 
   @privateRoute()

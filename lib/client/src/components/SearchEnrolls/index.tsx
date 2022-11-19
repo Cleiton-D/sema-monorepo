@@ -73,7 +73,9 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
     if (!school) return [{ label: 'Selecione uma escola', value: '' }];
     if (isLoadingClassrooms) return [{ label: 'Carregando...', value: '' }];
 
-    return classrooms?.map(({ description, id }) => ({
+    const classroomsItems = classrooms?.items || [];
+
+    return classroomsItems.map(({ description, id }) => ({
       label: description,
       value: id
     }));

@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { Scope, FormHandles as UnformHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { addMonths, parseISO } from 'date-fns';
+import addMonths from 'date-fns/addMonths';
 import { useAtom } from 'jotai';
 import { ValidationError } from 'yup';
 
@@ -24,6 +24,8 @@ import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
 import { schoolYearAtom } from 'store/atoms/school-year';
 
 import { useCreateSchoolYearMudation } from 'requests/mutations/school-year';
+
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import useAtomCallback from 'hooks/use-atom-callback';
 
@@ -121,15 +123,15 @@ const SchoolYearBasicForm: React.ForwardRefRenderFunction<FormHandles> = (
 
     const school_year = {
       reference_year: schoolYear.reference_year,
-      date_start: parseISO(schoolYear.date_start),
-      date_end: parseISO(schoolYear.date_end)
+      date_start: parseDateWithoutTimezone(schoolYear.date_start),
+      date_end: parseDateWithoutTimezone(schoolYear.date_end)
     };
 
     const school_terms = schoolTermPeriods.reduce((acc, item) => {
       const key = item.school_term;
       const value = {
-        date_start: parseISO(item.date_start),
-        date_end: parseISO(item.date_end)
+        date_start: parseDateWithoutTimezone(item.date_start),
+        date_end: parseDateWithoutTimezone(item.date_end)
       };
 
       return { ...acc, [key]: value };

@@ -1,7 +1,8 @@
 import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
-import { Enroll } from 'models/Enroll';
+import { PaginatedHttpResponse } from 'models/app';
+import { Enroll, EnrollStatus } from 'models/Enroll';
 
 import { initializeApi } from 'services/api';
 import { useMemo } from 'react';
@@ -11,6 +12,9 @@ export type EnrollFilters = {
   school_id?: string;
   grade_id?: string;
   class_period_id?: string;
+  page?: number;
+  size?: number;
+  status?: EnrollStatus;
 };
 
 type CountEnrollsResponse = {
@@ -24,7 +28,7 @@ export const enrollsKeys = {
   counts: () => [...enrollsKeys.all, 'count'] as const,
   count: (filters: string) => [...enrollsKeys.counts(), { filters }] as const,
   shows: () => [...enrollsKeys.all, 'show'] as const,
-  show: (filters: string) => [...enrollsKeys.shows(), { filters }] as const
+  show: (filters?: string) => [...enrollsKeys.shows(), { filters }] as const
 };
 
 export const listEnrolls = (
@@ -34,14 +38,18 @@ export const listEnrolls = (
   const api = initializeApi(session);
 
   return api
-    .get<Enroll[]>('/enrolls', { params: filters })
+    .get<PaginatedHttpResponse<Enroll>>('/enrolls', { params: filters })
     .then((response) => response.data);
 };
 
 export const getEnrollDetails = (
-  enroll_id: string,
-  session: Session | null
+  enroll_id?: string,
+  session?: Session | null
 ) => {
+  if (!enroll_id) {
+    return undefined;
+  }
+
   const api = initializeApi(session);
 
   const enroll = api
@@ -76,8 +84,8 @@ export const useListEnrolls = (
 };
 
 export const useGetEnrollDetails = (
-  enroll_id: string,
-  session: Session | null
+  enroll_id?: string,
+  session?: Session | null
 ) => {
   const key = useMemo(() => enrollsKeys.show(enroll_id), [enroll_id]);
 

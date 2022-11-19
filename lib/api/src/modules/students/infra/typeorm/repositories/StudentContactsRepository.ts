@@ -1,4 +1,6 @@
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IStudentContactsRepository from '@modules/students/repositories/IStudentContactsRepository';
 import StudentContact from '../entities/StudentContact';
@@ -7,7 +9,7 @@ class StudentContactsRepository implements IStudentContactsRepository {
   private ormRepository: Repository<StudentContact>;
 
   constructor() {
-    this.ormRepository = getRepository(StudentContact);
+    this.ormRepository = dataSource.getRepository(StudentContact);
   }
 
   public async removeMany(employee_contacts: StudentContact[]): Promise<void> {

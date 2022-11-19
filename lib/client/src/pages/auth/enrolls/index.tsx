@@ -17,7 +17,9 @@ const getData = async (session: Session | null, id?: string) => {
   const school = id ? await getSchool(session, { id }) : null;
 
   const filters = {
-    school_id: school?.id
+    school_id: school?.id,
+    page: 1,
+    size: 20
   };
 
   return prefetchQuery([

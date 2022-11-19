@@ -7,11 +7,23 @@ import ListGradeService from '@modules/education_core/services/ListGradeService'
 import privateRoute from '@shared/decorators/privateRoute';
 import DeleteGradeService from '@modules/education_core/services/DeleteGradeService';
 import CountGradesService from '@modules/education_core/services/CountGradesService';
+import ShowGradeService from '@modules/education_core/services/ShowGradeService';
 
 class GradesController {
   public async index(request: Request, response: Response): Promise<Response> {
     const listGrades = container.resolve(ListGradeService);
-    const grade = await listGrades.execute();
+    const grades = await listGrades.execute();
+
+    return response.json(grades);
+  }
+
+  public async show(request: Request, response: Response): Promise<Response> {
+    const { grade_id } = request.params;
+
+    const showGrade = container.resolve(ShowGradeService);
+    const grade = await showGrade.execute({
+      id: grade_id,
+    });
 
     return response.json(grade);
   }
@@ -27,7 +39,10 @@ class GradesController {
     const { description, after_of } = request.body;
 
     const createGrade = container.resolve(CreateGradeService);
-    const grade = await createGrade.execute({ description, after_of });
+    const grade = await createGrade.execute({
+      description,
+      after_of,
+    });
 
     return response.json(grade);
   }

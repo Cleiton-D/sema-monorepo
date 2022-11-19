@@ -6,3 +6,5 @@ export type SchoolTerm =
   | 'FIRST-REC'
   | 'SECOND-REC'
   | 'EXAM';
+
+export type LowedSchoolTerm = Replace<Lowercase<SchoolTerm>, '-', '_'>;

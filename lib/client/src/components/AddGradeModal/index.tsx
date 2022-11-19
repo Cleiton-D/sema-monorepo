@@ -2,12 +2,15 @@ import {
   forwardRef,
   ForwardRefRenderFunction,
   useCallback,
-  useRef
+  useRef,
+  useState,
+  useImperativeHandle
 } from 'react';
-import mergeRef from 'react-merge-refs';
 import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
+
+import { Grade } from 'models/Grade';
 
 import Modal, { ModalRef as DefaultModalRef } from 'components/Modal';
 import TextInput from 'components/TextInput';
@@ -19,19 +22,34 @@ import { addGradeSchema } from './rules/schema';
 
 import * as S from './styles';
 
-export type ModalRef = DefaultModalRef;
+export type ModalRef = {
+  openModal: (grade?: Grade) => void;
+};
 
 type AddGradeFormData = {
   description: string;
+  workload?: string;
 };
 
 const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
-  const modalRef = useRef<ModalRef>(null);
-  const { data: session } = useSession();
-  const mutation = useAddGradeMutation(modalRef, session);
+  const [grade, setGrade] = useState<Grade>();
 
+  const modalRef = useRef<DefaultModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
+  const { data: session } = useSession();
+
+  const openModal = useCallback((item?: Grade) => {
+    setGrade(item);
+    modalRef.current?.openModal();
+  }, []);
+
+  const handleBack = useCallback(() => {
+    formRef.current?.reset();
+    modalRef.current?.closeModal();
+  }, []);
+
+  const mutation = useAddGradeMutation(handleBack, session);
   const handleSave = useCallback(
     async (values: AddGradeFormData) => {
       try {
@@ -39,7 +57,11 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
 
         await addGradeSchema.validate(values, { abortEarly: false });
 
-        mutation.mutate(values);
+        const requestData = {
+          description: values.description
+        };
+
+        mutation.mutate(requestData);
       } catch (err) {
         if (err instanceof ValidationError) {
           const validationErrors: Record<string, string> = {};
@@ -56,19 +78,18 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
     [mutation]
   );
 
-  const handleBack = useCallback(() => {
-    modalRef.current?.closeModal();
-  }, []);
+  useImperativeHandle(ref, () => ({ openModal }));
 
   return (
     <Modal
-      title="Adicionar série"
+      title={grade ? `Editar ${grade.description}` : 'Adicionar série'}
       closeOnClickOutside={false}
-      ref={mergeRef([ref, modalRef])}
+      ref={modalRef}
     >
       <S.Wrapper>
-        <S.Form onSubmit={handleSave} ref={formRef}>
+        <S.Form onSubmit={handleSave} ref={formRef} initialData={grade}>
           <TextInput name="description" label="Nome" />
+
           <S.ButtonsContainer>
             <Button
               styleType="outlined"

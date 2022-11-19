@@ -54,3 +54,13 @@ export const InputContainer = styled.div<InputContainerProps>`
       }
     `}
 `;
+
+export const ClearButton = styled.button`
+  ${({ theme }) => css`
+    background: transparent;
+    border: none;
+    outline: 0;
+
+    color: ${theme.colors.red};
+  `}
+`;

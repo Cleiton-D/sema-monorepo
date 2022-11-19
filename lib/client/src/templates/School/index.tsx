@@ -109,10 +109,10 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
                   <strong>Turmas</strong>
                   <span>{schoolDetail?.classrooms_count}</span>
                 </S.GridItem>
-                <S.GridItem>
+                {/* <S.GridItem>
                   <strong>Seriados</strong>
                   <span>{schoolDetail?.multigrades_count}</span>
-                </S.GridItem>
+                </S.GridItem> */}
               </>
             )}
           </S.Grid>

@@ -1,6 +1,8 @@
-import { parseISO, format, differenceInYears } from 'date-fns';
+import format from 'date-fns/format';
+import differenceInYears from 'date-fns/differenceInYears';
 
 import { Enroll, EnrollStatus, MappedEnroll } from 'models/Enroll';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 export const genderMap = {
   male: 'Masculino',
@@ -21,7 +23,9 @@ export const statusMap: Record<EnrollStatus | string, string> = {
 export const enrollMapper = (enroll: Enroll): MappedEnroll => {
   const birthDateStr = enroll.student.birth_date as unknown as string;
 
-  const parsedBirthDate = birthDateStr ? parseISO(birthDateStr) : undefined;
+  const parsedBirthDate = birthDateStr
+    ? parseDateWithoutTimezone(birthDateStr)
+    : undefined;
 
   const birthDate = parsedBirthDate
     ? format(parsedBirthDate, 'dd/MM/yyyy')
@@ -45,7 +49,10 @@ export const enrollMapper = (enroll: Enroll): MappedEnroll => {
     formattedGender: enroll.student.gender && genderMap[enroll.student.gender],
     formattedStatus: enroll.status && statusMap[enroll.status],
     studentAge: studentAge,
-    formattedCreatedAt: format(parseISO(enroll.created_at), 'dd/MM/yyyy'),
+    formattedCreatedAt: format(
+      parseDateWithoutTimezone(enroll.created_at),
+      'dd/MM/yyyy'
+    ),
     formattedEnrollDate: newEnrollDate
   };
 };

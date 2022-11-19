@@ -1,9 +1,6 @@
-import {
-  getRepository,
-  MigrationInterface,
-  QueryRunner,
-  Repository,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import Employee from '@modules/employees/infra/typeorm/entities/Employee';
 
@@ -36,11 +33,12 @@ type ContactRaw = {
 type EmployeeMap = Record<string, Employee>;
 
 export default class MigratePersonDataToEmployee1634043154318
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   private employeesRepository: Repository<Employee>;
 
   constructor() {
-    this.employeesRepository = getRepository(Employee);
+    this.employeesRepository = dataSource.getRepository(Employee);
   }
 
   public async up(queryRunner: QueryRunner): Promise<void> {

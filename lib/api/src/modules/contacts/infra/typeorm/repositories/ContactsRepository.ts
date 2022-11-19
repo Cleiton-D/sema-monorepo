@@ -1,4 +1,6 @@
-import { getRepository, Repository, In } from 'typeorm';
+import { Repository, In } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IContactsRepository from '@modules/contacts/repositories/IContactsRepository';
 import Contact from '../entities/Contact';
@@ -9,17 +11,19 @@ export default class ContactsRepository implements IContactsRepository {
   private ormRepository: Repository<Contact>;
 
   constructor() {
-    this.ormRepository = getRepository(Contact);
+    this.ormRepository = dataSource.getRepository(Contact);
   }
 
   public async findById(contact_id: string): Promise<Contact | undefined> {
-    const contact = await this.ormRepository.findOne(contact_id);
-    return contact;
+    const contact = await this.ormRepository.findOne({
+      where: { id: contact_id },
+    });
+    return contact ?? undefined;
   }
 
   public async findMany(contacts_ids: string[]): Promise<Contact[]> {
     const contacts = await this.ormRepository.find({
-      id: In(contacts_ids),
+      where: { id: In(contacts_ids) },
     });
 
     return contacts;

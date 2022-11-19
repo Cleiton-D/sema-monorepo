@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository, ILike } from 'typeorm';
+import { FindOptionsWhere, Repository, ILike } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IMultigradesRepository from '@modules/schools/repositories/IMultigradesRepository';
 import FindMultigradesDTO from '@modules/schools/dtos/FindMultigradesDTO';
@@ -8,7 +10,7 @@ class MultigradesRepository implements IMultigradesRepository {
   private ormRepository: Repository<Multigrade>;
 
   constructor() {
-    this.ormRepository = getRepository(Multigrade);
+    this.ormRepository = dataSource.getRepository(Multigrade);
   }
 
   public async findOne({
@@ -18,7 +20,7 @@ class MultigradesRepository implements IMultigradesRepository {
     school_id,
     school_year_id,
   }: FindMultigradesDTO): Promise<Multigrade | undefined> {
-    const where: FindConditions<Multigrade> = {};
+    const where: FindOptionsWhere<Multigrade> = {};
     if (id) where.id = id;
     if (description) where.description = ILike(`%${description}%`);
     if (class_period_id) where.class_period_id = class_period_id;
@@ -26,7 +28,7 @@ class MultigradesRepository implements IMultigradesRepository {
     if (school_year_id) where.school_year_id = school_year_id;
 
     const multigrade = await this.ormRepository.findOne({ where });
-    return multigrade;
+    return multigrade ?? undefined;
   }
 
   public async findAll({

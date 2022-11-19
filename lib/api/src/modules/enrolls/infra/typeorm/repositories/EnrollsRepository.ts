@@ -1,16 +1,20 @@
 import {
-  FindConditions,
-  getRepository,
+  FindOptionsWhere,
   In,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
 } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IEnrollsRepository from '@modules/enrolls/repositories/IEnrollsRepository';
 import CreateEnrollDTO from '@modules/enrolls/dtos/CreateEnrollDTO';
 import FindEnrollDTO from '@modules/enrolls/dtos/FindEnrollDTO';
 import EnrollCountResultDTO from '@modules/enrolls/dtos/EntollCountResultDTO';
+
+import { PaginatedResponse } from '@shared/dtos';
+
 import Enroll from '../entities/Enroll';
 
 type AndWhere = {
@@ -21,10 +25,10 @@ class EnrollsRepository implements IEnrollsRepository {
   private ormRepository: Repository<Enroll>;
 
   constructor() {
-    this.ormRepository = getRepository(Enroll);
+    this.ormRepository = dataSource.getRepository(Enroll);
   }
 
-  private makeFindCondition({
+  private createQueryBuilder({
     id,
     status,
     grade_id,
@@ -39,7 +43,7 @@ class EnrollsRepository implements IEnrollsRepository {
     student_birth_certificate,
     order,
   }: FindEnrollDTO) {
-    const where: FindConditions<Enroll> = {};
+    const where: FindOptionsWhere<Enroll> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
@@ -87,46 +91,50 @@ class EnrollsRepository implements IEnrollsRepository {
     //   parameters: { enrollClassroomStatus: 'ACTIVE' },
     // });
 
-    const orderArray = order || [];
-    const regexp = /^(.*?)\((desc|asc)\)/;
-    const orderObj = orderArray.reduce((acc, item) => {
-      const result = regexp.exec(item);
-      if (!result) return acc;
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('enroll')
+      .select()
 
-      const [, field, ascDesc] = result;
-      return { ...acc, [field]: ascDesc.toUpperCase() };
-    }, {});
-
-    return {
-      join: {
-        alias: 'enroll',
-        leftJoinAndSelect: {
-          enroll_classroom: 'enroll.enroll_classrooms',
-          classroom: 'enroll_classroom.classroom',
-          student: 'enroll.student',
-          student_contact: 'student.student_contacts',
-          contact: 'student_contact.contact',
-          student_address: 'student.address',
-        },
-      },
-      relations: ['grade', 'class_period', 'school'],
-      where: (qb: WhereExpression) => {
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
 
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      order: orderObj,
-    };
+      })
+      .leftJoinAndSelect('enroll.enroll_classrooms', 'enroll_classroom')
+      .leftJoinAndSelect('enroll_classroom.classroom', 'classroom')
+      .leftJoinAndSelect('enroll.student', 'student')
+      .leftJoinAndSelect('student.student_contacts', 'student_contact')
+      .leftJoinAndSelect('student_contact.contact', 'contact')
+      .leftJoinAndSelect('student.address', 'student_address')
+      .leftJoinAndSelect('enroll.grade', 'grade')
+      .leftJoinAndSelect('enroll.class_period', 'class_period')
+      .leftJoinAndSelect('enroll.school', 'school');
+
+    const orderArray = order || [];
+    const regexp = /^(.*?)\((desc|asc)\)/;
+
+    orderArray.forEach(item => {
+      const result = regexp.exec(item);
+      if (!result) return;
+
+      const [, field, ascDesc] = result;
+      queryBuilder.addOrderBy(
+        `enroll.${field}`,
+        ascDesc.toUpperCase() as 'ASC' | 'DESC',
+      );
+    });
+
+    return queryBuilder;
   }
 
   public async findOne(filters: FindEnrollDTO): Promise<Enroll | undefined> {
-    const enroll = await this.ormRepository.findOne(
-      this.makeFindCondition(filters),
-    );
+    const queryBuilder = this.createQueryBuilder(filters);
 
-    return enroll;
+    const enroll = await queryBuilder.getOne();
+
+    return enroll ?? undefined;
   }
 
   public async findAllByIds(enroll_ids: string[]): Promise<Enroll[]> {
@@ -137,12 +145,23 @@ class EnrollsRepository implements IEnrollsRepository {
     return enrolls;
   }
 
-  public async findAll(filters: FindEnrollDTO): Promise<Enroll[]> {
-    const enrolls = await this.ormRepository.find({
-      ...this.makeFindCondition(filters),
-    });
+  public async findAll(
+    filters: FindEnrollDTO,
+  ): Promise<PaginatedResponse<Enroll>> {
+    const queryBuilder = this.createQueryBuilder(filters);
+    const total = await queryBuilder.getCount();
 
-    return enrolls;
+    const { page, size } = filters;
+    if (size) {
+      queryBuilder.limit(size);
+      if (page) {
+        queryBuilder.offset((page - 1) * size);
+      }
+    }
+
+    const enrolls = await queryBuilder.getMany();
+
+    return { page: page || 1, size: size || total, total, items: enrolls };
   }
 
   public async count({
@@ -152,7 +171,7 @@ class EnrollsRepository implements IEnrollsRepository {
     school_year_id,
     student_id,
   }: FindEnrollDTO): Promise<EnrollCountResultDTO> {
-    const where: FindConditions<Enroll> = {};
+    const where: FindOptionsWhere<Enroll> = {};
 
     if (status) where.status = status;
     if (grade_id) where.grade_id = grade_id;

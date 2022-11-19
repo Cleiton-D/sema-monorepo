@@ -22,7 +22,7 @@ class UpdateGradeSchoolSubjectService {
     workload,
   }: UpdateGradeSchoolSubjectRequest): Promise<GradeSchoolSubject> {
     const gradeSchoolSubject = await this.gradeSchoolSubjectsRepository.findOne(
-      { id: grade_school_subject_id },
+      { id: grade_school_subject_id, include_multidisciplinary: true },
     );
     if (!gradeSchoolSubject) {
       throw new AppError('Grade School Subject not found');

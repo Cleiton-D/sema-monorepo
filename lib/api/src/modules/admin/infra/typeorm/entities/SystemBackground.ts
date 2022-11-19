@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -25,6 +26,11 @@ class SystemBackground {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Expose({ name: 'image_url' })
+  getImageUrl(): string {
+    return `${process.env.API_URL}/files/${this.name}`;
+  }
 }
 
 export default SystemBackground;

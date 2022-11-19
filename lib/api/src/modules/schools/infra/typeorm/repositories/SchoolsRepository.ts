@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreateSchoolDTO from '@modules/schools/dtos/CreateSchoolDTO';
 import ISchoolsRepository from '@modules/schools/repositories/ISchoolsRepository';
@@ -11,7 +13,7 @@ export default class SchoolsRepository implements ISchoolsRepository {
   private ormRepository: Repository<School>;
 
   constructor() {
-    this.ormRepository = getRepository(School);
+    this.ormRepository = dataSource.getRepository(School);
   }
 
   public async findOne({
@@ -19,7 +21,7 @@ export default class SchoolsRepository implements ISchoolsRepository {
     branch_id,
     inep_code,
   }: FindSchoolsDTO): Promise<School | undefined> {
-    const where: FindConditions<School> = {};
+    const where: FindOptionsWhere<School> = {};
 
     if (id) where.id = id;
     if (branch_id) where.branch_id = branch_id;
@@ -37,7 +39,7 @@ export default class SchoolsRepository implements ISchoolsRepository {
       relations: ['address', 'director', 'vice_director'],
     });
 
-    return school;
+    return school ?? undefined;
   }
 
   public async findAll(): Promise<School[]> {

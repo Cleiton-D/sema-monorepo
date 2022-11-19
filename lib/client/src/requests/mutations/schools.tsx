@@ -10,7 +10,7 @@ import { School } from 'models/School';
 
 export function useAddSchoolMutation(session?: Session | null) {
   const addSchool = useCallback(
-    async (values) => {
+    async (values: any) => {
       const api = initializeApi(session);
       return api.post('/schools', values);
     },

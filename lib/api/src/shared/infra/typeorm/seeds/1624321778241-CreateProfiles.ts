@@ -1,4 +1,6 @@
-import { getRepository, In, MigrationInterface, Repository } from 'typeorm';
+import { In, MigrationInterface, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import AccessLevel from '@modules/authorization/infra/typeorm/entities/AccessLevel';
 
@@ -8,7 +10,7 @@ export default class CreateProfiles1624321778241 implements MigrationInterface {
   private items: AccessLevel[];
 
   constructor() {
-    this.repository = getRepository(AccessLevel);
+    this.repository = dataSource.getRepository(AccessLevel);
 
     const administrator = this.repository.create({
       description: 'Administrador',

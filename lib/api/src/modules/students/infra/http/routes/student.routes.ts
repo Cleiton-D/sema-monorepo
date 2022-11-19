@@ -10,5 +10,6 @@ studentRouter.get('/', studentsController.index);
 studentRouter.post('/', studentsController.create);
 
 studentRouter.get('/:id', studentsController.show);
+studentRouter.put('/:student_id', studentsController.update);
 
 export default studentRouter;

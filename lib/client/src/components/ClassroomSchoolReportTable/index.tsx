@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
-import { parseISO, isBefore, addDays } from 'date-fns';
+import addDays from 'date-fns/addDays';
+import isBefore from 'date-fns/isBefore';
 
 import Button from 'components/Button';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 import ClassroomSchoolReportInput from 'components/ClassroomSchoolReportInput';
+import ClassroomSchoolReportTableLine from 'components/ClassroomSchoolReportTableLine';
 
 import { useAccess } from 'hooks/AccessProvider';
 
@@ -19,9 +21,9 @@ import { useListSchoolTermPeriods } from 'requests/queries/school-term-periods';
 import { useRegisterSchoolReports } from 'requests/mutations/school-reports';
 
 import { schoolReportsEnrollsMapper } from 'utils/mappers/schoolReportsMapper';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
-import ClassroomSchoolReportTableLine from 'components/ClassroomSchoolReportTableLine';
 
 type SchoolReportsValues = Record<SchoolTerm, Record<string, string>>;
 
@@ -42,12 +44,16 @@ const ClassroomSchoolReportTable = ({
     const requestItems = Object.entries(values).map(([enroll, averages]) => {
       const newAverages = Object.entries(averages)
         .filter(([, value]) => {
-          if (value === '') return false;
+          if (value === '') return true;
 
           const parsed = Number(value);
           return !isNaN(parsed);
         })
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: Number(value) }), {});
+        .reduce((acc, [key, value]) => {
+          if (value === '') return { ...acc, [key]: null };
+
+          return { ...acc, [key]: Number(value) };
+        }, {});
 
       return {
         enroll_id: enroll,
@@ -95,8 +101,8 @@ const ClassroomSchoolReportTable = ({
       (acc, item) => {
         const { school_term, date_end, date_start, status } = item;
         if (status === 'FINISH') {
-          const parsedDateStart = parseISO(date_start);
-          const parsedDateEnd = parseISO(date_end);
+          const parsedDateStart = parseDateWithoutTimezone(date_start);
+          const parsedDateEnd = parseDateWithoutTimezone(date_end);
           const dateEnd = addDays(parsedDateEnd, 10);
 
           const dateStartAfterToday = isBefore(parsedDateStart, new Date());
@@ -137,7 +143,13 @@ const ClassroomSchoolReportTable = ({
             <ClassroomSchoolReportTableLine {...props} classroom={classroom} />
           )}
         >
-          <TableColumn label="Aluno" tableKey="enroll.student.name" />
+          <TableColumn
+            label="Aluno"
+            tableKey="enroll.student.name"
+            border="right"
+            fixed
+            render={(value) => <S.StudentName>{value}</S.StudentName>}
+          />
           <TableColumn
             label="1º Bimestre"
             tableKey="first"

@@ -14,6 +14,7 @@ type LinkClassroomTeacherSchoolSubjectForm = {
   teacher_school_subjects: Array<{
     employee_id: string;
     school_subject_id: string;
+    is_multidisciplinary?: boolean;
   }>;
 };
 

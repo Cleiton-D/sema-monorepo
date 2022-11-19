@@ -1,10 +1,11 @@
 import {
-  FindConditions,
-  getRepository,
+  FindOptionsWhere,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
 } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import FindUserProfileDTO from '@modules/users/dtos/FindUserProfileDTO';
 import CreateUserProfileDTO from '@modules/users/dtos/CreateUserProfileDTO';
@@ -21,7 +22,7 @@ class UserProfilesRepository implements IUserProfilesRepository {
   private ormRepository: Repository<UserProfile>;
 
   constructor() {
-    this.ormRepository = getRepository(UserProfile);
+    this.ormRepository = dataSource.getRepository(UserProfile);
   }
 
   public async findOne({
@@ -32,7 +33,7 @@ class UserProfilesRepository implements IUserProfilesRepository {
     access_level_name,
     default: isDefault,
   }: FindUserProfileDTO): Promise<UserProfile | undefined> {
-    const where: FindConditions<UserProfile> = {};
+    const where: FindOptionsWhere<UserProfile> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
@@ -48,24 +49,22 @@ class UserProfilesRepository implements IUserProfilesRepository {
       });
     }
 
-    const userProfile = await this.ormRepository.findOne({
-      join: {
-        alias: 'user_profile',
-        leftJoinAndSelect: {
-          access_level: 'user_profile.access_level',
-          branch: 'user_profile.branch',
-        },
-      },
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('user_profile')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
 
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-    });
+      })
+      .leftJoinAndSelect('user_profile.access_level', 'access_level')
+      .leftJoinAndSelect('user_profile.branch', 'branch');
 
-    return userProfile;
+    const userProfile = await queryBuilder.getOne();
+
+    return userProfile ?? undefined;
   }
 
   public async findAll({
@@ -76,7 +75,7 @@ class UserProfilesRepository implements IUserProfilesRepository {
     access_level_name,
     default: isDefault,
   }: FindUserProfileDTO): Promise<UserProfile[]> {
-    const where: FindConditions<UserProfile> = {};
+    const where: FindOptionsWhere<UserProfile> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
@@ -92,22 +91,20 @@ class UserProfilesRepository implements IUserProfilesRepository {
       });
     }
 
-    const userProfiles = await this.ormRepository.find({
-      join: {
-        alias: 'user_profile',
-        leftJoinAndSelect: {
-          access_level: 'user_profile.access_level',
-          branch: 'user_profile.branch',
-        },
-      },
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('user_profile')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
 
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-    });
+      })
+      .leftJoinAndSelect('user_profile.access_level', 'access_level')
+      .leftJoinAndSelect('user_profile.branch', 'branch');
+
+    const userProfiles = await queryBuilder.getMany();
 
     return userProfiles;
   }

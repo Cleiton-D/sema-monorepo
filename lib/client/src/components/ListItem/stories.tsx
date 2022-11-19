@@ -12,7 +12,7 @@ export default {
   },
   argTypes: {
     children: {
-      type: ''
+      type: undefined
     }
   }
 } as Meta;

@@ -21,6 +21,7 @@ import { SchoolSubject } from 'models/SchoolSubject';
 import { addSchoolSubjectSchema } from './rules/schema';
 
 import * as S from './styles';
+import Checkbox from 'components/Checkbox';
 
 export type SchoolSubjectModalRef = {
   openModal: (schoolSubject?: SchoolSubject) => void;
@@ -39,6 +40,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
   SchoolSubjectModalRef,
   AddSchoolSubjectModalProps
 > = ({ refetchFn }, ref) => {
+  const [isMultidisciplinary, setIsMultidisciplinary] = useState(false);
   const [schoolSubject, setSchoolSubject] = useState<SchoolSubject>();
 
   const modalRef = useRef<ModalRef>(null);
@@ -54,7 +56,11 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
 
         await addSchoolSubjectSchema.validate(values, { abortEarly: false });
 
-        await mutation.mutateAsync({ id: schoolSubject?.id, ...values });
+        await mutation.mutateAsync({
+          id: schoolSubject?.id,
+          is_multidisciplinary: isMultidisciplinary,
+          ...values
+        });
         refetchFn && refetchFn();
       } catch (err) {
         if (err instanceof ValidationError) {
@@ -70,15 +76,18 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
         }
       }
     },
-    [mutation, schoolSubject, refetchFn]
+    [mutation, schoolSubject, isMultidisciplinary, refetchFn]
   );
 
   const handleBack = useCallback(() => {
+    setSchoolSubject(undefined);
+    setIsMultidisciplinary(false);
     modalRef.current?.closeModal();
   }, []);
 
   const openModal = useCallback((data?: SchoolSubject) => {
     setSchoolSubject(data);
+    setIsMultidisciplinary(data?.is_multidisciplinary || false);
     modalRef.current?.openModal();
   }, []);
 
@@ -93,6 +102,16 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
       <S.Wrapper>
         <S.Form onSubmit={handleSave} ref={formRef} initialData={schoolSubject}>
           <TextInput name="description" label="Nome da disciplina" />
+
+          <S.Divider />
+          <Checkbox
+            label="Multidisciplinar?"
+            labelFor="is_multidisciplinary"
+            isChecked={isMultidisciplinary}
+            onCheck={setIsMultidisciplinary}
+          />
+          <S.Divider />
+
           <TextInput name="index" label="Ordem" type="number" />
           <TextInput
             name="additional_description"

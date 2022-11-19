@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "br.net.diarioescolar.grpc";
+option java_outer_classname = "ReportProto";
+
+import "google/protobuf/timestamp.proto";
+
+package report;
+
+service ClassDiary {
+  rpc Generate (ClassDiaryGenerateRequest) returns (ClassDiaryGenerateResponse) {}
+}
+
+message MinifiedAttendance {
+  string student_name = 1;
+  google.protobuf.Timestamp class_date = 2;
+  bool attendance = 3;
+}
+
+message Class {
+  string classDate = 1;
+  string taughtContent = 2;
+}
+
+message SchoolTermSchoolReports {
+  string schoolSubject = 1;
+  int32 schoolSubjectOrder = 2;
+  string studentName = 3;
+  string average = 4;
+  optional int32 absences = 5;
+}
+
+message SchoolTermItems {
+  string schoolTerm = 1;
+  google.protobuf.Timestamp schoolTermEnd = 2;
+  repeated MinifiedAttendance attendances = 3;
+  repeated Class classes = 4;
+  repeated SchoolTermSchoolReports schoolReport = 5;
+}
+
+message SchoolSubjectClassDiary {
+  string schoolSubject = 2;
+  string teacher = 7;
+  int32 workload = 8;
+
+  repeated SchoolTermItems bySchoolTerm = 9;
+}
+
+message Enrollment {
+  string student_name = 1;
+  string enroll_date = 2;
+  string gender = 3;
+  string origin = 4;
+  string breed = 5;
+  string birth_date = 6;
+  string age = 7;
+  string transfer_date = 8;
+}
+
+message FinalResult {
+  string studentName = 1;
+  string schoolSubject = 2;
+  int32 schoolSubjectOrder = 3;
+  string finalResult = 4;
+  string average = 5;
+}
+
+message ClassDiaryGenerateRequest {
+  repeated SchoolSubjectClassDiary items = 1;
+  repeated Enrollment enrolls = 2;
+  repeated FinalResult finalResult = 3;
+
+  string schoolName = 4;
+  string referenceYear = 5;
+  string grade = 6;
+  string classroom = 7;
+  string classPeriod = 8;
+}
+
+message ClassDiaryGenerateResponse {
+  bytes fileChunk = 1;
+}

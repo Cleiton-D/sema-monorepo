@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import privateRoute from '@shared/decorators/privateRoute';
 
@@ -27,7 +27,7 @@ class EmployeesController {
       accessCode: accessCode as string,
     });
 
-    return response.json(classToClass(employee));
+    return response.json(instanceToInstance(employee));
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
@@ -79,7 +79,7 @@ class EmployeesController {
       rg,
     });
 
-    return response.json(classToClass(employee));
+    return response.json(instanceToInstance(employee));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
@@ -115,7 +115,7 @@ class EmployeesController {
       rg,
     });
 
-    return response.json(classToClass(employee));
+    return response.json(instanceToInstance(employee));
   }
 
   @privateRoute()

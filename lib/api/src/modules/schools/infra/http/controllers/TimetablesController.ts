@@ -49,13 +49,8 @@ class TimetablesController {
     request: Request,
     response: Response,
   ): Promise<Response> {
-    const {
-      employee_id,
-      day_of_week,
-      time_start,
-      time_end,
-      classroom_id,
-    } = request.query;
+    const { employee_id, day_of_week, time_start, time_end, classroom_id } =
+      request.query;
 
     const validateTimetable = container.resolve(ValidateTimetableService);
     const result = await validateTimetable.execute({

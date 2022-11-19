@@ -1,7 +1,10 @@
 import styled, { css } from 'styled-components';
 
-import * as ButtonStyles from 'components/Button/styles';
 import { customMedia } from 'styles/devices';
+
+import * as ButtonStyles from 'components/Button/styles';
+import * as SelectStyles from 'components/Select/styles';
+import * as CheckboxStyles from 'components/Checkbox/styles';
 
 export const Wrapper = styled.div`
   ${({ theme }) => css`
@@ -12,11 +15,23 @@ export const Wrapper = styled.div`
 `;
 
 export const FieldsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  ${customMedia.lessThan('tabletS')`
+  ${({ theme }) => css`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    ${customMedia.lessThan('tabletS')`
     grid-template-columns: 1fr;
+  `}
+
+    & > ${SelectStyles.Wrapper} {
+      grid-column-start: 1;
+      grid-column-end: 3;
+    }
+
+    & > ${CheckboxStyles.Wrapper} {
+      justify-content: unset;
+      margin-left: ${theme.spacings.xxsmall};
+    }
   `}
 `;
 
@@ -28,5 +43,17 @@ export const ButtonContainer = styled.div`
     ${ButtonStyles.Wrapper} {
       width: 17.1rem;
     }
+  `}
+`;
+
+export const Divider = styled.hr`
+  ${({ theme }) => css`
+    grid-column: 1/3;
+    width: 100%;
+    appearance: none;
+    content: '';
+    display: block;
+    box-shadow: 0rem 0rem 0rem 0.05rem ${theme.colors.lightSilver};
+    border: none;
   `}
 `;

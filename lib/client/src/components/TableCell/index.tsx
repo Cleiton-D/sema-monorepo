@@ -8,22 +8,29 @@ import { withAccessComponent } from 'hooks/AccessProvider';
 
 import * as S from './styles';
 
+type RenderChildrenFunction = (item: any) => React.ReactNode;
+
 export type TableCellProps = {
   item: Record<string, any>;
   objectKey: string;
   columnProps: TableColumnProps;
-  renderInternalContent: (content: React.ReactNode) => void;
+  renderInternalContent: (
+    content: React.ReactNode | RenderChildrenFunction
+  ) => void;
+  lineIndex: number;
 };
 
 const TableCell = ({
   item,
   objectKey,
   columnProps,
+  lineIndex,
   renderInternalContent
 }: TableCellProps) => {
   const {
     fixed,
     contentAlign,
+    border,
     actionColumn,
     render,
     children,
@@ -36,7 +43,9 @@ const TableCell = ({
 
   const { eventEmitter, minimal } = useTable();
 
-  const onChangePosition = useCallback((position) => {
+  const onChangePosition = useCallback((position?: number) => {
+    if (!position) return;
+
     setPosition(position);
   }, []);
 
@@ -71,8 +80,8 @@ const TableCell = ({
 
     if (!render) return value;
 
-    return actionColumn ? render(item) : render(value);
-  }, [item, objectKey, actionColumn, render]);
+    return actionColumn ? render(item, lineIndex) : render(value, lineIndex);
+  }, [item, objectKey, actionColumn, render, lineIndex]);
 
   return (
     <S.Wrapper
@@ -83,6 +92,7 @@ const TableCell = ({
       showingDetail={showing}
       ellipsis={ellipsis}
       title={ellipsis && renderedContent}
+      border={border}
     >
       {children ? (
         <S.ExpandButton onClick={handleRenderInternalContent}>

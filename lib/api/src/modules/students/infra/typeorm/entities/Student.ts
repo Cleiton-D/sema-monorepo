@@ -91,6 +91,8 @@ class Student {
 
   @Expose({ name: 'contacts' })
   getContacts(): Contact[] {
+    if (!this.student_contacts) return [];
+
     return this.student_contacts.map(
       student_contact => student_contact.contact,
     );

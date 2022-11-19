@@ -1,13 +1,22 @@
 import styled, { css } from 'styled-components';
 import { Form as Unform } from '@unform/web';
+import Image from 'next/image';
 
 import SectionContent from 'components/SectionContent';
 import Heading from 'components/Heading';
 
 import * as InputStyles from 'components/TextInput/styles';
 
-export const Wrapper = styled.main`
-  ${({ theme }) => css`
+export const Background = styled(Image)`
+  z-index: 0;
+  filter: brightness(80%) contrast(120%) !important;
+`;
+
+type WrapperProps = {
+  hasBackground: boolean;
+};
+export const Wrapper = styled.main<WrapperProps>`
+  ${({ theme, hasBackground }) => css`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,6 +24,21 @@ export const Wrapper = styled.main`
     height: 100vh;
     background: ${theme.colors.mainBg};
     color: ${theme.colors.gray};
+
+    ${hasBackground &&
+    css`
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+        box-shadow: inset 0rem 0rem 15rem rgba(0, 0, 15, 1);
+      }
+    `}
   `}
 `;
 
@@ -22,15 +46,14 @@ export const Content = styled(SectionContent)`
   ${({ theme }) => css`
     @keyframes show-in {
       from {
-        box-shadow: none;
         transform: scale(0.99);
       }
       to {
-        box-shadow: 0rem 0rem 1rem ${theme.colors.lightGray};
         transform: scale(1);
       }
     }
 
+    z-index: 1;
     max-width: 55rem !important;
     display: flex;
     flex-direction: column;

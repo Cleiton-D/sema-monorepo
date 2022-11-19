@@ -87,6 +87,9 @@ class Enroll {
   @Column({ default: 'now()' })
   enroll_date: Date;
 
+  @Column()
+  transfer_date?: Date;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -95,6 +98,7 @@ class Enroll {
 
   @Expose({ name: 'current_classroom' })
   getCurrentClassroom(): Classroom | undefined {
+    if (!this.enroll_classrooms) return undefined;
     if (this.enroll_classrooms.length <= 0) return undefined;
 
     const activeEnrollClassroom = this.enroll_classrooms.find(

@@ -10,6 +10,7 @@ type UpdateSchoolSubjectRequest = {
   description: string;
   additional_description: string;
   index: number;
+  is_multidisciplinary?: boolean;
 };
 
 @injectable()
@@ -24,6 +25,7 @@ class UpdateSchoolSubjectService {
     description,
     additional_description,
     index,
+    is_multidisciplinary,
   }: UpdateSchoolSubjectRequest): Promise<SchoolSubject> {
     const schoolSubject = await this.schoolSubjectsRepository.findByid(id);
     if (!schoolSubject) {
@@ -34,6 +36,7 @@ class UpdateSchoolSubjectService {
       description,
       additional_description,
       index,
+      is_multidisciplinary,
     });
 
     return this.schoolSubjectsRepository.update(schoolSubject);

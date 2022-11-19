@@ -116,6 +116,9 @@ import MultigradesClassroomsRepository from '@modules/schools/infra/typeorm/repo
 import ISystemBackgroundsRepository from '@modules/admin/repositories/ISystemBackgroundsRepository';
 import SystemBackgroundsRepository from '@modules/admin/infra/typeorm/repositories/SystemBackgroundsRepository';
 
+import ICalendarEventsRespository from '@modules/education_core/repositories/ICalendarEventsRepository';
+import CalendarEventsRespository from '@modules/education_core/infra/typeorm/repositories/CalendarEventsRepository';
+
 container.registerSingleton<IContactsRepository>(
   'ContactsRepository',
   ContactsRepository,
@@ -304,6 +307,11 @@ container.registerSingleton<IMultigradesClassroomsRepository>(
 container.registerSingleton<ISystemBackgroundsRepository>(
   'SystemBackgroundsRepository',
   SystemBackgroundsRepository,
+);
+
+container.registerSingleton<ICalendarEventsRespository>(
+  'CalendarEventsRespository',
+  CalendarEventsRespository,
 );
 
 container.registerSingleton<IHashProvider>('HashProvider', BCryptHashProvider);

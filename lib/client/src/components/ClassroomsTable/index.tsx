@@ -1,3 +1,4 @@
+import Link, { LinkProps } from 'next/link';
 import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
@@ -7,14 +8,21 @@ import { Classroom } from 'models/Classroom';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
+import * as S from './styles';
+
 type ClassroomsTableProps = {
   classrooms: Classroom[];
   subTable?: (classroom: Classroom) => JSX.Element;
+  link?: {
+    name: string;
+    createHref: (classroom: Classroom) => LinkProps['href'];
+  };
 };
 
 export const ClassroomsTable = ({
   classrooms,
-  subTable
+  subTable,
+  link
 }: ClassroomsTableProps) => {
   const { data: session } = useSession();
 
@@ -37,6 +45,20 @@ export const ClassroomsTable = ({
         tableKey="class_period.description"
         render={(class_period) => translateDescription(class_period)}
       />
+
+      {!!link && (
+        <TableColumn
+          label="Links"
+          tableKey=""
+          contentAlign="center"
+          actionColumn
+          render={(classroom: Classroom) => (
+            <Link href={link.createHref(classroom)} passHref>
+              <S.TableLink>{link.name}</S.TableLink>
+            </Link>
+          )}
+        />
+      )}
     </Table>
   );
 };

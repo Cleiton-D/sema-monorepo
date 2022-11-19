@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { parseISO, isBefore } from 'date-fns';
+import isBefore from 'date-fns/isBefore';
 
 import Base from 'templates/Base';
 
@@ -23,6 +23,7 @@ import { useShowSchoolSubject } from 'requests/queries/school-subjects';
 import { useRegisterSchoolReports } from 'requests/mutations/school-reports';
 
 import { schoolReportsEnrollsMapper } from 'utils/mappers/schoolReportsMapper';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
 
@@ -64,7 +65,7 @@ const SchoolReportsTemplate = () => {
     return termPeriods.reduce<Record<SchoolTerm, boolean>>(
       (acc, item) => {
         const { school_term, date_end } = item;
-        const parsedDateEnd = parseISO(date_end);
+        const parsedDateEnd = parseDateWithoutTimezone(date_end);
 
         return { ...acc, [school_term]: isBefore(new Date(), parsedDateEnd) };
       },
@@ -135,7 +136,7 @@ const SchoolReportsTemplate = () => {
                     <TextInput
                       label=""
                       size="medium"
-                      mask="school-report"
+                      mask="school-report-field"
                       disabled={!enabledTermPeriods.FIRST}
                       containerStyle={{ maxWidth: 80 }}
                       name={`FIRST.${item.enroll.id}`}
@@ -161,7 +162,7 @@ const SchoolReportsTemplate = () => {
                     <TextInput
                       label=""
                       size="medium"
-                      mask="school-report"
+                      mask="school-report-field"
                       disabled={!enabledTermPeriods.SECOND}
                       containerStyle={{ maxWidth: 80 }}
                       name={`SECOND.${item.enroll.id}`}
@@ -187,7 +188,7 @@ const SchoolReportsTemplate = () => {
                     <TextInput
                       label=""
                       size="medium"
-                      mask="school-report"
+                      mask="school-report-field"
                       disabled={!enabledTermPeriods.THIRD}
                       containerStyle={{ maxWidth: 80 }}
                       name={`THIRD.${item.enroll.id}`}
@@ -213,7 +214,7 @@ const SchoolReportsTemplate = () => {
                     <TextInput
                       label=""
                       size="medium"
-                      mask="school-report"
+                      mask="school-report-field"
                       disabled={!enabledTermPeriods.FOURTH}
                       containerStyle={{ maxWidth: 80 }}
                       name={`FOURTH.${item.enroll.id}`}

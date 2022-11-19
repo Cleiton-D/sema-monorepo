@@ -34,7 +34,7 @@ const ClassroomSelector = ({
   const classroomsOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
 
-    const classroomArray = classrooms || [];
+    const classroomArray = classrooms?.items || [];
     const filteredClassrooms = classroomArray.filter(
       (classroom) => classroom.id !== exceptId
     );

@@ -48,7 +48,7 @@ const SelectClassroomToMultigradeModal: React.ForwardRefRenderFunction<
   const [multigradesClassrooms, setMultigradesClassrooms] =
     useAtom(classroomsAtom);
 
-  const { data: classrooms = [], isLoading } = useListClassrooms(session, {
+  const { data: classrooms, isLoading } = useListClassrooms(session, {
     class_period_id: classPeriodId,
     school_id: schoolId,
     with_in_multigrades: false
@@ -61,7 +61,9 @@ const SelectClassroomToMultigradeModal: React.ForwardRefRenderFunction<
   const classromsOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
 
-    return classrooms
+    const classroomsItems = classrooms?.items || [];
+
+    return classroomsItems
       .filter(({ id }) => !currentClassrooms.includes(id))
       .map((classroom) => ({
         label: classroom.description,

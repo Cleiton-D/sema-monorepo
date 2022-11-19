@@ -29,6 +29,7 @@ class CreateClassAttendancesService {
 
     const createAttendances = enrollClassrooms.map(item => ({
       enroll_id: item.enroll_id,
+      enroll_classroom_id: item.id,
       class_id: classEntity.id,
       attendance: true,
     }));

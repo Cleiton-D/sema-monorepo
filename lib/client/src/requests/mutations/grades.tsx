@@ -3,18 +3,17 @@ import { Session } from 'next-auth';
 import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
-import { ModalRef } from 'components/Modal';
 
 import { initializeApi, useMutation } from 'services/api';
 
 import { Grade } from 'models/Grade';
 
 export function useAddGradeMutation(
-  modalRef: RefObject<ModalRef>,
+  onMutate: () => void,
   session?: Session | null
 ) {
   const addGrade = useCallback(
-    async (values) => {
+    async (values: any) => {
       const api = initializeApi(session);
       return api.post('/education/admin/grades', values);
     },
@@ -28,7 +27,7 @@ export function useAddGradeMutation(
         { ...newGrade, id: uuidv4(), disabled: true }
       ]
     },
-    onMutate: () => modalRef.current?.closeModal(),
+    onMutate: onMutate,
     renderLoading: function render(newGrade) {
       return (
         <ToastContent showSpinner>
@@ -44,7 +43,7 @@ export function useAddGradeMutation(
 
 export function useDeleteGradeMutation(session?: Session | null) {
   const deleteGrade = useCallback(
-    async (grade) => {
+    async (grade: Grade) => {
       const api = initializeApi(session);
 
       return api.delete(`/education/admin/grades/${grade.id}`);

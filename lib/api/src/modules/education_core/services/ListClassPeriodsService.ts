@@ -3,6 +3,10 @@ import { inject, injectable } from 'tsyringe';
 import ClassPeriod from '../infra/typeorm/entities/ClassPeriod';
 import IClassPeriodsRepository from '../repositories/IClassPeriodsRepository';
 
+type ListClassPeriodsRequest = {
+  school_id?: string;
+};
+
 @injectable()
 class ListClassPeriodsService {
   constructor(
@@ -10,8 +14,12 @@ class ListClassPeriodsService {
     private classPeriodsRepository: IClassPeriodsRepository,
   ) {}
 
-  public async execute(): Promise<ClassPeriod[]> {
-    const classPeriods = await this.classPeriodsRepository.findAll();
+  public async execute({
+    school_id,
+  }: ListClassPeriodsRequest): Promise<ClassPeriod[]> {
+    const classPeriods = await this.classPeriodsRepository.findAll({
+      school_id,
+    });
     return classPeriods;
   }
 }

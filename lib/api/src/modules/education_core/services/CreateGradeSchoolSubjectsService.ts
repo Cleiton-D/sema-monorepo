@@ -1,10 +1,14 @@
 import { inject, injectable } from 'tsyringe';
 
 import CreateSchoolReportsToEnrollService from '@modules/enrolls/services/CreateSchoolReportsToEnrollService';
-
 import IEnrollsRepository from '@modules/enrolls/repositories/IEnrollsRepository';
+
+import AppError from '@shared/errors/AppError';
+
 import GradeSchoolSubject from '../infra/typeorm/entities/GradeSchoolSubject';
 import IGradeSchoolSubjectsRepository from '../repositories/IGradeSchoolSubjectsRepository';
+import IGradesRepository from '../repositories/IGradesRepository';
+import ISchoolSubjectsRepository from '../repositories/ISchoolSubjectsRepository';
 
 type SchoolSubject = {
   school_subject_id: string;
@@ -19,25 +23,84 @@ type CreateGradeSchoolSubjectsRequest = {
 @injectable()
 class CreateGradeSchoolSubjectsService {
   constructor(
+    @inject('GradesRepository') private gradesRepository: IGradesRepository,
     @inject('GradeSchoolSubjectsRepository')
     private gradeSchoolSubjectsRepository: IGradeSchoolSubjectsRepository,
     @inject('EnrollsRepository') private enrollsRepository: IEnrollsRepository,
     private createSchoolReportsToEnrollService: CreateSchoolReportsToEnrollService,
+    @inject('SchoolSubjectsRepository')
+    private schoolSubjectsRepository: ISchoolSubjectsRepository,
   ) {}
 
   public async execute({
     grade_id,
     school_subjects,
   }: CreateGradeSchoolSubjectsRequest): Promise<GradeSchoolSubject[]> {
-    const data = school_subjects.map(({ school_subject_id, workload }) => ({
-      grade_id,
-      school_subject_id,
-      workload,
-    }));
+    const grade = await this.gradesRepository.findById(grade_id);
+    if (!grade) {
+      throw new AppError('Grade not found');
+    }
 
-    const gradeSchoolSubjects = await this.gradeSchoolSubjectsRepository.createMany(
-      data,
+    let multidisciplinary_grade_school_subject: GradeSchoolSubject | undefined;
+    if (grade.is_multidisciplinary) {
+      multidisciplinary_grade_school_subject =
+        await this.gradeSchoolSubjectsRepository.findOne({
+          grade_id,
+          is_multidisciplinary: true,
+        });
+    }
+
+    const promises = school_subjects.map(
+      async ({ school_subject_id, workload }) => {
+        if (grade.is_multidisciplinary) {
+          const schoolSubject = await this.schoolSubjectsRepository.findByid(
+            school_subject_id,
+          );
+          if (!schoolSubject) {
+            throw new AppError('School Subject not found');
+          }
+
+          if (
+            schoolSubject.is_multidisciplinary &&
+            multidisciplinary_grade_school_subject &&
+            schoolSubject.id !==
+              multidisciplinary_grade_school_subject.school_subject_id
+          ) {
+            throw new AppError(
+              'Already exist a multidisciplinary school subject to this grade',
+            );
+          }
+
+          if (schoolSubject.is_multidisciplinary) {
+            return {
+              grade_id,
+              school_subject_id,
+              workload,
+            };
+          }
+
+          if (!multidisciplinary_grade_school_subject) {
+            throw new AppError('Grade School subject not found');
+          }
+
+          return {
+            grade_id,
+            school_subject_id,
+            workload: multidisciplinary_grade_school_subject.workload,
+          };
+        }
+
+        return {
+          grade_id,
+          school_subject_id,
+          workload,
+        };
+      },
     );
+
+    const createData = await Promise.all(promises);
+    const gradeSchoolSubjects =
+      await this.gradeSchoolSubjectsRepository.createMany(createData);
 
     const enrolls = await this.enrollsRepository.findAll({
       grade_id,
@@ -47,7 +110,7 @@ class CreateGradeSchoolSubjectsService {
     const schoolSubjectIds = gradeSchoolSubjects.map(
       ({ school_subject_id }) => school_subject_id,
     );
-    const enrollIds = enrolls.map(({ id }) => id);
+    const enrollIds = enrolls.items.map(({ id }) => id);
 
     await this.createSchoolReportsToEnrollService.execute({
       enroll_id: enrollIds,

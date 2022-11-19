@@ -17,7 +17,7 @@ class DeleteGradeSchoolSubjectService {
     grade_school_subject_id,
   }: DeleteGradeSchoolSubjectRequest): Promise<void> {
     const gradeSchoolSubject = await this.gradeSchoolSubjectsRepository.findOne(
-      { id: grade_school_subject_id },
+      { id: grade_school_subject_id, include_multidisciplinary: true },
     );
     if (!gradeSchoolSubject) {
       throw new AppError('Grade School Subject not found');

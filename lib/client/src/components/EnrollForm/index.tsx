@@ -69,7 +69,9 @@ const EnrollForm: React.ForwardRefRenderFunction<
     if (isLoading) return [{ value: '', label: 'Carregando...' }];
     if (!classrooms) return [];
 
-    return classrooms.map(({ id, description }) => ({
+    const classroomItems = classrooms.items || [];
+
+    return classroomItems.map(({ id, description }) => ({
       label: description,
       value: id
     }));
@@ -155,7 +157,7 @@ const EnrollForm: React.ForwardRefRenderFunction<
       <S.Wrapper>
         <S.SectionTitle>Matrícula</S.SectionTitle>
         <S.Form onSubmit={handleSubmit} initialData={state} ref={formRef}>
-          <TextInput name="unique_code" label="Código único" />
+          {/* <TextInput name="unique_code" label="Código único" /> */}
           <TextInput label="Data de matrícula" name="enroll_date" mask="date" />
           <Select
             name="origin"

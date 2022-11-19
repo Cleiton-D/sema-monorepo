@@ -10,6 +10,7 @@ import Heading from 'components/Heading';
 import Button from 'components/Button';
 import SearchEnrolls from 'components/SearchEnrolls';
 import EnrollsTable from 'components/EnrollsTable';
+import Paginator from 'components/Paginator';
 
 import { useAccess } from 'hooks/AccessProvider';
 
@@ -17,14 +18,22 @@ import { EnrollFilters, useListEnrolls } from 'requests/queries/enrolls';
 
 import * as S from './styles';
 
+const INITIAL_FILTERS = {
+  page: 1,
+  size: 20
+};
 const Enrolls = () => {
-  const [filters, setFilters] = useState<EnrollFilters>({});
+  const [filters, setFilters] = useState<EnrollFilters>(INITIAL_FILTERS);
 
   const { enableAccess } = useAccess();
 
   const { query } = useRouter();
 
   const { data: session } = useSession();
+
+  const handleSearch = (searchData: EnrollFilters) => {
+    setFilters({ ...INITIAL_FILTERS, ...searchData });
+  };
 
   const schoolId = useMemo(() => {
     if (!query.school_id || query.school_id === 'me') {
@@ -36,8 +45,9 @@ const Enrolls = () => {
   const enrollsFilters = useMemo(() => {
     return {
       school_id: schoolId as string,
+      status: 'ACTIVE',
       ...filters
-    };
+    } as EnrollFilters;
   }, [schoolId, filters]);
 
   const { data: enrolls } = useListEnrolls(session, enrollsFilters);
@@ -46,8 +56,6 @@ const Enrolls = () => {
     () => enableAccess({ module: 'ENROLL', rule: 'WRITE' }),
     [enableAccess]
   );
-
-  console.log(enrolls);
 
   return (
     <Base>
@@ -67,13 +75,26 @@ const Enrolls = () => {
         </S.AddButtonContainer>
       )}
 
-      <SearchEnrolls handleSearch={setFilters} />
+      <SearchEnrolls handleSearch={handleSearch} />
 
       <S.TableSection>
         <S.SectionTitle>
           <h4>Matrículas</h4>
         </S.SectionTitle>
-        <EnrollsTable enrolls={enrolls} showActions />
+        <EnrollsTable enrolls={enrolls?.items || []} showActions />
+        <S.PaginatorContainer>
+          <Paginator
+            total={enrolls?.total || 0}
+            currentPage={enrolls?.page || 1}
+            currentSize={enrolls?.size || 20}
+            onChangeSize={(size: number) =>
+              setFilters((current) => ({ ...current, size }))
+            }
+            onChangePage={(page: number) =>
+              setFilters((current) => ({ ...current, page }))
+            }
+          />
+        </S.PaginatorContainer>
       </S.TableSection>
     </Base>
   );

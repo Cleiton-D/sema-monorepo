@@ -32,6 +32,10 @@ const municipalSecretary = [
     name: 'Matrículas'
   },
   {
+    path: '/auth/calendar',
+    name: 'Calendário Escolar'
+  },
+  {
     path: '/auth/reports/ata',
     name: 'Ata'
   },
@@ -46,6 +50,10 @@ const municipalSecretary = [
   {
     path: '/auth/reports/total-attendances',
     name: 'Total geral de faltas'
+  },
+  {
+    path: '/auth/class-reports',
+    name: 'Relatório de aulas'
   }
 ];
 
@@ -57,6 +65,22 @@ const teacher = [
   {
     path: '/auth/classes',
     name: 'Aulas registradas'
+  },
+  {
+    path: '/auth/school-reports/by-classroom',
+    name: 'Notas'
+  },
+  {
+    path: '/auth/class-reports',
+    name: 'Relatório de aulas'
+  },
+  {
+    path: '/auth/reports/total-attendances',
+    name: 'Total geral de faltas'
+  },
+  {
+    path: '/auth/calendar',
+    name: 'Calendário Escolar'
   }
 ];
 
@@ -72,6 +96,10 @@ const administrator = [
   {
     path: '/auth/users',
     name: 'Usuários'
+  },
+  {
+    path: '/auth/system/backgrounds',
+    name: 'Planos de fundo'
   },
   {
     path: '/auth/administration/employees',
@@ -98,6 +126,10 @@ const administrator = [
     name: 'Períodos e Horários'
   },
   {
+    path: '/auth/calendar',
+    name: 'Calendário Escolar'
+  },
+  {
     path: '/auth/reports/ata',
     name: 'Ata'
   },
@@ -112,6 +144,10 @@ const administrator = [
   {
     path: '/auth/reports/total-attendances',
     name: 'Total geral de faltas'
+  },
+  {
+    path: '/auth/class-reports',
+    name: 'Relatório de aulas'
   }
 ];
 
@@ -139,6 +175,26 @@ export const schoolAdministration = [
   {
     path: '/auth/school/me/timetables',
     name: 'Horários'
+  },
+  {
+    path: '/auth/reports/ata',
+    name: 'Ata'
+  },
+  {
+    path: '/auth/class-reports',
+    name: 'Relatório de aulas'
+  },
+  {
+    path: '/auth/final-reports',
+    name: 'Relatório Final'
+  },
+  {
+    path: '/auth/reports/total-attendances',
+    name: 'Total geral de faltas'
+  },
+  {
+    path: '/auth/calendar',
+    name: 'Calendário Escolar'
   }
 ];
 

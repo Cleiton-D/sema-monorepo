@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISchoolContactsRepository from '@modules/schools/repositories/ISchoolContactsRepository';
 import FindSchoolContactDTO from '@modules/schools/dtos/FindSchoolContactDTO';
@@ -9,14 +11,14 @@ class SchoolContactsRepository implements ISchoolContactsRepository {
   private ormRepository: Repository<SchoolContact>;
 
   constructor() {
-    this.ormRepository = getRepository(SchoolContact);
+    this.ormRepository = dataSource.getRepository(SchoolContact);
   }
 
   public async findAll({
     contact_id,
     school_id,
   }: FindSchoolContactDTO): Promise<SchoolContact[]> {
-    const where: FindConditions<SchoolContact> = {};
+    const where: FindOptionsWhere<SchoolContact> = {};
     if (contact_id) where.contact_id = contact_id;
     if (school_id) where.school_id = school_id;
 

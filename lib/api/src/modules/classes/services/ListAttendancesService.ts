@@ -4,7 +4,7 @@ import Attendance from '../infra/typeorm/entities/Attendance';
 import IAttendancesRepository from '../repositories/IAttendancesRepository';
 
 type ListAttendancesRequest = {
-  class_id?: string | 'all';
+  class_id?: string | string[] | 'all';
   classroom_id?: string;
   enroll_id?: string;
 };

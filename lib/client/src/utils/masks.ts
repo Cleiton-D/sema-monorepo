@@ -1,5 +1,7 @@
 export const masks = {
-  time: (value: string) => {
+  time: (value?: string) => {
+    if (!value) return value;
+
     const newValue = value.replace(/\D/g, '');
 
     if (newValue.length <= 2) return newValue;
@@ -19,13 +21,25 @@ export const masks = {
 
     return newValue;
   },
-  'school-report': (value: string) => {
+  'school-report-field': (value: string) => {
     const newValue = value
       .replace(/\D/g, '')
       .replace(/(^10)(0)/, '$1.$2')
       .replace(/(^10\.0)([1-9])/, '$1')
-      .replace(/(^(?!^10)0?[0-9])([0-9])/, '$1.$2')
-      .replace(/(^10|[0-9]\.[0-9]{2})\d+?$/, '$1');
+      .replace(/(^(?!^10)[0-9])([0-9])/, '$1.$2')
+      .replace(/(^10|[0-9]\.[0-9])(\d+?$)/, '$1');
+
+    return newValue;
+  },
+  'school-report': (value: string) => {
+    const normalizedValue = value.padStart(3, '0');
+
+    const newValue = normalizedValue
+      .replace(/\D/g, '')
+      .replace(/(^10)(0)/, '$1.$2')
+      .replace(/(^10\.0)([1-9])/, '$1')
+      .replace(/(^(?!^10)[0-9])([0-9])/, '$1.$2')
+      .replace(/(^10|[0-9]\.[0-9])(\d+?$)/, '$1');
 
     return newValue;
   }

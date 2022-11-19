@@ -14,6 +14,8 @@ type FindEnrollDTO = {
   student_nis?: string;
   student_birth_certificate?: string;
   order?: string[];
+  page?: number;
+  size?: number;
 };
 
 export default FindEnrollDTO;

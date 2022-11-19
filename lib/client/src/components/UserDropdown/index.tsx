@@ -11,8 +11,8 @@ type UserDropdownProps = {
 const UserDropdown = ({ username, image }: UserDropdownProps) => {
   const [show, setShow] = useState(false);
 
-  const handleSignout = () => {
-    signOut();
+  const handleSignout = async () => {
+    await signOut();
   };
 
   const toggleDropdown = () => {

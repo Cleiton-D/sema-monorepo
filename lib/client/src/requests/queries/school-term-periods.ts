@@ -9,6 +9,7 @@ import { schoolTermPeriodMapper } from 'utils/mappers/schoolTermPeriodMapper';
 
 type ListSchoolTermPeriodsFilters = {
   school_year_id?: string;
+  status?: TermPeriodStatus | TermPeriodStatus[];
 };
 
 export const listSchoolTermPeriods = (
@@ -35,7 +36,9 @@ export const useListSchoolTermPeriods = (
 };
 
 type ShowSchoolTermPeriodFilters = {
+  id?: string;
   school_year_id?: string;
+  contain_date?: string | Date;
   status?: TermPeriodStatus;
 };
 export const showSchoolTermPeriod = (

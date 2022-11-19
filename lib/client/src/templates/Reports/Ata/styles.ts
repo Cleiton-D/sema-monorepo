@@ -20,3 +20,7 @@ export const SectionTitle = styled.div`
     padding-top: 1.5rem;
   `}
 `;
+
+export const PaginatorContainer = styled.div`
+  padding: 2rem 3rem;
+`;

@@ -1,30 +1,37 @@
-import { getRepository, Raw, Repository } from 'typeorm';
+import { FindOptionsWhere, Raw, Repository, In } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISchoolYearsRepository from '@modules/education_core/repositories/ISchoolYearsRepository';
 import FindSchollYearByPeriodDTO from '@modules/education_core/dtos/FindSchollYearByPeriodDTO';
 
 import CreateSchoolYearDTO from '@modules/education_core/dtos/CreateSchoolYearDTO';
+import FindSchoolYearsDTO from '@modules/education_core/dtos/FindSchoolYearsDTO';
 import SchoolYear from '../entities/SchoolYear';
 
 class SchoolYearsRepository implements ISchoolYearsRepository {
   private ormRepository: Repository<SchoolYear>;
 
   constructor() {
-    this.ormRepository = getRepository(SchoolYear);
+    this.ormRepository = dataSource.getRepository(SchoolYear);
   }
 
   public async findById(
     school_year_id: string,
   ): Promise<SchoolYear | undefined> {
-    const school_year = await this.ormRepository.findOne(school_year_id);
-    return school_year;
+    const school_year = await this.ormRepository.findOne({
+      where: { id: school_year_id },
+    });
+    return school_year ?? undefined;
   }
 
   public async findByReferenceYear(
     reference_year: string,
   ): Promise<SchoolYear | undefined> {
-    const schoolYear = await this.ormRepository.findOne({ reference_year });
-    return schoolYear;
+    const schoolYear = await this.ormRepository.findOne({
+      where: { reference_year },
+    });
+    return schoolYear ?? undefined;
   }
 
   public async findByPeriod({
@@ -80,15 +87,18 @@ class SchoolYearsRepository implements ISchoolYearsRepository {
       ],
     });
 
-    return schoolYear;
+    return schoolYear ?? undefined;
   }
 
   public async findLast(): Promise<SchoolYear | undefined> {
-    const schoolYear = await this.ormRepository.findOne({
-      order: { created_at: 'DESC' },
-    });
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('school_year')
+      .select()
+      .orderBy({ created_at: 'DESC' });
 
-    return schoolYear;
+    const schoolYear = await queryBuilder.getOne();
+
+    return schoolYear ?? undefined;
   }
 
   public async getCurrent(): Promise<SchoolYear | undefined> {
@@ -98,7 +108,24 @@ class SchoolYearsRepository implements ISchoolYearsRepository {
       },
     });
 
-    return schoolYear;
+    return schoolYear ?? undefined;
+  }
+
+  public async findAll({ status }: FindSchoolYearsDTO): Promise<SchoolYear[]> {
+    const where: FindOptionsWhere<SchoolYear> = {};
+
+    if (status) {
+      if (Array.isArray(status)) {
+        where.status = In(status);
+      } else {
+        where.status = status;
+      }
+    }
+
+    const schoolYears = await this.ormRepository.find({
+      where,
+    });
+    return schoolYears;
   }
 
   public async create({
@@ -119,6 +146,11 @@ class SchoolYearsRepository implements ISchoolYearsRepository {
   public async update(schoolYear: SchoolYear): Promise<SchoolYear> {
     await this.ormRepository.save(schoolYear);
     return schoolYear;
+  }
+
+  public async updateMany(schoolYears: SchoolYear[]): Promise<SchoolYear[]> {
+    await this.ormRepository.save(schoolYears);
+    return schoolYears;
   }
 }
 

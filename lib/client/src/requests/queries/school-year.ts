@@ -53,7 +53,32 @@ export const useSchoolYearWithSchoolTerms = (
   session?: Session | null,
   filters: GetSchoolYearFilters = {}
 ) => {
-  return useQuery(['show-school-year'], () =>
+  return useQuery(['show-school-year-detail'], () =>
     getSchoolYearWithSchoolTerms(session, filters)
+  );
+};
+
+export const showSchoolYear = async (
+  session?: Session | null,
+  filters: GetSchoolYearFilters = {}
+) => {
+  const api = initializeApi(session);
+
+  const { id, ...params } = filters;
+
+  return api
+    .get<SchoolYear>(`/education/admin/school-years/${id || 'current'}`, {
+      params
+    })
+    .then((response) => response.data)
+    .catch(() => undefined);
+};
+
+export const useShowSchoolYear = (
+  session?: Session | null,
+  filters: GetSchoolYearFilters = {}
+) => {
+  return useQuery(['show-school-year', JSON.stringify(filters)], () =>
+    showSchoolYear(session, filters)
   );
 };

@@ -1,4 +1,6 @@
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IPersonDocumentsRepository from '@modules/persons/repositories/IPersonDocumentsRepository';
 import CreatePersonDocumentDTO from '@modules/persons/dtos/CreatePersonDocumentDTO';
@@ -9,7 +11,7 @@ class PersonDocumentsRepository implements IPersonDocumentsRepository {
   private ormRepository: Repository<PersonDocument>;
 
   constructor() {
-    this.ormRepository = getRepository(PersonDocument);
+    this.ormRepository = dataSource.getRepository(PersonDocument);
   }
 
   public async create({

@@ -63,7 +63,8 @@ const SchoolYear = () => {
 
     await updateSchoolTermPeriod.mutateAsync({
       id: item.id,
-      status: newStatus
+      status: newStatus,
+      manually_changed: true
     });
     refetch();
   };

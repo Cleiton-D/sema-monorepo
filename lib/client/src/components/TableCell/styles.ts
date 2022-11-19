@@ -20,11 +20,26 @@ const wrapperModifiers = {
   `
 };
 
+const bordersModifiers = {
+  none: () => css``,
+  left: () => css`
+    border-right: 0.2rem left #97aeb1;
+  `,
+  right: () => css`
+    border-right: 0.2rem solid #97aeb1;
+  `,
+  all: () => css`
+    ${bordersModifiers.left};
+    ${bordersModifiers.right};
+  `
+};
+
 type WrapperProps = {
   position: number;
   fixed?: boolean;
   minimal: boolean;
   contentAlign?: 'left' | 'center' | 'right';
+  border?: 'all' | 'left' | 'right' | 'none';
   showingDetail?: boolean;
   ellipsis?: boolean;
 };
@@ -35,12 +50,12 @@ export const Wrapper = styled.td<WrapperProps>`
     position,
     minimal,
     contentAlign = 'left',
+    border = 'none',
     showingDetail,
     ellipsis = false
   }) => css`
     font-size: ${theme.font.sizes.medium};
     color: ${theme.colors.silver};
-    padding: ${theme.spacings.xxsmall} 0;
     border-bottom: 0.1rem solid ${theme.colors.lightSilver};
     padding: ${theme.spacings.xsmall};
     background: ${theme.colors.white};
@@ -52,6 +67,7 @@ export const Wrapper = styled.td<WrapperProps>`
     ${!!fixed && columnFixedModifier(theme, position)}
     ${!!minimal && wrapperModifiers.minimal(theme)};
     ${!!showingDetail && wrapperModifiers.showingDetail(theme)}
+    ${!!border && bordersModifiers[border]}
   `}
 `;
 

@@ -8,17 +8,18 @@ import Heading from 'components/Heading';
 import TextInput from 'components/TextInput';
 import Button from 'components/Button';
 import Select from 'components/Select';
-import DatePicker from 'components/Datepicker';
+import SchoolDayDatepicker from 'components/SchoolDayDatepicker';
 
 import { DayOfWeek, DayOfWeekEnum } from 'models/DafOfWeek';
 import { Timetable } from 'models/Timetable';
 
 import { useListTimetables } from 'requests/queries/timetables';
-import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { useListClassPeriods } from 'requests/queries/class-periods';
 import { useShowSchoolTermPeriod } from 'requests/queries/school-term-periods';
 import { useCreateClass } from 'requests/mutations/classes';
+
+import { useListSchoolSubjects } from 'components/SearchClasses/hooks';
 
 import { masks } from 'utils/masks';
 import {
@@ -44,11 +45,12 @@ type TimesOptions = {
 
 const currentDay = new Date().getDay();
 const NewClass = () => {
+  const [saving, setSaving] = useState(false);
+
   const [dayOfWeek, setDayOfWeek] = useState<DayOfWeek | undefined>(
     DayOfWeekEnum[currentDay] as DayOfWeek
   );
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
-  const [selectedTime, setSelectedTime] = useState<Timetable>();
   const [selectedSchoolSubject, setSelectedSchoolSubject] = useState<string>();
   const [selectedClassroom, setSelectedClassroom] = useState<string>();
 
@@ -61,24 +63,30 @@ const NewClass = () => {
     day_of_week: dayOfWeek
   });
 
-  const { data: schoolSubjects, isLoading: loadingSchoolSubjects } =
-    useListSchoolsSubjects(session, {
-      grade_id: selectedTime?.classroom?.grade_id,
-      school_year_id: selectedTime?.classroom?.school_year_id
+  const { data: schoolSubjects, isLoading: isLoadingSchoolSubjects } =
+    useListSchoolSubjects(session, {
+      classroom_id: selectedClassroom,
+      school_id: session?.schoolId,
+      school_year_id: session?.configs.school_year_id
+      // grade_id: grade
     });
 
   const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms(
     session,
     {
-      school_id: session?.schoolId
+      school_id: session?.schoolId,
+      employee_id: session?.user.employeeId,
+      with_in_multigrades: false,
+      with_multigrades: true
     }
   );
 
   const { data: classPeriods, isLoading: loadingClassPeriods } =
-    useListClassPeriods(session);
+    useListClassPeriods(session, { school_id: session?.schoolId });
 
   const { data: schoolTermPeriod } = useShowSchoolTermPeriod(session, {
     school_year_id: session?.configs.school_year_id,
+    contain_date: selectedDay,
     status: 'ACTIVE'
   });
 
@@ -87,24 +95,25 @@ const NewClass = () => {
   const handleSubmit = async (values: FormData) => {
     const { timetable } = values;
 
-    if (!schoolTermPeriod) return;
-
+    setSaving(true);
     const requestData = {
       classroom_id: values.classroom,
       school_subject_id: values.school_subject,
       period: timetable,
       class_date: values.date,
-      taught_content: values.taught_content,
-      school_term: schoolTermPeriod.school_term
+      taught_content: values.taught_content
     };
 
-    const classEntity = await createClass.mutateAsync(requestData);
-    push(`/auth/classes/${classEntity.id}`);
+    createClass
+      .mutateAsync(requestData)
+      .then((classEntity) => {
+        push(`/auth/classes/${classEntity.id}`);
+      })
+      .finally(() => setSaving(false));
   };
 
   const handleChangeDate = (date?: Date) => {
     setSelectedDay(date);
-    setSelectedTime(undefined);
     setSelectedSchoolSubject(undefined);
     setSelectedClassroom(undefined);
 
@@ -125,8 +134,6 @@ const NewClass = () => {
 
       return label === value;
     });
-
-    setSelectedTime(selectedTimetable);
 
     if (selectedTimetable) {
       setSelectedSchoolSubject(selectedTimetable?.school_subject_id);
@@ -164,7 +171,7 @@ const NewClass = () => {
   }, [classPeriods, loadingClassPeriods]);
 
   const schoolSubjectsOptions = useMemo(() => {
-    if (loadingSchoolSubjects) return [{ label: 'Carregando...', value: '' }];
+    if (isLoadingSchoolSubjects) return [{ label: 'Carregando...', value: '' }];
 
     return schoolSubjects?.map((schoolSubject) => {
       return {
@@ -172,12 +179,14 @@ const NewClass = () => {
         value: schoolSubject.id
       };
     });
-  }, [loadingSchoolSubjects, schoolSubjects]);
+  }, [isLoadingSchoolSubjects, schoolSubjects]);
 
   const classroomsOptions = useMemo(() => {
     if (loadingClassrooms) return [{ label: 'Carregando...', value: '' }];
 
-    return classrooms?.map((classroom) => {
+    const classroomsItems = classrooms?.items || [];
+
+    return classroomsItems.map((classroom) => {
       return {
         label: classroom.description,
         value: classroom.id
@@ -195,11 +204,11 @@ const NewClass = () => {
         <S.Form onSubmit={handleSubmit}>
           <S.Grid>
             <S.GridItem>
-              <DatePicker
+              <SchoolDayDatepicker
                 name="date"
                 label="Data"
-                value={selectedDay}
-                onChangeDay={handleChangeDate}
+                selectedDay={selectedDay}
+                handleChangeDate={handleChangeDate}
               />
             </S.GridItem>
             <S.GridItem>
@@ -216,6 +225,7 @@ const NewClass = () => {
                 label="Turma"
                 options={classroomsOptions}
                 selectedOption={selectedClassroom}
+                onChange={setSelectedClassroom}
               />
             </S.GridItem>
             <S.GridItem>
@@ -237,8 +247,8 @@ const NewClass = () => {
             />
           </S.InputContent>
           <S.SaveButtonContainer>
-            <Button styleType="normal" size="medium">
-              Iniciar aula
+            <Button styleType="normal" size="medium" disabled={saving}>
+              {saving ? 'Salvando...' : 'Iniciar aula'}
             </Button>
           </S.SaveButtonContainer>
         </S.Form>

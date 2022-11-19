@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IMultigradesClassroomsRepository from '@modules/schools/repositories/IMultigradesClassroomsRepository';
 import FindMultigradeClassroomDTO from '@modules/schools/dtos/FindMultigradeClassroomDTO';
@@ -6,18 +8,19 @@ import CreateMultigradeClassroomDTO from '@modules/schools/dtos/CreateMultigrade
 import MultigradeClassroom from '../entities/MultigradeClassroom';
 
 class MultigradesClassroomsRepository
-  implements IMultigradesClassroomsRepository {
+  implements IMultigradesClassroomsRepository
+{
   private ormRepository: Repository<MultigradeClassroom>;
 
   constructor() {
-    this.ormRepository = getRepository(MultigradeClassroom);
+    this.ormRepository = dataSource.getRepository(MultigradeClassroom);
   }
 
   public async findOne({
     id,
     owner_id,
   }: FindMultigradeClassroomDTO): Promise<MultigradeClassroom | undefined> {
-    const where: FindConditions<MultigradeClassroom> = {};
+    const where: FindOptionsWhere<MultigradeClassroom> = {};
     if (id) where.id = id;
     if (owner_id) where.owner_id = owner_id;
 
@@ -25,7 +28,7 @@ class MultigradesClassroomsRepository
       where,
       relations: ['classroom', 'classroom.grade'],
     });
-    return multigradeClassrooms;
+    return multigradeClassrooms ?? undefined;
   }
 
   public async findAll({

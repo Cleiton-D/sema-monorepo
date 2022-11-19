@@ -1,11 +1,12 @@
 import {
-  FindConditions,
-  getRepository,
+  FindOptionsWhere,
   In,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
 } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ITimetablesRepository from '@modules/schools/repositories/ITimetablesRepository';
 import FindTimetableDTO from '@modules/schools/dtos/FindTimetableDTO';
@@ -21,7 +22,7 @@ class TimetablesRepository implements ITimetablesRepository {
   private ormRepository: Repository<Timetable>;
 
   constructor() {
-    this.ormRepository = getRepository(Timetable);
+    this.ormRepository = dataSource.getRepository(Timetable);
   }
 
   public async findOne({
@@ -33,7 +34,7 @@ class TimetablesRepository implements ITimetablesRepository {
     time_start,
     time_end,
   }: FindTimetableDTO): Promise<Timetable | undefined> {
-    const where: FindConditions<Timetable> = {};
+    const where: FindOptionsWhere<Timetable> = {};
 
     if (id) {
       if (Array.isArray(id)) {
@@ -49,18 +50,17 @@ class TimetablesRepository implements ITimetablesRepository {
     if (time_start) where.time_start = time_start;
     if (time_end) where.time_end = time_end;
 
-    const timetables = await this.ormRepository.findOne({
-      where,
-      relations: ['school_subject', 'employee'],
-      join: {
-        alias: 'timetable',
-        leftJoinAndSelect: {
-          classroom: 'timetable.classroom',
-        },
-      },
-    });
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('timetable')
+      .select()
+      .where(where)
+      .leftJoinAndSelect('timetable.classroom', 'classroom')
+      .leftJoinAndSelect('timetable.school_subject', 'school_subject')
+      .leftJoinAndSelect('timetable.employee', 'employee');
 
-    return timetables;
+    const timetable = await queryBuilder.getOne();
+
+    return timetable ?? undefined;
   }
 
   public async findAll(filters: FindTimetableDTO = {}): Promise<Timetable[]> {
@@ -75,7 +75,7 @@ class TimetablesRepository implements ITimetablesRepository {
       time_end,
     } = filters;
 
-    const where: FindConditions<Timetable> = {};
+    const where: FindOptionsWhere<Timetable> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) {
@@ -99,21 +99,20 @@ class TimetablesRepository implements ITimetablesRepository {
       });
     }
 
-    const timetables = await this.ormRepository.find({
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('timetable')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      relations: ['school_subject', 'employee'],
-      join: {
-        alias: 'timetable',
-        leftJoinAndSelect: {
-          classroom: 'timetable.classroom',
-        },
-      },
-    });
+      })
+      .leftJoinAndSelect('timetable.classroom', 'classroom')
+      .leftJoinAndSelect('timetable.school_subject', 'school_subject')
+      .leftJoinAndSelect('timetable.employee', 'employee');
+
+    const timetables = await queryBuilder.getMany();
 
     return timetables;
   }

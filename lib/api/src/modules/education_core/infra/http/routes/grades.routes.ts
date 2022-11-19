@@ -9,6 +9,7 @@ const gradesRouter = Router();
 const gradesController = new GradesController();
 
 gradesRouter.get('/count', gradesController.count);
+gradesRouter.get('/:grade_id', gradesController.show);
 gradesRouter.get('/', gradesController.index);
 gradesRouter.post('/', gradesController.create);
 gradesRouter.delete('/:grade_id', gradesController.delete);

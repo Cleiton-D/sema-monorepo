@@ -2,7 +2,7 @@ import { useRef, useState, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { PlusCircle, X } from '@styled-icons/feather';
 
-import Base from 'templates/Base';
+import Base, { BaseRef } from 'templates/Base';
 
 import Heading from 'components/Heading';
 import Button from 'components/Button';
@@ -22,6 +22,7 @@ const Grades = () => {
   const [selectedGrade, setSelectedGrade] = useState<Grade>();
 
   const modalRef = useRef<ModalRef>(null);
+  const baseRef = useRef<BaseRef>(null);
 
   const { enableAccess } = useAccess();
 
@@ -44,6 +45,7 @@ const Grades = () => {
     if (selectedGrade?.id === grade.id) {
       setSelectedGrade(undefined);
     } else {
+      baseRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       setSelectedGrade(grade);
     }
   };
@@ -54,7 +56,7 @@ const Grades = () => {
   );
 
   return (
-    <Base>
+    <Base ref={baseRef}>
       <Heading>Séries</Heading>
       <S.Content>
         <S.Wrapper>

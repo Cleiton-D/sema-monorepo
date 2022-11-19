@@ -9,24 +9,35 @@ export const queryKeys = {
   LIST_CLASS_PERIODS: 'get-class-periods'
 };
 
+type ClassPeriodsFilters = {
+  school_id?: string;
+};
+
 export const listClassPeriods = (
-  session?: Session | null
+  session?: Session | null,
+  filters: ClassPeriodsFilters = {}
 ): Promise<FormattedClassPeriod[]> => {
   const api = initializeApi(session);
 
   return api
-    .get<ClassPeriod[]>('/education/admin/class-periods')
+    .get<ClassPeriod[]>('/education/admin/class-periods', { params: filters })
     .then((response) => response.data.map(classPeriodsMapper));
 };
 
-export const fetchClassPeriods = (session?: Session | null) => {
+export const fetchClassPeriods = (
+  session?: Session | null,
+  filters: ClassPeriodsFilters = {}
+) => {
   return queryClient.fetchQuery(queryKeys.LIST_CLASS_PERIODS, () =>
-    listClassPeriods(session)
+    listClassPeriods(session, filters)
   );
 };
 
-export const useListClassPeriods = (session?: Session | null) => {
+export const useListClassPeriods = (
+  session?: Session | null,
+  filters: ClassPeriodsFilters = {}
+) => {
   return useQuery(queryKeys.LIST_CLASS_PERIODS, () =>
-    listClassPeriods(session)
+    listClassPeriods(session, filters)
   );
 };

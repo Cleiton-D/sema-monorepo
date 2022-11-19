@@ -16,6 +16,7 @@ type CreateClassroomForm = {
   school_id?: string;
   enroll_count: number;
   is_multigrade?: boolean;
+  is_multidisciplinary?: boolean;
   grade: {
     description: string;
   };

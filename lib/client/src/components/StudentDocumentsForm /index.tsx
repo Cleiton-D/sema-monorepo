@@ -70,6 +70,7 @@ const StudentDocumentsForm: React.ForwardRefRenderFunction<
         <TextInput label="CPF" name="cpf" />
         <TextInput label="RG" name="rg" />
         <TextInput label="NIS" name="nis" />
+        <TextInput name="unique_code" label="Código único" />
         <TextInput label="Cert. Nascimento" name="birth_certificate" />
       </S.Form>
     </S.Wrapper>

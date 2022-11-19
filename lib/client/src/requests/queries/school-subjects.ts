@@ -1,5 +1,5 @@
 import { Session } from 'next-auth';
-import { useQuery } from 'react-query';
+import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { SchoolSubject } from 'models/SchoolSubject';
 
@@ -8,6 +8,8 @@ import { initializeApi } from 'services/api';
 type ListSchoolSubjectsFilters = {
   grade_id?: string | 'all';
   school_year_id?: string;
+  include_multidisciplinary?: boolean;
+  is_multidisciplinary?: boolean;
 };
 
 export const listSchoolSubjects = (
@@ -16,20 +18,37 @@ export const listSchoolSubjects = (
 ) => {
   const api = initializeApi(session);
 
+  const { include_multidisciplinary, is_multidisciplinary, ...restParams } =
+    filters;
+  const params = { ...restParams } as any;
+
+  if (typeof include_multidisciplinary !== 'undefined') {
+    params.include_multidisciplinary = Number(include_multidisciplinary);
+  }
+
+  if (typeof is_multidisciplinary !== 'undefined') {
+    params.is_multidisciplinary = Number(is_multidisciplinary);
+  }
+
   return api
     .get<SchoolSubject[]>('/education/admin/school-subjects', {
-      params: filters
+      params
     })
     .then((response) => response.data);
 };
 
 export const useListSchoolsSubjects = (
   session?: Session | null,
-  filters: ListSchoolSubjectsFilters = {}
+  filters: ListSchoolSubjectsFilters = {},
+  queryOptions: QueryObserverOptions<SchoolSubject[]> = {}
 ) => {
   const key = `get-school-subjects-${JSON.stringify(filters)}`;
 
-  const result = useQuery(key, () => listSchoolSubjects(session, filters));
+  const result = useQuery<SchoolSubject[]>(
+    key,
+    () => listSchoolSubjects(session, filters),
+    queryOptions
+  );
 
   return { ...result, key };
 };

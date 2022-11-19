@@ -58,7 +58,7 @@ export const ListItem = styled(Li)<ListItemProps>`
     ${
       selected &&
       css`
-        z-index: ${theme.layers.modal};
+        z-index: ${theme.layers.card};
         position: relative;
         transform: translateX(0.5rem);
         background: ${theme.colors.white};
@@ -69,7 +69,7 @@ export const ListItem = styled(Li)<ListItemProps>`
 
 export const GradeSchoolSubjectsCardContainer = styled.div`
   ${({ theme }) => css`
-    z-index: ${theme.layers.modal};
+    z-index: ${theme.layers.card};
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -87,7 +87,7 @@ export const Overlay = styled.div<OverlayProps>`
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.2);
-    z-index: ${theme.layers.overlay};
+    z-index: ${theme.layers.cardOverlay};
     visibility: hidden;
     opacity: 0;
     transition: all 0.3s ease-out;

@@ -13,7 +13,7 @@ export function useAddAccessLevelMutation(
   session?: Session | null
 ) {
   const addAccessLevel = useCallback(
-    async (values) => {
+    async (values: any) => {
       const api = initializeApi(session);
       return api.post('/app/access-levels', values);
     },
@@ -44,7 +44,7 @@ export function useAddAccessLevelMutation(
 
 export function useDeleteAccessLevelMutation(session?: Session | null) {
   const deleteAccessLevel = useCallback(
-    async (accessLevel) => {
+    async (accessLevel: AccessLevel) => {
       const api = initializeApi(session);
       return api.delete(`/app/access-levels/${accessLevel.id}`);
     },

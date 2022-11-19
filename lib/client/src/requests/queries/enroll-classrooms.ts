@@ -10,6 +10,7 @@ export type EnrollClassroomsFilters = {
   classroom_id?: string;
   enroll_id?: string;
   status?: string;
+  with_old_multigrades?: 0 | 1;
 };
 
 export const enrollClassroomsKeys = {
@@ -22,7 +23,7 @@ export const enrollClassroomsKeys = {
 export const listEnrollClassrooms = (
   session?: Session | null,
   filters: EnrollClassroomsFilters = {}
-) => {
+): Promise<EnrollClassroom[]> => {
   const api = initializeApi(session);
 
   return api

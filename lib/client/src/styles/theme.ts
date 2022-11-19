@@ -32,6 +32,7 @@ export default {
   colors: {
     primary: '#0393BE',
     secondary: '#0DBF87',
+    tertiary: '#00A4A6',
     mainBg: '#F8FAFA',
     white: '#ffffff',
     black: '#13110C',
@@ -54,8 +55,10 @@ export default {
   layers: {
     base: 10,
     menu: 20,
-    overlay: 30,
-    modal: 40,
-    alwaysOnTop: 50
+    cardOverlay: 30,
+    card: 40,
+    overlay: 50,
+    modal: 60,
+    alwaysOnTop: 70
   }
 } as const;

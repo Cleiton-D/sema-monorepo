@@ -54,6 +54,7 @@ declare module 'next-auth/jwt' {
     schoolId: string;
     branchId: string;
     branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';
+    sessionId?: string;
   }
 }
 declare module 'next-auth/react' {

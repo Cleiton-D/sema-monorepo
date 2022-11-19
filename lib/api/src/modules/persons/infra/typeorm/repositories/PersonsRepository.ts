@@ -1,4 +1,6 @@
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreatePersonDTO from '@modules/persons/dtos/CreatePersonDTO';
 import IPersonsRepository from '@modules/persons/repositories/IPersonsRepository';
@@ -9,22 +11,20 @@ export default class PersonsRepository implements IPersonsRepository {
   private ormRepository: Repository<Person>;
 
   constructor() {
-    this.ormRepository = getRepository(Person);
+    this.ormRepository = dataSource.getRepository(Person);
   }
 
   public async findById(person_id: string): Promise<Person | undefined> {
-    const person = await this.ormRepository.findOne({
-      where: { id: person_id },
-      relations: ['address'],
-      join: {
-        alias: 'person',
-        innerJoinAndSelect: {
-          person_contact: 'person.person_contacts',
-          contact: 'person_contact.contact',
-        },
-      },
-    });
-    return person;
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('person')
+      .select()
+      .where({ id: person_id })
+      .innerJoinAndSelect('person.person_contacts', 'person_contact')
+      .innerJoinAndSelect('person_contact.contact', 'contact')
+      .leftJoinAndSelect('person.address', 'address');
+
+    const person = await queryBuilder.getOne();
+    return person ?? undefined;
   }
 
   public async create({

@@ -16,7 +16,7 @@ const DescriptionInput = ({
   defaultValue,
   disabled
 }: DescriptionInputProps) => {
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState<string>();
   const [customEditing, setCustomEditing] = useState(false);
   const [locked, setLocked] = useState(true);
 

@@ -6,15 +6,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export type ClassPeriodType = 'MORNING' | 'EVENING' | 'NOCTURNAL';
-
 @Entity('class_periods')
 class ClassPeriod {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum' })
-  description: ClassPeriodType;
+  @Column()
+  description: string;
 
   @Column({ type: 'time' })
   time_start: string;

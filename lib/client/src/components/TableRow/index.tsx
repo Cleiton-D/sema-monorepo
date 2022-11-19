@@ -23,17 +23,18 @@ export type TableRowProps<T = Record<string, any>> = {
     | React.ReactElement<TableColumnProps & Partial<WithAccessOptions>>[];
   rowKey: string;
   className?: string;
+  lineIndex: number;
 };
 
 const TableRow = ({
   item,
   columns,
   rowKey,
-  className
+  className,
+  lineIndex
 }: TableRowProps): JSX.Element => {
-  const [internalContent, setInternalContent] = useState<
-    RenderChildrenFunction | React.ReactNode | null
-  >();
+  const [internalContent, setInternalContent] =
+    useState<React.ReactNode | null>();
 
   const childArray = useMemo(
     () => Children.map(columns, ({ props }) => props),
@@ -75,6 +76,7 @@ const TableRow = ({
             renderInternalContent={handleOpen}
             module={columnProps.module}
             rule={columnProps.rule}
+            lineIndex={lineIndex}
           />
         ))}
       </S.Wrapper>

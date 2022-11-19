@@ -1,13 +1,16 @@
-import { getRepository, MigrationInterface, Repository } from 'typeorm';
+import { MigrationInterface, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import Branch from '@modules/authorization/infra/typeorm/entities/Branch';
 
 export default class CreateMunicipalSecreataryBranch1624412176832
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   private repository: Repository<Branch>;
 
   constructor() {
-    this.repository = getRepository(Branch);
+    this.repository = dataSource.getRepository(Branch);
   }
 
   public async up(): Promise<void> {

@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth, { NextAuthOptions, Session } from 'next-auth';
 import { CredentialInput } from 'next-auth/providers';
 import { AxiosError, AxiosInstance } from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+import Cookies from 'cookies';
 
 import { Credentials, Refresh } from 'providers';
 
@@ -128,94 +130,116 @@ const signInProvider = Credentials<Record<string, CredentialInput>>({
   }
 });
 
-const options: NextAuthOptions = {
-  jwt: {
-    secret: process.env.JWT_SIGNING_PRIVATE_KEY
-  },
-  secret: 'Q0yLUJWJw+fsHG98mWLOZq/lxYMD8q1xDRxGJqROhTY=',
-  pages: {
-    signIn: '/sign-in'
-  },
-  providers: [signInProvider, refreshProvider],
-  callbacks: {
-    session: async (...args) => {
-      const { token, session } = args[0];
-      const api = initializeApi();
-
-      try {
-        await api.get('/sessions/validate', {
-          headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
-        });
-      } catch (err) {
-        const { response } = err as AxiosError;
-
-        if (response?.status === 401) {
+const createOptions = (
+  sessionId?: string
+): NextAuthOptions & { site?: string } => {
+  return {
+    site: process.env.NEXTAUTH_URL,
+    jwt: {
+      secret: process.env.JWT_SIGNING_PRIVATE_KEY
+    },
+    secret: 'Q0yLUJWJw+fsHG98mWLOZq/lxYMD8q1xDRxGJqROhTY=',
+    pages: {
+      signIn: '/sign-in'
+    },
+    providers: [signInProvider, refreshProvider],
+    callbacks: {
+      session: async (...args) => {
+        const { token, session } = args[0];
+        if (token.sessionId !== sessionId) {
           return Promise.resolve({} as Session);
         }
-      }
 
-      const sessionConfigs: Record<string, string | undefined> = {};
+        const api = initializeApi();
 
-      try {
-        const { data: schoolYear } = await api.get<SchoolYear>(
-          '/education/admin/school-years/current',
-          {
+        try {
+          await api.get('/sessions/validate', {
             headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
+          });
+        } catch (err) {
+          const { response } = err as AxiosError;
+
+          if (response?.status === 401) {
+            return Promise.resolve({} as Session);
           }
-        );
+        }
 
-        sessionConfigs.school_year_id = schoolYear?.id;
-      } catch {
-        sessionConfigs.school_year_id = undefined;
+        const sessionConfigs: Record<string, string | undefined> = {};
+
+        try {
+          const { data: schoolYear } = await api.get<SchoolYear>(
+            '/education/admin/school-years/current',
+            {
+              headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
+            }
+          );
+
+          sessionConfigs.school_year_id = schoolYear?.id;
+        } catch {
+          sessionConfigs.school_year_id = undefined;
+        }
+
+        const {
+          schoolId,
+          profileId,
+          accessLevel,
+          jwt,
+          branchId,
+          branchType,
+          ...rest
+        } = token;
+
+        session.jwt = jwt;
+        session.id = token.id;
+        session.user = {
+          ...rest
+        };
+        session.profileId = profileId;
+        session.accessLevel = accessLevel;
+        session.schoolId = schoolId;
+        session.branch = {
+          id: branchId,
+          type: branchType
+        };
+        session.configs = sessionConfigs;
+
+        return Promise.resolve(session);
+      },
+      jwt: async (args) => {
+        const { token, user } = args;
+        if (user) {
+          token.id = user.id;
+          token.changePassword = user.change_password;
+          token.email = user.login;
+          token.jwt = user.jwt;
+          token.profileId = user.profileId;
+          token.accessLevel = user.accessLevel;
+          token.schoolId = user.schoolId;
+          token.employeeId = user.employeeId;
+          token.branchId = user.branchId;
+          token.branchType = user.branchType;
+        }
+
+        if (!token.sessionId) {
+          token.sessionId = sessionId;
+        }
+
+        return Promise.resolve(token);
       }
-
-      const {
-        schoolId,
-        profileId,
-        accessLevel,
-        jwt,
-        branchId,
-        branchType,
-        ...rest
-      } = token;
-
-      session.jwt = jwt;
-      session.id = token.id;
-      session.user = {
-        ...rest
-      };
-      session.profileId = profileId;
-      session.accessLevel = accessLevel;
-      session.schoolId = schoolId;
-      session.branch = {
-        id: branchId,
-        type: branchType
-      };
-      session.configs = sessionConfigs;
-
-      return Promise.resolve(session);
-    },
-    jwt: async (args) => {
-      const { token, user } = args;
-      if (user) {
-        token.id = user.id;
-        token.changePassword = user.change_password;
-        token.email = user.login;
-        token.jwt = user.jwt;
-        token.profileId = user.profileId;
-        token.accessLevel = user.accessLevel;
-        token.schoolId = user.schoolId;
-        token.employeeId = user.employeeId;
-        token.branchId = user.branchId;
-        token.branchType = user.branchType;
-      }
-
-      return Promise.resolve(token);
     }
-  }
+  };
 };
 
-const Auth = (request: NextApiRequest, response: NextApiResponse) =>
-  NextAuth(request, response, options);
+const Auth = async (request: NextApiRequest, response: NextApiResponse) => {
+  const cookies = new Cookies(request, response);
+
+  let sessionId = cookies.get('next-auth.session-id');
+  if (!sessionId) {
+    sessionId = uuidv4();
+    cookies.set('next-auth.session-id', sessionId);
+  }
+
+  return NextAuth(request, response, createOptions(sessionId));
+};
 
 export default Auth;

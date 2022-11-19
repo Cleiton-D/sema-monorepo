@@ -32,7 +32,7 @@ export type TextInputProps = InputHtmlProps & {
   mask?: keyof typeof masks;
   error?: string;
   containerStyle?: CSSProperties;
-  onChangeValue?: (value: string) => void;
+  onChangeValue?: (value?: string) => void;
   onClickIcon?: () => void;
 };
 
@@ -58,7 +58,7 @@ const TextInput: React.ForwardRefRenderFunction<
   },
   ref
 ) => {
-  const [fieldValue, setFieldValue] = useState('');
+  const [fieldValue, setFieldValue] = useState<string>();
   const { registerField, fieldName, error, defaultValue } = useField(name);
 
   const fieldRef = useRef<HTMLInputElement>(null);
@@ -68,6 +68,10 @@ const TextInput: React.ForwardRefRenderFunction<
 
     const masked = mask ? masks[mask](value) : value;
     setFieldValue(masked);
+
+    if (fieldRef.current) {
+      fieldRef.current.value = masked || '';
+    }
 
     onChangeValue && onChangeValue(masked);
   };
@@ -109,7 +113,7 @@ const TextInput: React.ForwardRefRenderFunction<
 
   useEffect(() => {
     if (fieldRef.current) {
-      fieldRef.current.value = fieldValue;
+      fieldRef.current.value = fieldValue || '';
     }
   }, [fieldValue]);
 

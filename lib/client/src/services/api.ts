@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {
   MutationFunction,
   QueryClient,
@@ -12,7 +12,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
 // import { serverSignOut } from 'utils/serverSignOut';
 
-const isServer = typeof window === 'undefined';
+const isChrome =
+  typeof navigator !== 'undefined' &&
+  /Chrome/.test(navigator.userAgent) &&
+  /Google Inc/.test(navigator.vendor);
+
+const isServer = typeof window === 'undefined' || (isChrome && !window.chrome);
 
 const createApi = (session?: Session | null) => {
   const jwt = session?.jwt;
@@ -85,7 +90,7 @@ export type ProcessQueryDataFn = (oldData: any, newData: any) => any;
 type UseMutationOptions = {
   linkedQueries?: Record<string, ProcessQueryDataFn>;
   renderLoading?: (data: any) => ToastContent;
-  renderError?: (data: any) => ToastContent;
+  renderError?: (data: any, error: any) => ToastContent;
   renderSuccess?: (data: any) => ToastContent;
   onMutate?: () => void;
 };
@@ -136,7 +141,7 @@ export function useMutation(
       if (options.renderError) {
         const toastObj = {
           type: toast.TYPE.ERROR,
-          render: options.renderError(data),
+          render: options.renderError(data, err),
           autoClose: 3000
         };
 
@@ -146,7 +151,7 @@ export function useMutation(
             transition: Flip
           });
         } else {
-          toast(toastObj);
+          toast(toastObj as unknown as ToastContent);
         }
       } else if (ctx.toastKey) {
         toast.dismiss(ctx.toastKey);
@@ -170,7 +175,7 @@ export function useMutation(
             transition: Flip
           });
         } else {
-          toast(toastObj);
+          toast(toastObj as unknown as ToastContent);
         }
       } else if (context.toastKey) {
         toast.dismiss(context.toastKey);
@@ -194,3 +199,12 @@ export const queryClient = new QueryClient({
     }
   }
 });
+
+type ApiError = {
+  message: string;
+  status: 'error';
+};
+
+export const isApiError = (error: unknown): error is AxiosError<ApiError> => {
+  return axios.isAxiosError(error);
+};

@@ -56,9 +56,10 @@ const queryMutateAccessModule = (
 export function useMutateAccessModules(accessLevel?: AccessLevel) {
   const { data: session } = useSession();
 
-  const queryFilter = useMemo(() => ({ access_level_id: accessLevel?.id }), [
-    accessLevel
-  ]);
+  const queryFilter = useMemo(
+    () => ({ access_level_id: accessLevel?.id }),
+    [accessLevel]
+  );
 
   const mutateAcessModules = useCallback(
     async (values: MutateAcessModulesFormData) => {
@@ -85,9 +86,8 @@ export function useMutateAccessModules(accessLevel?: AccessLevel) {
 
   return useMutation('mutate-access-modules', mutateAcessModules, {
     linkedQueries: {
-      [`list-access-modules-${JSON.stringify(
-        queryFilter
-      )}`]: queryMutateAccessModule
+      [`list-access-modules-${JSON.stringify(queryFilter)}`]:
+        queryMutateAccessModule
     },
     renderLoading: function render() {
       return <ToastContent showSpinner>Salvando...</ToastContent>;

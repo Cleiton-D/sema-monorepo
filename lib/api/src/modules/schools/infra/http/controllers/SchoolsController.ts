@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import privateRoute from '@shared/decorators/privateRoute';
 
@@ -28,11 +28,11 @@ class SchoolsController {
 
       const school = await showSchool.execute({ branch_id });
 
-      return response.json(classToClass(school));
+      return response.json(instanceToInstance(school));
     }
 
     const school = await showSchool.execute({ school_id });
-    return response.json(classToClass(school));
+    return response.json(instanceToInstance(school));
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
@@ -70,7 +70,7 @@ class SchoolsController {
       employees,
     });
 
-    return response.json(classToClass(school));
+    return response.json(instanceToInstance(school));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {
@@ -101,7 +101,7 @@ class SchoolsController {
       contacts,
     });
 
-    return response.json(classToClass(school));
+    return response.json(instanceToInstance(school));
   }
 }
 export default SchoolsController;

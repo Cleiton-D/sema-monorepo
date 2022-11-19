@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import privateRoute from '@shared/decorators/privateRoute';
 
@@ -22,7 +22,7 @@ class EnrollsController {
     const showEnroll = container.resolve(ShowEnrollService);
     const enroll = await showEnroll.execute({ enroll_id });
 
-    return response.json(classToClass(enroll));
+    return response.json(instanceToInstance(enroll));
   }
 
   @privateRoute({ module: 'ENROLL' })
@@ -38,6 +38,8 @@ class EnrollsController {
       student_nis,
       student_birth_certificate,
       order,
+      page,
+      size,
     } = request.query;
 
     const filters: ListEnrollsRequest = {
@@ -50,6 +52,8 @@ class EnrollsController {
       student_birth_certificate: student_birth_certificate as string,
       status: status as EnrollStatus,
       order: order as string[],
+      page: page ? Number(page) : undefined,
+      size: size ? Number(size) : undefined,
     };
     if (school_id === 'me') {
       filters.branch_id = request.profile.branch_id;
@@ -60,7 +64,7 @@ class EnrollsController {
     const listEnrolls = container.resolve(ListEnrollsService);
     const enrolls = await listEnrolls.execute(filters);
 
-    return response.json(classToClass(enrolls));
+    return response.json(instanceToInstance(enrolls));
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
@@ -127,15 +131,16 @@ class EnrollsController {
   @privateRoute({ module: 'ENROLL' })
   public async update(request: Request, response: Response): Promise<Response> {
     const { enroll_id } = request.params;
-    const { status } = request.body;
+    const { status, transfer_date } = request.body;
 
     const updateEnroll = container.resolve(UpdateEnrollService);
     const updatedEnroll = await updateEnroll.execute({
       enroll_id,
+      transfer_date,
       status,
     });
 
-    return response.json(classToClass(updatedEnroll));
+    return response.json(instanceToInstance(updatedEnroll));
   }
 
   @privateRoute({ module: 'ENROLL' })
@@ -153,7 +158,7 @@ class EnrollsController {
       to,
     });
 
-    return response.json(classToClass(relocatedEnroll));
+    return response.json(instanceToInstance(relocatedEnroll));
   }
 }
 

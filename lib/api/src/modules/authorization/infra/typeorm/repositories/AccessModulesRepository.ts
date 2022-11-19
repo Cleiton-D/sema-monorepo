@@ -1,11 +1,12 @@
 import {
-  FindConditions,
-  getRepository,
+  FindOptionsWhere,
   In,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
 } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreateAccessModuleDTO from '@modules/authorization/dtos/CreateAccessModuleDTO';
 import IAccessModulesRepository from '@modules/authorization/repositories/IAccessModulesRepository';
@@ -22,7 +23,7 @@ class AccessModulesRepository implements IAccessModulesRepository {
   private ormRepository: Repository<AccessModule>;
 
   constructor() {
-    this.ormRepository = getRepository(AccessModule);
+    this.ormRepository = dataSource.getRepository(AccessModule);
   }
 
   private mountQuery({
@@ -33,7 +34,7 @@ class AccessModulesRepository implements IAccessModulesRepository {
     read,
     write,
   }: FindAccessModuleDTO) {
-    const where: FindConditions<AccessModule> = {};
+    const where: FindOptionsWhere<AccessModule> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
@@ -61,37 +62,38 @@ class AccessModulesRepository implements IAccessModulesRepository {
       });
     }
 
-    return {
-      join: {
-        alias: 'access_module',
-        innerJoinAndSelect: {
-          app_module: 'access_module.app_module',
-        },
-      },
-      where: (qb: WhereExpression) => {
-        qb.where(where);
+    return (qb: WhereExpressionBuilder) => {
+      qb.where(where);
 
-        andWhere.forEach(({ condition, parameters }) =>
-          qb.andWhere(condition, parameters),
-        );
-      },
+      andWhere.forEach(({ condition, parameters }) =>
+        qb.andWhere(condition, parameters),
+      );
     };
   }
 
   public async findOne(
     filters: FindAccessModuleDTO,
   ): Promise<AccessModule | undefined> {
-    const accessModule = await this.ormRepository.findOne(
-      this.mountQuery(filters),
-    );
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('access_module')
+      .select()
+      .where(this.mountQuery(filters))
+      .innerJoinAndSelect('access_module.app_module', 'app_module');
 
-    return accessModule;
+    const accessModule = await queryBuilder.getOne();
+
+    return accessModule ?? undefined;
   }
 
   public async findAll(filters: FindAccessModuleDTO): Promise<AccessModule[]> {
-    const accessModules = await this.ormRepository.find(
-      this.mountQuery(filters),
-    );
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('access_module')
+      .select()
+      .where(this.mountQuery(filters))
+      .innerJoinAndSelect('access_module.app_module', 'app_module')
+      .orderBy('app_module.description', 'ASC');
+
+    const accessModules = await queryBuilder.getMany();
     return accessModules;
   }
 

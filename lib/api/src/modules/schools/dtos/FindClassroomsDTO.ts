@@ -7,6 +7,8 @@ type FindClassroomsDTO = {
   employee_id?: string;
   with_in_multigrades?: boolean;
   with_multigrades?: boolean;
+  page?: number;
+  size?: number;
 };
 
 export default FindClassroomsDTO;

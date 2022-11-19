@@ -69,6 +69,17 @@ const SchoolAdministrationDashboard = () => {
 
         <Card description="Aulas registradas" link="/auth/classes" />
         <Card description="Horários" link="/auth/school/me/timetables" />
+
+        <Card description="Ata" link="/auth/reports/ata" />
+        <Card description="Relatório de aulas" link={`/auth/class-reports`} />
+        <Card description="Relatório Final" link={`/auth/final-reports`} />
+
+        <Card
+          description="Calendário Escolar"
+          link={`/auth/calendar`}
+          module="CALENDAR"
+          rule="READ"
+        />
       </S.Wrapper>
     </Base>
   );

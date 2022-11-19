@@ -23,11 +23,11 @@ const ClassroomStudentNominalRelation = ({
   const mappedEnrolls = useMemo(() => {
     if (!enrolls) return [];
 
-    return enrolls.map(enrollMapper);
+    return enrolls.items.map(enrollMapper);
   }, [enrolls]);
 
   return (
-    <Table items={mappedEnrolls} keyExtractor={(value) => value.id}>
+    <Table items={mappedEnrolls} keyExtractor={(value) => value.id} minimal>
       <TableColumn label="Nome do aluno" tableKey="student.name" />
       <TableColumn label="Sexo" tableKey="formattedGender" />
       <TableColumn label="Nascimento" tableKey="formattedBirthDate" />

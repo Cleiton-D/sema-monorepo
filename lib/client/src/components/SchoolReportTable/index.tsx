@@ -7,7 +7,9 @@ import TableColumn from 'components/TableColumn';
 import { MappedSchoolReportSubject } from 'models/SchoolReport';
 
 import { useListSchoolReports } from 'requests/queries/school-reports';
-import { useListAttendances } from 'requests/queries/attendances';
+import { useCountAttendances } from 'requests/queries/attendances';
+import { useGetEnrollDetails } from 'requests/queries/enrolls';
+import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 
 import { schoolReportsSubjectsMapper } from 'utils/mappers/schoolReportsMapper';
 import { masks } from 'utils/masks';
@@ -24,20 +26,38 @@ const SchoolReportTable = ({
   isMininal = false
 }: SchoolReportTableProps) => {
   const { data: session } = useSession();
+
+  const { data: enroll } = useGetEnrollDetails(enrollId, session);
   const { data: schoolReports = [] } = useListSchoolReports(session, {
     enroll_id: enrollId
   });
-  const { data: attendances } = useListAttendances(session, {
+
+  const { data: attendances } = useCountAttendances(session, {
     class_id: 'all',
-    enroll_id: enrollId
+    enroll_id: enrollId,
+    split_by_school_term: true,
+    split_by_school_subject: true
   });
+
+  const { data: schoolSubjects = [] } = useListSchoolsSubjects(
+    session,
+    {
+      grade_id: enroll?.grade_id,
+      include_multidisciplinary: true
+    },
+    { enabled: !!enroll?.grade_id }
+  );
 
   const mappedSchoolReports = useMemo(
     () =>
       schoolReports
-        ? schoolReportsSubjectsMapper(schoolReports, attendances)
+        ? schoolReportsSubjectsMapper(
+            schoolReports,
+            attendances,
+            schoolSubjects
+          )
         : [],
-    [schoolReports, attendances]
+    [schoolReports, attendances, schoolSubjects]
   );
 
   return (
@@ -50,7 +70,7 @@ const SchoolReportTable = ({
         <TableColumn label="Disciplina" tableKey="school_subject" />
         <TableColumn
           label="Notas 1° Bi."
-          tableKey="first"
+          tableKey="FIRST"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value}`) || '-'}
         />
@@ -62,7 +82,7 @@ const SchoolReportTable = ({
         />
         <TableColumn
           label="Notas 2° Bi."
-          tableKey="second"
+          tableKey="SECOND"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value} `) || '-'}
         />
@@ -74,13 +94,13 @@ const SchoolReportTable = ({
         />
         <TableColumn
           label="Nota Rec 1° Sem."
-          tableKey="first_rec"
+          tableKey="FIRST-REC"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value} `) || '-'}
         />
         <TableColumn
           label="Notas 3° Bi."
-          tableKey="third"
+          tableKey="THIRD"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value}`) || '-'}
         />
@@ -92,7 +112,7 @@ const SchoolReportTable = ({
         />
         <TableColumn
           label="Notas 4° Bi."
-          tableKey="fourth"
+          tableKey="FOURTH"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value}`) || '-'}
         />
@@ -104,13 +124,25 @@ const SchoolReportTable = ({
         />
         <TableColumn
           label="Nota Rec 2° Sem."
-          tableKey="second_rec"
+          tableKey="SECOND-REC"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value} `) || '-'}
         />
         <TableColumn
           label="Nota Exame"
-          tableKey="exam"
+          tableKey="EXAM"
+          contentAlign="center"
+          render={(value) => masks['school-report'](`${value} `) || '-'}
+        />
+        <TableColumn
+          label="Média Final"
+          tableKey="finalAverage"
+          contentAlign="center"
+          render={(value) => masks['school-report'](`${value} `) || '-'}
+        />
+        <TableColumn
+          label="Média Anual"
+          tableKey="annualAverage"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value} `) || '-'}
         />

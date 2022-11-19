@@ -4,7 +4,6 @@ import { Session } from 'next-auth';
 import TeacherSchoolSubjects from 'templates/TeacherSchoolSubjects';
 
 import { getSchool, schoolKeys } from 'requests/queries/schools';
-import { listClassrooms } from 'requests/queries/classrooms';
 
 import protectedRoutes from 'utils/protected-routes';
 import prefetchQuery from 'utils/prefetch-query';
@@ -16,15 +15,7 @@ function TeacherSchoolSubjectsPage() {
 const getData = async (session: Session | null, id: string) => {
   const school = await getSchool(session, { id });
 
-  const filters = {
-    school_id: school.id
-  };
-
   return prefetchQuery([
-    {
-      key: `list-classrooms-${JSON.stringify(filters)}`,
-      fetcher: () => listClassrooms(session, filters)
-    },
     {
       key: schoolKeys.show(JSON.stringify({ id: id })),
       fetcher: () => school

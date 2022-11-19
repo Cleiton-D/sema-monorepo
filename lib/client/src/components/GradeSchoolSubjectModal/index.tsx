@@ -1,4 +1,10 @@
-import { useRef, forwardRef, useImperativeHandle, useState } from 'react';
+import {
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useMemo
+} from 'react';
 import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -16,7 +22,10 @@ import {
 
 import { GradeSchoolSubject } from 'models/GradeSchoolSubject';
 
-import { gradeSchoolSubjectSchema } from './rules/schema';
+import { getGradeSchoolSubjectSchema } from './rules/schema';
+
+import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
+import { useShowGrade } from 'requests/queries/grades';
 
 import * as S from './styles';
 
@@ -38,17 +47,22 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
   GradeSchoolSubjectModalRef,
   GradeSchoolSubjectModalProps
 > = ({ gradeId, refetchFn }, ref) => {
-  const [
-    gradeSchoolSubject,
-    setGradeSchoolSubject
-  ] = useState<GradeSchoolSubject>();
+  const [gradeSchoolSubject, setGradeSchoolSubject] =
+    useState<GradeSchoolSubject>();
   const [saving, setSaving] = useState(false);
 
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
   const { data: session } = useSession();
+
   const { data: schoolSubjects, isLoading } = useListSchoolsSubjects(session);
+
+  const { data: grade } = useShowGrade(session, gradeId);
+  const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(session, {
+    grade_id: gradeId,
+    include_multidisciplinary: true
+  });
 
   const mutation = useMutateGradeSchoolSubject(modalRef);
   const updateMutation = useUpdateGradeSchoolSubject(modalRef);
@@ -70,6 +84,9 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
     try {
       formRef.current?.setErrors({});
 
+      const gradeSchoolSubjectSchema = getGradeSchoolSubjectSchema(
+        !!grade?.is_multidisciplinary
+      );
       await gradeSchoolSubjectSchema.validate(values, { abortEarly: false });
 
       const { school_subject_id, workload } = values;
@@ -114,13 +131,24 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
     setSaving(false);
   };
 
-  const selectOptions =
-    !schoolSubjects && isLoading
-      ? [{ value: '', label: 'Carregando...' }]
-      : schoolSubjects?.map(({ id, description }) => ({
-          value: id,
-          label: description
-        }));
+  const selectOptions = useMemo(() => {
+    if (!schoolSubjects && isLoading)
+      return [{ value: '', label: 'Carregando...' }];
+
+    return schoolSubjects
+      ?.filter(({ id }) => {
+        if (gradeSchoolSubject?.school_subject_id === id) return true;
+
+        const exists = gradeSchoolSubjects?.find(
+          ({ school_subject_id }) => id === school_subject_id
+        );
+        return !exists;
+      })
+      .map(({ id, description }) => ({
+        value: id,
+        label: description
+      }));
+  }, [gradeSchoolSubjects, isLoading, schoolSubjects, gradeSchoolSubject]);
 
   return (
     <Modal
@@ -140,7 +168,12 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
             options={selectOptions}
             disabled={!!gradeSchoolSubject}
           />
-          <TextInput name="workload" label="Carga horária" type="number" />
+
+          {(!grade?.is_multidisciplinary ||
+            gradeSchoolSubject?.school_subject?.is_multidisciplinary) && (
+            <TextInput name="workload" label="Carga horária" type="number" />
+          )}
+
           <S.ButtonsContainer>
             <Button
               styleType="outlined"

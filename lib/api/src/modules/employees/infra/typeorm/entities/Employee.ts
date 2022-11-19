@@ -90,6 +90,8 @@ class Employee {
 
   @Expose({ name: 'contacts' })
   getContacts(): Contact[] {
+    if (!this.employee_contacts?.length) return [];
+
     return this.employee_contacts.map(
       employee_contact => employee_contact.contact,
     );

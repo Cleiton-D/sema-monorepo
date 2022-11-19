@@ -45,23 +45,19 @@ const SelectTeacherClassroomModal: React.ForwardRefRenderFunction<
   SelectTeacherClassroomModalRef,
   SelectTeacherClassroomModalProps
 > = ({ onSubmit }, ref) => {
-  const [
-    selectedClassroom,
-    setSelectedClassroom
-  ] = useState<SelectOptionValue>();
+  const [selectedClassroom, setSelectedClassroom] =
+    useState<SelectOptionValue>();
 
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
   const { data: session } = useSession();
-  const {
-    data: classroomTeacherSchoolSubjects,
-    isLoading
-  } = useListClassroomTeacherSchoolSubjects(session, {
-    classroom_id: 'all',
-    school_id: session?.schoolId,
-    employee_id: session?.user.employeeId
-  });
+  const { data: classroomTeacherSchoolSubjects, isLoading } =
+    useListClassroomTeacherSchoolSubjects(session, {
+      classroom_id: 'all',
+      school_id: session?.schoolId,
+      employee_id: session?.user.employeeId
+    });
 
   const classroomOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
@@ -74,10 +70,15 @@ const SelectTeacherClassroomModal: React.ForwardRefRenderFunction<
         const currentValue = (currentItem.value || {}) as SelectOptionValue;
         const currentSchoolSubjects = currentValue.school_subjects || [];
 
-        const newSchoolSubjects = [
-          ...currentSchoolSubjects,
-          { label: school_subject.description, value: school_subject.id }
-        ];
+        let newOption = {};
+        if (school_subject) {
+          newOption = {
+            label: school_subject?.description || '',
+            value: school_subject.id
+          };
+        }
+
+        const newSchoolSubjects = [...currentSchoolSubjects, newOption];
         return {
           ...acc,
           [classroom_id]: {

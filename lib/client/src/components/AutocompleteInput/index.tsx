@@ -201,9 +201,9 @@ function AutocompleteField<T>({
   );
 
   const handleInputChange = useCallback(
-    (value: string) => {
-      setInputValue(value);
-      debouncedHandleSearch(value);
+    (value?: string) => {
+      setInputValue(value || '');
+      debouncedHandleSearch(value || '');
     },
     [debouncedHandleSearch]
   );

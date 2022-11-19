@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import ListMultigradesService, {
   ListMultigradesRequest,
@@ -26,7 +26,7 @@ class MultigradesController {
     const listMultigrades = container.resolve(ListMultigradesService);
 
     const multigrades = await listMultigrades.execute(listMultigradesRequest);
-    return response.json(classToClass(multigrades));
+    return response.json(instanceToInstance(multigrades));
   }
 
   @privateRoute({ module: 'CLASSROOM' })
@@ -36,7 +36,7 @@ class MultigradesController {
     const showMultigrade = container.resolve(ShowMultigradeService);
 
     const multigrade = await showMultigrade.execute({ multigrade_id });
-    return response.json(classToClass(multigrade));
+    return response.json(instanceToInstance(multigrade));
   }
 }
 

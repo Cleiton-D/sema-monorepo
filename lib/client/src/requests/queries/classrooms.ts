@@ -1,10 +1,20 @@
+import { useMemo } from 'react';
 import { Session } from 'next-auth';
 import { useQuery, QueryObserverOptions } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Classroom } from 'models/Classroom';
+import { PaginatedHttpResponse } from 'models/app';
 
 import { initializeApi } from 'services/api';
+
+export const classroomsKeys = {
+  all: 'classrooms' as const,
+  lists: () => [...classroomsKeys.all, 'list'] as const,
+  list: (filters: string) => [...classroomsKeys.lists(), { filters }] as const,
+  shows: () => [...classroomsKeys.all, 'show'] as const,
+  show: (filters: string) => [...classroomsKeys.lists(), { filters }] as const
+};
 
 export const addClassroomQueryMutation = (
   old: Classroom[],
@@ -29,6 +39,8 @@ export type ListClassroomsFilters = {
   employee_id?: string;
   with_in_multigrades?: boolean | number;
   with_multigrades?: boolean | number;
+  page?: number;
+  size?: number;
 };
 
 export const listClassrooms = (
@@ -46,17 +58,21 @@ export const listClassrooms = (
   }
 
   return api
-    .get<Classroom[]>(`/classrooms`, { params })
+    .get<PaginatedHttpResponse<Classroom>>(`/classrooms`, { params })
     .then((response) => response.data);
 };
 
 export const useListClassrooms = (
   session: Session | null,
   filters: ListClassroomsFilters = {},
-  queryOptions: QueryObserverOptions<Classroom[]> = {}
+  queryOptions: QueryObserverOptions<PaginatedHttpResponse<Classroom>> = {}
 ) => {
-  const key = `list-classrooms-${JSON.stringify(filters)}`;
-  const result = useQuery<Classroom[]>(
+  const key = useMemo(
+    () => classroomsKeys.list(JSON.stringify(filters)),
+    [filters]
+  );
+
+  const result = useQuery<PaginatedHttpResponse<Classroom>>(
     key,
     () => listClassrooms(session, filters),
     queryOptions
@@ -87,11 +103,19 @@ export const showClassroom = (
 
 export const useShowClassroom = (
   session: Session | null,
-  filters: ShowClassroomFilters
+  filters: ShowClassroomFilters,
+  queryOptions: QueryObserverOptions<Classroom> = {}
 ) => {
-  const key = `show-classroom-${JSON.stringify(filters)}`;
+  const key = useMemo(
+    () => classroomsKeys.show(JSON.stringify(filters)),
+    [filters]
+  );
 
-  const result = useQuery(key, () => showClassroom(session, filters));
+  const result = useQuery<Classroom>(
+    key,
+    () => showClassroom(session, filters),
+    queryOptions
+  );
   return { ...result, key };
 };
 

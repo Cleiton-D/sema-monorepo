@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
+import { useQueryClient } from 'react-query';
 import { Edit3, X } from '@styled-icons/feather';
 
 import ListItem from 'components/ListItem';
@@ -13,6 +14,7 @@ import { useAccess } from 'hooks/AccessProvider';
 import { GradeSchoolSubject } from 'models/GradeSchoolSubject';
 
 import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
+import { useShowGrade } from 'requests/queries/grades';
 import { useDeleteGradeSchoolSubject } from 'requests/mutations/grade-school-subject';
 
 import * as S from './styles';
@@ -26,12 +28,24 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
 
   const { enableAccess } = useAccess();
 
+  const queryClient = useQueryClient();
   const { data: session } = useSession();
+
+  const { data: grade, isLoading: isLoadingGrade } = useShowGrade(
+    session,
+    gradeId
+  );
   const { data, isLoading, refetch } = useListGradeSchoolSubjects(session, {
-    grade_id: gradeId
+    grade_id: gradeId,
+    include_multidisciplinary: true
   });
   const deleteGradeSchoolSubjectMutation = useDeleteGradeSchoolSubject();
 
+  const refetchData = async () => {
+    refetch();
+    queryClient.invalidateQueries('get-grades');
+    queryClient.invalidateQueries(`show-grade-${gradeId}`);
+  };
   const handleRemove = async (gradeSchoolSubject: GradeSchoolSubject) => {
     const confirm = window.confirm(
       `Deseja remover a disciplina ${gradeSchoolSubject.school_subject?.description}?`
@@ -39,7 +53,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
 
     if (confirm) {
       await deleteGradeSchoolSubjectMutation.mutateAsync(gradeSchoolSubject);
-      refetch();
+      refetchData();
     }
   };
 
@@ -66,7 +80,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
         </S.SectionTitle>
         {gradeId ? (
           <S.ListSection>
-            {data ? (
+            {data && grade ? (
               <>
                 {data.length ? (
                   <S.List>
@@ -81,13 +95,17 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
 
                           {canChangeGradeSchoolSubject && (
                             <div>
-                              <S.ActionButton
-                                onClick={() =>
-                                  modalRef.current?.openModal(item)
-                                }
-                              >
-                                <Edit3 size={20} color="#0393BE" />
-                              </S.ActionButton>
+                              {(!grade?.is_multidisciplinary ||
+                                item.school_subject?.is_multidisciplinary) && (
+                                <S.ActionButton
+                                  onClick={() =>
+                                    modalRef.current?.openModal(item)
+                                  }
+                                >
+                                  <Edit3 size={20} color="#0393BE" />
+                                </S.ActionButton>
+                              )}
+
                               <S.ActionButton
                                 onClick={() => handleRemove(item)}
                               >
@@ -109,7 +127,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
               </>
             ) : (
               <>
-                {isLoading ? (
+                {isLoading || isLoadingGrade ? (
                   <S.Message>Carregando...</S.Message>
                 ) : (
                   <S.Message>
@@ -127,7 +145,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
       </S.Section>
       <GradeSchoolSubjectModal
         gradeId={gradeId}
-        refetchFn={refetch}
+        refetchFn={refetchData}
         ref={modalRef}
       />
     </S.Wrapper>

@@ -1,0 +1,128 @@
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { Printer } from '@styled-icons/feather';
+
+import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
+
+import UnregisteredSelect from 'components/UnregisteredSelect';
+import AttendancesReportTable from 'components/AttendancesReportTable';
+
+import { useShowClassroom } from 'requests/queries/classrooms';
+import { useShowGrade } from 'requests/queries/grades';
+
+import { useListSchoolSubjects } from './hooks';
+import * as S from './styles';
+
+type ClassroomAttendancesReportItemProps = {
+  schoolTermPeriod: SchoolTermPeriod;
+};
+const ClassroomAttendancesReportItem = ({
+  schoolTermPeriod
+}: ClassroomAttendancesReportItemProps) => {
+  const [selectedSchoolSubject, setSelectedSchoolSubject] = useState<string>();
+  // const [page, setPage] = useState(1);
+  // const [size, setSize] = useState(20);
+
+  const { query } = useRouter();
+  const { data: session } = useSession();
+
+  const { data: classroom } = useShowClassroom(
+    session,
+    {
+      id: query.classroom_id as string
+    },
+    { enabled: !!query.classroom_id }
+  );
+
+  const { data: grade } = useShowGrade(session, classroom?.grade_id);
+  const { data: schoolSubjects } = useListSchoolSubjects(session, {
+    grade_id: classroom?.grade_id,
+    is_multidisciplinary: grade?.is_multidisciplinary
+  });
+
+  const schoolSubjectOptions = useMemo(() => {
+    if (!schoolSubjects?.length) return [];
+
+    return schoolSubjects.map((schoolSubject) => ({
+      label: schoolSubject.description,
+      value: schoolSubject.id
+    }));
+  }, [schoolSubjects]);
+
+  return (
+    <S.Wrapper>
+      <S.Header>
+        <UnregisteredSelect
+          label="Disciplina"
+          name="school_subject_id"
+          options={schoolSubjectOptions}
+          css={{ width: 300 }}
+          onChange={setSelectedSchoolSubject}
+          selectedOption={selectedSchoolSubject}
+        />
+
+        <Link
+          href={{
+            pathname: '/auth/exports/attendances',
+            query: {
+              classroom_id: classroom?.id,
+              school_subject_id: selectedSchoolSubject,
+              school_term_period_id: schoolTermPeriod?.id
+            }
+          }}
+          passHref
+        >
+          <S.LightLink target="_blank">
+            <Printer
+              size={20}
+              style={{ strokeWidth: 2, marginRight: '0.5rem' }}
+            />
+            Imprimir
+          </S.LightLink>
+        </Link>
+      </S.Header>
+
+      {classroom && (
+        <AttendancesReportTable
+          schoolSubjectId={selectedSchoolSubject}
+          classroom={classroom}
+          schoolTermPeriod={schoolTermPeriod}
+        />
+      )}
+
+      {/* {classes?.items && (
+        <S.TableSection>
+          <Table
+            items={classes?.items || []}
+            keyExtractor={(classEntity) => classEntity.id}
+          >
+            <TableColumn
+              label="Dia"
+              tableKey="class_date"
+              render={(value) =>
+                format(parseDateWithoutTimezone(value), 'dd/MM')
+              }
+            />
+            <TableColumn label="Conteúdo" tableKey="taught_content" />
+          </Table>
+          <S.PaginatorContainer>
+            <Paginator
+              total={classes?.total || 0}
+              currentPage={classes?.page || 1}
+              currentSize={classes?.size || 20}
+              onChangeSize={(size: number) => {
+                setPage(1);
+                setSize(size);
+              }}
+              onChangePage={setPage}
+            />
+          </S.PaginatorContainer>
+        </S.TableSection>
+      )} */}
+    </S.Wrapper>
+  );
+};
+
+export default ClassroomAttendancesReportItem;

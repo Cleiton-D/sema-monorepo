@@ -165,6 +165,7 @@ class UpdateTimetablesService {
     const gradeSchoolSubject = await this.gradeSchoolSubjectsRepository.find({
       grade_id: classroom.grade_id,
       school_subject_id,
+      include_multidisciplinary: true,
     });
     if (!gradeSchoolSubject.length) {
       throw new AppError('classroom not linked with school subject');

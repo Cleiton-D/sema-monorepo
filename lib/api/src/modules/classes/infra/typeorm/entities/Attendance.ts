@@ -6,9 +6,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import Enroll from '@modules/enrolls/infra/typeorm/entities/Enroll';
+import EnrollClassroom from '@modules/enrolls/infra/typeorm/entities/EnrollClassroom';
+
 import Class from './Class';
 
 @Entity('attendances')
@@ -39,11 +42,21 @@ class Attendance {
   @Column()
   justification_description: string;
 
+  @Column()
+  enroll_classroom_id: string;
+
+  @ManyToOne(() => EnrollClassroom)
+  @JoinColumn({ name: 'enroll_classroom_id' })
+  enroll_classroom: EnrollClassroom;
+
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }
 
 export default Attendance;

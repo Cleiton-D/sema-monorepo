@@ -4,6 +4,7 @@ import School from '@modules/schools/infra/typeorm/entities/School';
 import ISchoolsRepository from '@modules/schools/repositories/ISchoolsRepository';
 
 import AppError from '@shared/errors/AppError';
+import { PaginatedResponse } from '@shared/dtos';
 
 import Enroll, { EnrollStatus } from '../infra/typeorm/entities/Enroll';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
@@ -20,6 +21,8 @@ export type ListEnrollsRequest = {
   student_nis?: string;
   student_birth_certificate?: string;
   order?: string | string[];
+  page?: number;
+  size?: number;
 };
 
 @injectable()
@@ -41,7 +44,9 @@ class ListEnrollsService {
     student_birth_certificate,
     status,
     order = [],
-  }: ListEnrollsRequest): Promise<Enroll[]> {
+    page,
+    size,
+  }: ListEnrollsRequest): Promise<PaginatedResponse<Enroll>> {
     const schoolId =
       school_id || branch_id
         ? (await this.getSchool({ school_id, branch_id })).id
@@ -59,6 +64,8 @@ class ListEnrollsService {
       student_nis,
       student_birth_certificate,
       order: orderArray,
+      page,
+      size,
     });
     return enrolls;
   }

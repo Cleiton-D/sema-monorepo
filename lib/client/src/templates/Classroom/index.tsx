@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { Printer } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -68,6 +70,24 @@ const ClassroomTemplate = () => {
       <S.TableSection>
         <S.SectionTitle>
           <h4>Relação Nominal</h4>
+
+          <Link
+            href={{
+              pathname: '/auth/exports/nominal-relation',
+              query: {
+                classroom_id: classroom?.id
+              }
+            }}
+            passHref
+          >
+            <S.LightLink target="_blank">
+              <Printer
+                size={18}
+                style={{ strokeWidth: 2, marginRight: '0.5rem' }}
+              />
+              Imprimir
+            </S.LightLink>
+          </Link>
         </S.SectionTitle>
         <ClassroomStudentNominalRelation classroomId={classroom?.id} />
       </S.TableSection>
@@ -75,6 +95,24 @@ const ClassroomTemplate = () => {
       <S.TableSection>
         <S.SectionTitle>
           <h4>Quadro de notas</h4>
+
+          <Link
+            href={{
+              pathname: '/auth/exports/school-reports',
+              query: {
+                classroom_id: classroom?.id
+              }
+            }}
+            passHref
+          >
+            <S.LightLink target="_blank">
+              <Printer
+                size={18}
+                style={{ strokeWidth: 2, marginRight: '0.5rem' }}
+              />
+              Imprimir boletim
+            </S.LightLink>
+          </Link>
         </S.SectionTitle>
 
         <EnrollsTable enrolls={enrolls || []} />

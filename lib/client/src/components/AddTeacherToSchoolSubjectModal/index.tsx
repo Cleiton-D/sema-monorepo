@@ -44,9 +44,8 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
     school_id: schoolId
   });
 
-  const addTeacherToSchoolSubject = useAddTeacherToSchoolSubjectMutation(
-    modalRef
-  );
+  const addTeacherToSchoolSubject =
+    useAddTeacherToSchoolSubjectMutation(modalRef);
 
   const employeesOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];

@@ -5,6 +5,7 @@ import {
   useMemo,
   useState
 } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/react';
 
 import Modal, { ModalRef } from 'components/Modal';
@@ -15,10 +16,10 @@ import Button from 'components/Button';
 import { Classroom } from 'models/Classroom';
 
 import { useAddClassroom } from 'requests/mutations/classroom';
+import { classroomsKeys } from 'requests/queries/classrooms';
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassPeriods } from 'requests/queries/class-periods';
 
-import { ProcessQueryDataFn } from 'services/api';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
@@ -28,7 +29,6 @@ export type ClassroomModalRef = {
 };
 
 type ClassroomModalProps = {
-  createQueries: Record<string, ProcessQueryDataFn>;
   schoolId: string;
 };
 
@@ -41,16 +41,18 @@ type ClassroomForm = {
 const ClassroomModal: React.ForwardRefRenderFunction<
   ClassroomModalRef,
   ClassroomModalProps
-> = ({ createQueries, schoolId }, ref) => {
+> = ({ schoolId }, ref) => {
   const [classroom, setClassroom] = useState<Classroom>();
 
   const modalRef = useRef<ModalRef>(null);
 
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
+
   const { data: grades } = useListGrades(session);
   const { data: classPeriods, isLoading } = useListClassPeriods(session);
 
-  const addClassroomMutation = useAddClassroom(createQueries);
+  const addClassroomMutation = useAddClassroom({});
 
   const classPeriodsOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];
@@ -71,12 +73,12 @@ const ClassroomModal: React.ForwardRefRenderFunction<
     }));
   }, [grades]);
 
-  const handleSubmit = (values: ClassroomForm) => {
+  const handleSubmit = async (values: ClassroomForm) => {
     const selectedGrade = gradesOptions.find(
       ({ value }) => value === values.grade_id
     );
 
-    addClassroomMutation.mutate({
+    await addClassroomMutation.mutateAsync({
       ...values,
       id: classroom?.id,
       is_multigrade: false,
@@ -86,15 +88,20 @@ const ClassroomModal: React.ForwardRefRenderFunction<
         description: selectedGrade?.label
       }
     });
-    modalRef.current?.closeModal();
+
+    await queryClient.invalidateQueries(classroomsKeys.lists());
+
+    handleBack();
   };
 
   const handleBack = () => {
+    setClassroom(undefined);
     modalRef.current?.closeModal();
   };
 
   const openModal = (item?: Classroom) => {
     setClassroom(item);
+
     modalRef.current?.openModal();
   };
 
@@ -119,6 +126,7 @@ const ClassroomModal: React.ForwardRefRenderFunction<
             options={classPeriodsOptions}
           />
           <Select name="grade_id" label="Série" options={gradesOptions} />
+
           <TextInput name="capacity" label="Lotação" type="number" min="0" />
           <S.ButtonsContainer>
             <Button

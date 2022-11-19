@@ -1,7 +1,5 @@
-import { ClassPeriodType } from '../infra/typeorm/entities/ClassPeriod';
-
 type CreateClassPeriodDTO = {
-  description: ClassPeriodType;
+  description: string;
   time_start: string;
   time_end: string;
   class_time: string;

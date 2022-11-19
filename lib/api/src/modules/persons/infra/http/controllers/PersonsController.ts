@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import ShowPersonService from '@modules/persons/services/ShowPersonService';
 
@@ -11,7 +11,7 @@ class PersonsController {
     const showPerson = container.resolve(ShowPersonService);
     const person = await showPerson.execute({ person_id });
 
-    return response.json(classToClass(person));
+    return response.json(instanceToInstance(person));
   }
 }
 

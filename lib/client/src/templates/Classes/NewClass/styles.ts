@@ -83,3 +83,14 @@ export const SectionTitle = styled.div`
     margin-bottom: ${theme.spacings.xsmall} !important;
   `}
 `;
+
+export const InterdisciplinaryText = styled.span`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+
+    color: #4e4e4e;
+    font-weight: ${theme.font.medium};
+    margin-right: ${theme.spacings.xxsmall};
+  `}
+`;

@@ -8,5 +8,7 @@ const attendancesController = new AttendancesController();
 
 attendancesRouter.put('/', attendancesController.update);
 attendancesRouter.get('/', attendancesController.index);
+attendancesRouter.get('/by-classes', attendancesController.indexByClasses);
+attendancesRouter.get('/count', attendancesController.count);
 
 export default attendancesRouter;

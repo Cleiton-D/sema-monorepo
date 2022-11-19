@@ -42,13 +42,14 @@ export const Wrapper = styled.main<WrapperProps>`
 export const Content = styled(SectionContent)`
   ${({ theme }) => css`
     z-index: 1;
-    max-width: 45rem !important;
+    max-width: 50rem !important;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0rem 0rem 0.5rem ${theme.colors.lightGray};
-    padding-top: ${theme.spacings.small};
+    /* box-shadow: 0rem 0rem 0.5rem ${theme.colors.lightGray}; */
+    padding-top: ${theme.spacings.xsmall};
+    position: relative;
   `}
 `;
 
@@ -56,13 +57,14 @@ export const Form = styled(Unform)`
   ${({ theme }) => css`
     padding: ${theme.spacings.small};
     width: 100%;
-    margin-top: ${theme.spacings.xsmall};
+    /* margin-top: ${theme.spacings.xlarge}; */
+    margin-bottom: ${theme.spacings.xxsmall};
 
     ${InputStyles.Wrapper} {
       margin-bottom: ${theme.spacings.xsmall};
 
       &:last-of-type {
-        margin-bottom: ${theme.spacings.small};
+        margin-bottom: ${theme.spacings.medium};
       }
     }
 
@@ -70,4 +72,18 @@ export const Form = styled(Unform)`
       padding: ${theme.spacings.small} ${theme.spacings.xxsmall};
     }
   `}
+`;
+
+export const WfLogoContainer = styled.div`
+  width: 9.5rem;
+  height: 9.5rem;
+  background: #fff;
+  border-radius: 50%;
+  position: relative;
+
+  border: 0.5rem solid #fff;
+
+  img {
+    border-radius: 50%;
+  }
 `;

@@ -4,7 +4,7 @@ import { Session } from 'next-auth';
 import Timetables from 'templates/Timetables';
 
 import { getSchool, schoolKeys } from 'requests/queries/schools';
-import { listClassrooms } from 'requests/queries/classrooms';
+import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 
 import protectedRoutes from 'utils/protected-routes';
 import prefetchQuery from 'utils/prefetch-query';
@@ -19,12 +19,14 @@ const getData = async (session: Session | null, id: string) => {
   const filters = {
     school_id: school.id,
     with_in_multigrades: false,
-    with_multigrades: true
+    with_multigrades: true,
+    page: 1,
+    size: 20
   };
 
   return prefetchQuery([
     {
-      key: `list-classrooms-${JSON.stringify(filters)}`,
+      key: classroomsKeys.list(JSON.stringify(filters)),
       fetcher: () => listClassrooms(session, filters)
     },
     {

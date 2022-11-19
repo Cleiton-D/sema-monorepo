@@ -1,8 +1,9 @@
 import { useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { parseISO, differenceInYears } from 'date-fns';
-import { Repeat } from '@styled-icons/feather';
+import differenceInYears from 'date-fns/differenceInYears';
+import { Repeat, Edit } from '@styled-icons/feather';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
@@ -15,6 +16,7 @@ import { Enroll } from 'models/Enroll';
 
 import { translateStatus } from 'utils/translateStatus';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
 
@@ -28,6 +30,7 @@ const EnrollsTable = ({
   showActions = false,
   enrolls
 }: EnrollsTableProps): JSX.Element => {
+  const router = useRouter();
   const { data: session } = useSession();
 
   const moveEnrollModalRef = useRef<MoveEnrollModalRef>(null);
@@ -51,7 +54,7 @@ const EnrollsTable = ({
           label="Idade"
           tableKey="student.birth_date"
           render={function (birth_date: string) {
-            const parsedBirthDate = parseISO(birth_date);
+            const parsedBirthDate = parseDateWithoutTimezone(birth_date);
 
             return <>{differenceInYears(new Date(), parsedBirthDate)}</>;
           }}
@@ -99,17 +102,26 @@ const EnrollsTable = ({
             module="ENROLL"
             rule="WRITE"
             render={(enroll: Enroll) => (
-              <S.ActionButton
-                type="button"
-                title="Movimentar estudante"
-                onClick={() => moveEnrollModalRef.current?.openModal(enroll)}
-              >
-                <Repeat
-                  size={20}
-                  color="#0393BE"
+              <S.ActionButtons>
+                <S.ActionButton
+                  type="button"
                   title="Movimentar estudante"
-                />
-              </S.ActionButton>
+                  onClick={() => moveEnrollModalRef.current?.openModal(enroll)}
+                >
+                  <Repeat
+                    size={20}
+                    color="#0393BE"
+                    title="Movimentar estudante"
+                  />
+                </S.ActionButton>
+                <S.ActionButton
+                  type="button"
+                  title="Editar aluno"
+                  onClick={() => router.push(`/auth/student/${enroll.id}/edit`)}
+                >
+                  <Edit size={20} color="#0393BE" title="Editar aluno" />
+                </S.ActionButton>
+              </S.ActionButtons>
             )}
           />
         )}

@@ -6,7 +6,7 @@ import ClassroomTeacher from 'templates/ClassroomTeacher';
 import prefetchQuery from 'utils/prefetch-query';
 import protectedRoutes from 'utils/protected-routes';
 
-import { listClassrooms } from 'requests/queries/classrooms';
+import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 function ClassroomTeacherPage() {
@@ -17,12 +17,14 @@ const getData = async (session: Session | null, id: string) => {
   const school = await getSchool(session, { id });
 
   const filters = {
-    school_id: school.id
+    school_id: school.id,
+    page: 1,
+    size: 20
   };
 
   return prefetchQuery([
     {
-      key: `list-classrooms-${JSON.stringify(filters)}`,
+      key: classroomsKeys.list(JSON.stringify(filters)),
       fetcher: () => listClassrooms(session, filters)
     },
     {

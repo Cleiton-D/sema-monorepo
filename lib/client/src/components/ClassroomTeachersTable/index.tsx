@@ -14,13 +14,14 @@ import { Classroom } from 'models/Classroom';
 import { Employee } from 'models/Employee';
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
 
-import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
+import { useListSchoolTeachers } from 'requests/queries/school-teachers';
+import { useShowGrade } from 'requests/queries/grades';
+import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
 import {
   useDeleteClassroomTeacherSchoolSubject,
   useLinkClassroomTeacherSchoolSubject
 } from 'requests/mutations/classroom-teacher-school-subjects';
-import { useListSchoolTeachers } from 'requests/queries/school-teachers';
 
 import * as S from './styles';
 
@@ -30,7 +31,8 @@ type ClassroomTeachersTableProps = {
 
 type ClassroomTeachersTableData = {
   key: string;
-  school_subject: SchoolSubject;
+  school_subject_description: string;
+  school_subject?: SchoolSubject;
   classroom_teacher_school_subject?: ClassroomTeacherSchoolSubject;
 };
 
@@ -38,13 +40,21 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: schoolSubjects } = useListSchoolsSubjects(session, {
-    grade_id: classroom.grade_id
-  });
+
+  const { data: grade } = useShowGrade(session, classroom.grade_id);
+  const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(
+    session,
+    {
+      grade_id: classroom.grade_id,
+      is_multidisciplinary: grade?.is_multidisciplinary
+    },
+    { enabled: !!grade }
+  );
 
   const { data: classroomTeacherSchoolSubjects, refetch } =
     useListClassroomTeacherSchoolSubjects(session, {
-      classroom_id: classroom.id
+      classroom_id: classroom.id,
+      is_multidisciplinary: null
     });
 
   const { data: schoolTeachers } = useListSchoolTeachers(session, {
@@ -57,27 +67,28 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
     useLinkClassroomTeacherSchoolSubject();
 
   const tableData = useMemo(() => {
-    if (!schoolSubjects) return [];
+    if (!gradeSchoolSubjects) return [];
 
-    return schoolSubjects.map((schoolSubject) => {
+    return gradeSchoolSubjects.map(({ school_subject }) => {
       const classroomTeacherSchoolSubject =
         classroomTeacherSchoolSubjects?.find(
-          (item) => item.school_subject_id === schoolSubject.id
+          (item) => item.school_subject_id === school_subject?.id
         );
 
       return {
         key: uuidv4(),
-        school_subject: schoolSubject,
+        school_subject_description: school_subject?.description || '',
+        school_subject: school_subject,
         classroom_teacher_school_subject: classroomTeacherSchoolSubject
       };
     });
-  }, [schoolSubjects, classroomTeacherSchoolSubjects]);
+  }, [gradeSchoolSubjects, classroomTeacherSchoolSubjects]);
 
   const handleRemoveTeacher = async (item: ClassroomTeachersTableData) => {
     const personName = item.classroom_teacher_school_subject?.employee.name;
 
     const confirm = window.confirm(
-      `Deseja remover o professor ${personName} da disciplina ${item.school_subject.description}?`
+      `Deseja remover o professor ${personName} da disciplina ${item.school_subject_description}?`
     );
     if (confirm) {
       await deleteClassroomTeacherSchoolSubject.mutateAsync({
@@ -98,8 +109,9 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
         classroom,
         teacher_school_subjects: [
           {
-            school_subject_id: item.school_subject.id,
-            employee_id: newEmployee.id
+            school_subject_id: item.school_subject?.id,
+            employee_id: newEmployee.id,
+            is_multidisciplinary: !!classroom.is_multidisciplinary
           }
         ]
       };
@@ -129,7 +141,7 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
       keyExtractor={(value) => value.key}
       minimal
     >
-      <TableColumn label="Disciplina" tableKey="school_subject.description" />
+      <TableColumn label="Disciplina" tableKey="school_subject_description" />
       <TableColumn
         label="Professor"
         tableKey=""

@@ -35,3 +35,17 @@ export const useGradesCount = (session?: Session | null) => {
 
   return { ...result, key };
 };
+
+export const showGrade = (session?: Session | null, gradeId?: string) => {
+  if (!gradeId) return undefined;
+
+  const api = initializeApi(session);
+
+  return api
+    .get<Grade>(`/education/admin/grades/${gradeId}`)
+    .then((response) => response.data);
+};
+
+export const useShowGrade = (session?: Session | null, gradeId?: string) => {
+  return useQuery(`show-grade-${gradeId}`, () => showGrade(session, gradeId));
+};

@@ -14,6 +14,7 @@ import Modal, { ModalRef } from 'components/Modal';
 import Button from 'components/Button';
 import Select from 'components/Select';
 import ClassroomSelector from 'components/ClassroomSelector';
+import DatePicker from 'components/Datepicker';
 
 import { Enroll } from 'models/Enroll';
 
@@ -22,6 +23,7 @@ import { enrollsKeys } from 'requests/queries/enrolls';
 import { useRelocateEnroll, useUpdateEnroll } from 'requests/mutations/enroll';
 
 import * as S from './styles';
+import { now } from 'next-auth/client/_utils';
 
 export type MoveEnrollModalRef = {
   openModal: (enroll: Enroll) => void;
@@ -57,7 +59,7 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
   }, []);
 
   const handleSave = useCallback(
-    async (values) => {
+    async (values: any) => {
       if (values.action === 'RELOCATE') {
         const requestData = {
           enroll_id: enroll?.id,
@@ -66,9 +68,13 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
         };
         await relocateEnroll.mutateAsync(requestData);
       } else {
+        const transfer_date =
+          values.action === 'TRANSFERRED' ? values.transfer_date : undefined;
+
         await updateEnroll.mutateAsync({
           enroll_id: enroll?.id,
-          status: values.action
+          status: values.action,
+          transfer_date
         });
       }
 
@@ -190,6 +196,15 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
               label="Turma"
               searchParams={classroomSearchParams}
               exceptId={enroll?.current_classroom?.id}
+            />
+          )}
+
+          {action === 'TRANSFERRED' && (
+            <DatePicker
+              name="transfer_date"
+              label="Data da Transferência"
+              toDate={new Date()}
+              value={new Date()}
             />
           )}
 

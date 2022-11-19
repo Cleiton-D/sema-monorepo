@@ -12,21 +12,6 @@ import { useListClassPeriods } from 'requests/queries/class-periods';
 
 import * as S from './styles';
 
-const statusOptions = [
-  {
-    value: 'ACTIVE',
-    label: 'Ativo'
-  },
-  {
-    value: 'INACTIVE',
-    label: 'Inativo'
-  },
-  {
-    value: 'TRANSFERRED',
-    label: 'Transferido'
-  }
-];
-
 type ClassroomsSearchProps = {
   handleSearch: (values: Record<string, string>) => void;
 };

@@ -11,7 +11,7 @@ export default {
       type: 'string'
     },
     icon: {
-      type: ''
+      type: undefined
     },
     size: {
       control: { type: 'select' },

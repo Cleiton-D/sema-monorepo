@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { format, parseISO } from 'date-fns';
+import format from 'date-fns/format';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
@@ -11,29 +11,35 @@ import AttendancesTableLine from 'components/AttendancesTableline';
 import { useAccess } from 'hooks/AccessProvider';
 
 import { EnrollClassroom } from 'models/EnrollClassroom';
+import { Enroll } from 'models/Enroll';
 import { Class } from 'models/Class';
 
-import { useListAttendances } from 'requests/queries/attendances';
+import { useListAttendancesByClasses } from 'requests/queries/attendances';
 import { useListEnrollClassrooms } from 'requests/queries/enroll-classrooms';
-import { useListClasses } from 'requests/queries/class';
 import { useRegisterAttendances } from 'requests/mutations/attendances';
 
 import { translateStatus } from 'utils/translateStatus';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
+import { getEnrollsWithAttendances } from 'utils/mappers/attendances';
 
 import * as S from './styles';
 
 type AttendancesTableProps = {
   class?: Class;
+  enableWithDone?: boolean;
 };
 
-type EnrollWithAttendances = EnrollClassroom & {
+type EnrollWithAttendances = {
+  enroll: Enroll;
+  enroll_classroom: EnrollClassroom;
   attendances: Record<string, boolean>;
 };
 
 type EnrollAttendances = Record<string, Record<string, boolean>>;
 
 export const AttendancesTable = ({
-  class: classEntity
+  class: classEntity,
+  enableWithDone = false
 }: AttendancesTableProps) => {
   const [saving, setSaving] = useState(false);
 
@@ -42,27 +48,24 @@ export const AttendancesTable = ({
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: attendances } = useListAttendances(session, {
-    class_id: 'all',
-    classroom_id: classEntity?.classroom_id
-  });
 
-  const { data: oldClasses } = useListClasses(session, {
-    classroom_id: classEntity?.classroom_id,
-    school_subject_id: classEntity?.school_subject_id,
-    limit: 6,
-    sortBy: 'date_start',
-    order: 'DESC'
-  });
+  const { data: { classes: oldClasses, attendances } = {} } =
+    useListAttendancesByClasses(
+      session,
+      {
+        classroom_id: classEntity?.classroom_id,
+        school_subject_id: classEntity?.school_subject_id,
+        limit: 6,
+        sortBy: 'date_start',
+        order: 'DESC',
+        before: classEntity?.id
+      },
+      { enabled: !!classEntity?.classroom_id }
+    );
 
   const { data: enrollClassrooms } = useListEnrollClassrooms(session, {
     classroom_id: classEntity?.classroom_id
   });
-
-  // const { data: enrolls } = useListEnrolls(session, {
-  //   classroom_id: classEntity?.classroom_id,
-  //   school_id: classEntity?.classroom.school_id
-  // });
 
   const registerAttendances = useRegisterAttendances();
 
@@ -98,110 +101,139 @@ export const AttendancesTable = ({
       attendances: attendancesRequest
     };
 
-    // console.log(requestData);
     await registerAttendances.mutateAsync(requestData);
     setSaving(false);
   };
 
   const classes = useMemo(() => {
-    if (!oldClasses) return [];
+    if (!oldClasses?.length) return [];
 
     return oldClasses
       .map((item) => ({
         ...item,
-        date: format(parseISO(item.class_date), 'dd/MM')
+        date: format(parseDateWithoutTimezone(item.class_date), 'dd/MM')
       }))
       .sort((a, b) => {
-        const parsedA = parseISO(a.created_at);
-        const parsedB = parseISO(b.created_at);
+        const parsedA = parseDateWithoutTimezone(a.class_date);
+        const parsedB = parseDateWithoutTimezone(b.class_date);
 
         return parsedA.getTime() - parsedB.getTime();
       });
   }, [oldClasses]);
 
-  const enrollsWithAttendances = useMemo(() => {
-    if (!enrollClassrooms) return [];
-
-    return enrollClassrooms.map((enrollClassroom) => {
-      const enrollAttendances = attendances
-        ?.filter(
-          (attendance) => attendance.enroll_id === enrollClassroom.enroll.id
-        )
-        .reduce<Record<string, boolean>>((acc, attendance) => {
-          return {
-            ...acc,
-            [attendance.class_id]: attendance.attendance
-          };
-        }, {});
-
-      return { ...enrollClassroom, attendances: enrollAttendances || {} };
-    });
-  }, [enrollClassrooms, attendances]);
+  const enrollsWithAttendances = useMemo(
+    () => getEnrollsWithAttendances(enrollClassrooms, attendances),
+    [attendances, enrollClassrooms]
+  );
 
   const canChangeAttendances = useMemo(
     () => enableAccess({ module: 'ATTENDANCE', rule: 'WRITE' }),
     [enableAccess]
   );
 
+  const validateCanChangeAttendance = (
+    classId: string,
+    enrollClassroom: EnrollClassroom
+  ) => {
+    if (!canChangeAttendances) return false;
+    if (enrollClassroom.status !== 'ACTIVE') return false;
+    if (classId !== classEntity?.id) return false;
+
+    if (classEntity?.status === 'DONE') {
+      if (!enableWithDone) return false;
+    }
+
+    return true;
+  };
+
   return (
     <S.TableSection>
       <S.SectionTitle>
         <h4>Frequência</h4>
       </S.SectionTitle>
-      <Table<EnrollWithAttendances>
+      <Table
         items={enrollsWithAttendances}
-        keyExtractor={(value) => value.id}
+        keyExtractor={(value) => value.enroll.id}
         renderRow={(props) => <AttendancesTableLine {...props} />}
       >
         {[
+          // <TableColumn
+          //   key="index"
+          //   label="Nº"
+          //   tableKey=""
+          //   fixed
+          //   render={(_value, index) => <span>{index + 1}</span>}
+          // />,
           <TableColumn
             key="name"
             label="Nome"
             tableKey="enroll.student.name"
+            border="right"
+            fixed
+            render={(value) => <S.StudentName>{value}</S.StudentName>}
           />,
+          ...(classEntity?.classroom.is_multigrade
+            ? [
+                <TableColumn
+                  key="classroom"
+                  label="Turma"
+                  tableKey="enroll_classroom.classroom.description"
+                />
+              ]
+            : []),
           <TableColumn
             key="status"
             label="Situação"
-            tableKey="status"
+            tableKey="enroll_classroom.status"
             render={(status) => translateStatus(status)}
           />,
           ...classes.map((item) => (
             <TableColumn
               key={item.id}
-              label={`${item.date} | ${item.period}`}
+              label={
+                <>
+                  {item.date}
+                  <br />
+                  {item.period}
+                </>
+              }
               tableKey={`attendances.${item.id}`}
               contentAlign="center"
               actionColumn
-              render={(enrollClassroom: EnrollWithAttendances) => (
-                <Checkbox
-                  isChecked={!!enrollClassroom.attendances[item.id]}
-                  disabled={
-                    !canChangeAttendances ||
-                    enrollClassroom.status !== 'ACTIVE' ||
-                    item.id !== classEntity?.id ||
-                    classEntity?.status === 'DONE'
-                  }
-                  onCheck={(checked) =>
-                    handleCheck(enrollClassroom.enroll.id, item.id, checked)
-                  }
-                />
-              )}
+              render={({
+                enroll_classroom,
+                enroll,
+                attendances
+              }: EnrollWithAttendances) =>
+                typeof attendances[item.id] !== 'undefined' && (
+                  <Checkbox
+                    isChecked={!!attendances[item.id]}
+                    disabled={
+                      !validateCanChangeAttendance(item.id, enroll_classroom)
+                    }
+                    onCheck={(checked) =>
+                      handleCheck(enroll.id, item.id, checked)
+                    }
+                  />
+                )
+              }
             />
           ))
         ]}
       </Table>
-      {canChangeAttendances && classEntity?.status === 'PROGRESS' && (
-        <S.ButtonContainer>
-          <Button
-            styleType="normal"
-            size="medium"
-            onClick={handleSubmit}
-            disabled={saving}
-          >
-            {saving ? 'Salvando...' : 'Salvar'}
-          </Button>
-        </S.ButtonContainer>
-      )}
+      {canChangeAttendances &&
+        (classEntity?.status === 'PROGRESS' || enableWithDone) && (
+          <S.ButtonContainer>
+            <Button
+              styleType="normal"
+              size="medium"
+              onClick={handleSubmit}
+              disabled={saving}
+            >
+              {saving ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </S.ButtonContainer>
+        )}
     </S.TableSection>
   );
 };

@@ -54,6 +54,9 @@ class SchoolReport {
   @Column()
   final_average: number;
 
+  @Column()
+  annual_average: number;
+
   @CreateDateColumn()
   created_at: Date;
 

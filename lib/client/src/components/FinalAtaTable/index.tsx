@@ -27,7 +27,7 @@ const FinalAtaTable = ({ classroom }: FinalAtaTable) => {
       grade_id: classroom.grade_id
     }
   );
-  const { data: enrolls = [] } = useListEnrolls(session, {
+  const { data: enrolls } = useListEnrolls(session, {
     classroom_id: classroom.id
   });
   const { data: schoolReports = [] } = useListSchoolReports(session, {
@@ -39,7 +39,9 @@ const FinalAtaTable = ({ classroom }: FinalAtaTable) => {
   }, [gradeSchoolSubjects]);
 
   const finalReports = useMemo(() => {
-    return enrolls.map((enroll) => {
+    const enrollsItems = enrolls?.items || [];
+
+    return enrollsItems.map((enroll) => {
       const filteredSchoolReports = schoolReports.filter(
         ({ enroll_id }) => enroll_id === enroll.id
       );

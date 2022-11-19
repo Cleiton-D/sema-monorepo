@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IClassPeriodsRepository from '@modules/education_core/repositories/IClassPeriodsRepository';
 import CreateClassPeriodDTO from '@modules/education_core/dtos/CreateClassPeriodDTO';
@@ -10,35 +12,63 @@ class ClassPeriodsRepository implements IClassPeriodsRepository {
   private ormRepository: Repository<ClassPeriod>;
 
   constructor() {
-    this.ormRepository = getRepository(ClassPeriod);
+    this.ormRepository = dataSource.getRepository(ClassPeriod);
   }
 
   public async findOne({
     id,
+    school_id,
   }: FindClassPeriodFiltersDTO): Promise<ClassPeriod | undefined> {
-    const where: FindConditions<ClassPeriod> = {};
+    const where: FindOptionsWhere<ClassPeriod> = {};
     if (id) where.id = id;
 
-    const classPeriod = await this.ormRepository.findOne({ where });
-    return classPeriod;
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('class_period')
+      .select()
+      .where(where);
+
+    if (school_id) {
+      queryBuilder.andWhere(
+        `EXISTS (
+          SELECT 1
+            FROM classrooms as classroom
+           WHERE classroom.school_id = :schoolId
+             AND classroom.class_period_id = class_period.id
+        )`,
+        { schoolId: school_id },
+      );
+    }
+
+    const classPeriod = await queryBuilder.getOne();
+    return classPeriod ?? undefined;
   }
 
-  public async findBySchoolYear(
-    school_year_id: string,
-  ): Promise<ClassPeriod[]> {
-    const classPeriods = await this.ormRepository.find({
-      where: { school_year_id },
-    });
-    return classPeriods;
-  }
-
-  public async findAll({ id }: FindClassPeriodFiltersDTO = {}): Promise<
-    ClassPeriod[]
-  > {
-    const where: FindConditions<ClassPeriod> = {};
+  public async findAll({
+    id,
+    school_id,
+  }: FindClassPeriodFiltersDTO = {}): Promise<ClassPeriod[]> {
+    const where: FindOptionsWhere<ClassPeriod> = {};
     if (id) where.id = id;
 
-    const classPeriods = await this.ormRepository.find({ where });
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('class_period')
+      .select()
+      .where(where);
+
+    if (school_id) {
+      queryBuilder.andWhere(
+        `EXISTS (
+          SELECT 1
+            FROM classrooms as classroom
+           WHERE classroom.school_id = :schoolId
+             AND classroom.class_period_id = class_period.id
+        )`,
+        { schoolId: school_id },
+      );
+    }
+
+    const classPeriods = await queryBuilder.getMany();
+
     return classPeriods;
   }
 

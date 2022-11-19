@@ -1,4 +1,4 @@
-import { parseISO, format } from 'date-fns';
+import format from 'date-fns/format';
 import { SchoolTerm } from 'models/SchoolTerm';
 import {
   FormattedSchoolTermPeriod,
@@ -6,6 +6,8 @@ import {
   SchoolTermPeriodsObject,
   TermPeriodStatus
 } from 'models/SchoolTermPeriod';
+
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 const status: Record<TermPeriodStatus, string> = {
   ACTIVE: 'Ativo',
@@ -30,10 +32,13 @@ export const schoolTermPeriodMapper = (
   translatedDescription: descriptions[schoolTermPeriod.school_term],
   translatedStatus: status[schoolTermPeriod.status],
   formattedDateStart: format(
-    parseISO(schoolTermPeriod.date_start),
+    parseDateWithoutTimezone(schoolTermPeriod.date_start),
     'dd/MM/yyyy'
   ),
-  formattedDateEnd: format(parseISO(schoolTermPeriod.date_end), 'dd/MM/yyyy')
+  formattedDateEnd: format(
+    parseDateWithoutTimezone(schoolTermPeriod.date_end),
+    'dd/MM/yyyy'
+  )
 });
 
 export const mapSchoolTermPeriodsToObject = (

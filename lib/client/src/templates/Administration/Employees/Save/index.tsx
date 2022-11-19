@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { useUpdateAtom, RESET } from 'jotai/utils';
-import { parseISO, format } from 'date-fns';
+import format from 'date-fns/format';
 
 import Base from 'templates/Base';
 
@@ -23,6 +23,8 @@ import {
 
 import { useShowEmployee } from 'requests/queries/employee';
 import { useSaveEmployee } from 'requests/mutations/employee';
+
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
 
@@ -90,7 +92,9 @@ const SaveEmployee = () => {
       ...employee,
       name,
       gender,
-      birth_date: birth_date && format(parseISO(birth_date), 'dd/MM/yyyy'),
+      birth_date:
+        birth_date &&
+        format(parseDateWithoutTimezone(birth_date), 'dd/MM/yyyy'),
       mother_name,
       dad_name,
       address

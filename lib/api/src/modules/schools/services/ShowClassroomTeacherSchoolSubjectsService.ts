@@ -4,6 +4,7 @@ import ClassroomTeacherSchoolSubject from '../infra/typeorm/entities/ClassroomTe
 import IClassroomTeacherSchoolSubjectsRepository from '../repositories/IClassroomTeacherSchoolSubjectsRepository';
 
 type ShowClassroomTeacherSchoolSubjectsRequest = {
+  id?: string;
   classroom_id?: string | 'all';
   school_id?: string;
   employee_id?: string;
@@ -17,21 +18,22 @@ class ShowClassroomTeacherSchoolSubjectsService {
   ) {}
 
   public async execute({
+    id,
     classroom_id,
     school_id,
     employee_id,
   }: ShowClassroomTeacherSchoolSubjectsRequest): Promise<
     ClassroomTeacherSchoolSubject | undefined
   > {
-    const classroomTeacherSchoolSubjects = await this.classroomTeacherSchoolSubjectsRepository.findOne(
-      {
+    const classroomTeacherSchoolSubject =
+      await this.classroomTeacherSchoolSubjectsRepository.findOne({
+        id,
         classroom_id: classroom_id === 'all' ? undefined : classroom_id,
         school_id,
         employee_id,
-      },
-    );
+      });
 
-    return classroomTeacherSchoolSubjects;
+    return classroomTeacherSchoolSubject;
   }
 }
 

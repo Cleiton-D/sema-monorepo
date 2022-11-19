@@ -1,3 +1,4 @@
+import { VirtualColumn } from '@shared/decorators/virtualColumn';
 import {
   Column,
   CreateDateColumn,
@@ -17,6 +18,9 @@ class Grade {
 
   @Column()
   after_of?: string;
+
+  @VirtualColumn()
+  is_multidisciplinary: boolean;
 
   @CreateDateColumn()
   created_at: Date;

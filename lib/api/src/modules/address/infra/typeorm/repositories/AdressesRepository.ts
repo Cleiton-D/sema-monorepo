@@ -1,4 +1,6 @@
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IAdressesRepository from '@modules/address/repositories/IAdressesRepository';
 import Address from '../entities/Address';
@@ -9,12 +11,17 @@ export default class AdressesRepository implements IAdressesRepository {
   private ormRepository: Repository<Address>;
 
   constructor() {
-    this.ormRepository = getRepository(Address);
+    this.ormRepository = dataSource.getRepository(Address);
   }
 
   public async findById(address_id: string): Promise<Address | undefined> {
-    const address = await this.ormRepository.findOne(address_id);
-    return address;
+    const address = await this.ormRepository.findOne({
+      where: {
+        id: address_id,
+      },
+    });
+
+    return address ?? undefined;
   }
 
   public async create({

@@ -4,9 +4,9 @@ import { useRouter } from 'next/router';
 import { Form } from '@unform/web';
 
 import Select from 'components/Select';
-import DatePicker from 'components/Datepicker';
 import TextInput from 'components/TextInput';
 import Button from 'components/Button';
+import SchoolDayDatepicker from 'components/SchoolDayDatepicker';
 
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { useListSchools } from 'requests/queries/schools';
@@ -19,9 +19,13 @@ import { useListSchoolSubjects } from './hooks';
 import * as S from './styles';
 
 type SearchClassesProps = {
-  handleSearch: (values: Record<string, string>) => void;
+  handleSearch: (values: Record<string, unknown>) => void;
+  currentValues?: Record<string, unknown>;
 };
-const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
+const SearchClasses = ({
+  handleSearch,
+  currentValues
+}: SearchClassesProps): JSX.Element => {
   const [school, setSchool] = useState<string>();
   const [grade, setGrade] = useState<string>();
   const [classPeriod, setClassPeriod] = useState<string>();
@@ -43,7 +47,11 @@ const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
     useListClassrooms(session, {
       school_id: school,
       grade_id: grade,
-      class_period_id: classPeriod
+      class_period_id: classPeriod,
+      employee_id:
+        session?.accessLevel?.code === 'teacher'
+          ? session.user.employeeId
+          : undefined
     });
 
   const { data: schoolSubjects, isLoading: isLoadingSchoolSubjects } =
@@ -54,8 +62,12 @@ const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
       grade_id: grade
     });
 
-  const { data: teachers, isLoading: isLoadingTeachers } =
-    useListTeachers(session);
+  const { data: teachers, isLoading: isLoadingTeachers } = useListTeachers(
+    session,
+    {
+      school_id: school
+    }
+  );
 
   const schoolsOptions = useMemo(() => {
     if (isLoadingSchools) return [{ label: 'Carregando...', value: '' }];
@@ -85,7 +97,9 @@ const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
     if (!school) return [{ label: 'Selecione uma escola', value: '' }];
     if (isLoadingClassrooms) return [{ label: 'Carregando...', value: '' }];
 
-    return classrooms?.map(({ description, id }) => ({
+    const classroomItems = classrooms?.items || [];
+
+    return classroomItems?.map(({ description, id }) => ({
       label: description,
       value: id
     }));
@@ -121,7 +135,7 @@ const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
       <S.SectionTitle>
         <h4>Pesquisar</h4>
       </S.SectionTitle>
-      <Form onSubmit={handleSearch}>
+      <Form onSubmit={handleSearch} initialData={currentValues}>
         <S.FieldsContainer>
           <Select
             name="status"
@@ -132,7 +146,7 @@ const SearchClasses = ({ handleSearch }: SearchClassesProps): JSX.Element => {
             ]}
             emptyOption
           />
-          <DatePicker name="class_date" label="Data" />
+          <SchoolDayDatepicker name="class_date" label="Data" />
 
           {!session?.schoolId && (
             <Select

@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISystemBackgroundsRepository from '@modules/admin/repositories/ISystemBackgroundsRepository';
 import CreateSystemBackgroundDTO from '@modules/admin/dtos/CreateSystemBackgroundDTO';
@@ -10,14 +12,14 @@ class SystemBackgroundsRepository implements ISystemBackgroundsRepository {
   private ormRepository: Repository<SystemBackground>;
 
   constructor() {
-    this.ormRepository = getRepository(SystemBackground);
+    this.ormRepository = dataSource.getRepository(SystemBackground);
   }
 
   public async findOne({
     current_defined,
     id,
   }: FindSystemBackgroundDTO): Promise<SystemBackground | undefined> {
-    const where: FindConditions<SystemBackground> = {};
+    const where: FindOptionsWhere<SystemBackground> = {};
 
     if (id) where.id = id;
     if (typeof current_defined !== 'undefined') {
@@ -25,14 +27,14 @@ class SystemBackgroundsRepository implements ISystemBackgroundsRepository {
     }
 
     const systemBackgrounds = await this.ormRepository.findOne({ where });
-    return systemBackgrounds;
+    return systemBackgrounds ?? undefined;
   }
 
   public async findAll({
     current_defined,
     id,
   }: FindSystemBackgroundDTO): Promise<SystemBackground[]> {
-    const where: FindConditions<SystemBackground> = {};
+    const where: FindOptionsWhere<SystemBackground> = {};
 
     if (id) where.id = id;
     if (typeof current_defined !== 'undefined') {
@@ -70,6 +72,10 @@ class SystemBackgroundsRepository implements ISystemBackgroundsRepository {
   ): Promise<SystemBackground[]> {
     await this.ormRepository.save(systemBackgrounds);
     return systemBackgrounds;
+  }
+
+  public async delete(systemBackground: SystemBackground): Promise<void> {
+    await this.ormRepository.remove(systemBackground);
   }
 }
 

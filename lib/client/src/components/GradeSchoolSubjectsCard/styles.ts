@@ -8,6 +8,7 @@ export const Wrapper = styled(SectionContent).attrs({ as: 'article' })`
     padding: 1rem 1.5rem !important;
     box-shadow: ${theme.shadow.elevateCardShadow};
     height: 100%;
+    overflow: auto;
   `}
 `;
 

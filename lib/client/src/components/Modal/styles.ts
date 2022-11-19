@@ -37,6 +37,7 @@ export const Title = styled.div`
     font-size: ${theme.font.sizes.medium};
     font-weight: ${theme.font.bold};
     color: ${theme.colors.lightSilver};
+    text-align: left;
   `}
 `;
 

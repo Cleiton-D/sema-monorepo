@@ -1,10 +1,11 @@
 import {
-  FindConditions,
-  getRepository,
+  FindOptionsWhere,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
 } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IClassroomTeacherSchoolSubjectsRepository from '@modules/schools/repositories/IClassroomTeacherSchoolSubjectsRepository';
 import CreateClassroomTeacherSchoolSubjectDTO from '@modules/schools/dtos/CreateClassroomTeacherSchoolSubjectDTO';
@@ -17,11 +18,14 @@ type AndWhere = {
 };
 
 class ClassroomTeacherSchoolSubjectsRepository
-  implements IClassroomTeacherSchoolSubjectsRepository {
+  implements IClassroomTeacherSchoolSubjectsRepository
+{
   private ormRepository: Repository<ClassroomTeacherSchoolSubject>;
 
   constructor() {
-    this.ormRepository = getRepository(ClassroomTeacherSchoolSubject);
+    this.ormRepository = dataSource.getRepository(
+      ClassroomTeacherSchoolSubject,
+    );
   }
 
   public async findOne({
@@ -33,7 +37,7 @@ class ClassroomTeacherSchoolSubjectsRepository
   }: FindClassroomTeacherSchoolSubjectDTO): Promise<
     ClassroomTeacherSchoolSubject | undefined
   > {
-    const where: FindConditions<ClassroomTeacherSchoolSubject> = {};
+    const where: FindOptionsWhere<ClassroomTeacherSchoolSubject> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
@@ -47,24 +51,30 @@ class ClassroomTeacherSchoolSubjectsRepository
       });
     }
 
-    const classroomTeacherSchoolSubject = await this.ormRepository.findOne({
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('classroom_teacher_school_subject')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      join: {
-        alias: 'classroom_teacher_school_subject',
-        leftJoinAndSelect: {
-          employee: 'classroom_teacher_school_subject.employee',
-          classroom: 'classroom_teacher_school_subject.classroom',
-          school_subject: 'classroom_teacher_school_subject.school_subject',
-        },
-      },
-    });
+      })
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.employee',
+        'employee',
+      )
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.classroom',
+        'classroom',
+      )
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.school_subject',
+        'school_subject',
+      );
 
-    return classroomTeacherSchoolSubject;
+    const classroomTeacherSchoolSubject = await queryBuilder.getOne();
+    return classroomTeacherSchoolSubject ?? undefined;
   }
 
   public async findAll({
@@ -73,16 +83,39 @@ class ClassroomTeacherSchoolSubjectsRepository
     school_subject_id,
     employee_id,
     school_id,
+    is_multidisciplinary,
   }: FindClassroomTeacherSchoolSubjectDTO): Promise<
     ClassroomTeacherSchoolSubject[]
   > {
-    const where: FindConditions<ClassroomTeacherSchoolSubject> = {};
+    const where: FindOptionsWhere<ClassroomTeacherSchoolSubject> = {};
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
     if (classroom_id) where.classroom_id = classroom_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
     if (employee_id) where.employee_id = employee_id;
+    if (typeof is_multidisciplinary !== 'undefined') {
+      const multidisciplinary_query = `
+        SELECT 1
+          FROM "grade_school_subjects" "grade_school_subject"
+    INNER JOIN "school_subjects" "school_subject2" ON ("school_subject2"."id" = "grade_school_subject"."school_subject_id")
+         WHERE "school_subject2"."is_multidisciplinary" IS TRUE
+           AND "grade_school_subject"."grade_id" = "grade"."id"
+           AND "grade_school_subject"."deleted_at" is null
+           AND "school_subject2"."id" = "school_subject"."id"
+         LIMIT 1
+    `;
+
+      if (!is_multidisciplinary) {
+        andWhere.push({
+          condition: `NOT EXISTS (${multidisciplinary_query})`,
+        });
+      } else {
+        andWhere.push({
+          condition: `EXISTS (${multidisciplinary_query})`,
+        });
+      }
+    }
     if (school_id) {
       andWhere.push({
         condition: 'classroom.school_id = :schoolId',
@@ -90,22 +123,30 @@ class ClassroomTeacherSchoolSubjectsRepository
       });
     }
 
-    const classroomTeacherSchoolSubjects = await this.ormRepository.find({
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('classroom_teacher_school_subject')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      join: {
-        alias: 'classroom_teacher_school_subject',
-        leftJoinAndSelect: {
-          employee: 'classroom_teacher_school_subject.employee',
-          classroom: 'classroom_teacher_school_subject.classroom',
-          school_subject: 'classroom_teacher_school_subject.school_subject',
-        },
-      },
-    });
+      })
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.employee',
+        'employee',
+      )
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.classroom',
+        'classroom',
+      )
+      .leftJoinAndSelect(
+        'classroom_teacher_school_subject.school_subject',
+        'school_subject',
+      )
+      .leftJoin('classroom.grade', 'grade');
+
+    const classroomTeacherSchoolSubjects = await queryBuilder.getMany();
 
     return classroomTeacherSchoolSubjects;
   }

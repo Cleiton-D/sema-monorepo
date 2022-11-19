@@ -53,7 +53,7 @@ export function useSaveEmployee() {
 
 export function useDeleteEmployee(session?: Session | null) {
   const deleteEmployee = useCallback(
-    async (employee) => {
+    async (employee: Employee) => {
       const api = initializeApi(session);
 
       return api.delete(`/employees/${employee.id}`);

@@ -3,7 +3,8 @@ import ClassroomTeacherSchoolSubjectsController from '../controllers/ClassroomTe
 
 const classroomTeacherSchoolSubjectsRouter = Router({ mergeParams: true });
 
-const classroomTeacherSchoolSubjectsController = new ClassroomTeacherSchoolSubjectsController();
+const classroomTeacherSchoolSubjectsController =
+  new ClassroomTeacherSchoolSubjectsController();
 
 classroomTeacherSchoolSubjectsRouter.get(
   '/',
@@ -12,6 +13,10 @@ classroomTeacherSchoolSubjectsRouter.get(
 classroomTeacherSchoolSubjectsRouter.post(
   '/',
   classroomTeacherSchoolSubjectsController.create,
+);
+classroomTeacherSchoolSubjectsRouter.get(
+  '/:classroom_teacher_school_subject_id',
+  classroomTeacherSchoolSubjectsController.show,
 );
 classroomTeacherSchoolSubjectsRouter.delete(
   '/:classroom_teacher_school_subject_id',

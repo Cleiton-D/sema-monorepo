@@ -54,8 +54,7 @@ const NewEnroll = ({ school, ufs }: NewEnrollProps) => {
       const enroll = get(createEnrollData);
       const selectedStudent = get(selectedStudentAtom);
 
-      const { student, schoolReports, unique_code, enroll_date, ...newEnroll } =
-        enroll;
+      const { student, schoolReports, enroll_date, ...newEnroll } = enroll;
       const { birth_date, ...newStudent } = student;
       const newBirthDate = birth_date.replace(
         /(^[0-9]{2})\/([0-9]{2})\/([0-9]{4})$/,
@@ -74,7 +73,6 @@ const NewEnroll = ({ school, ufs }: NewEnrollProps) => {
         school_id: school.id,
         student: {
           ...newStudent,
-          unique_code,
           birth_date: newBirthDate,
           id: selectedStudent?.id
         }

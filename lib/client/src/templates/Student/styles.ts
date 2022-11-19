@@ -73,7 +73,7 @@ export const Section = styled.section`
 
 export const Divider = styled.hr`
   ${({ theme }) => css`
-    width: 75%;
+    width: 90%;
     appearance: none;
     content: '';
     display: block;
@@ -93,10 +93,26 @@ export const TableSection = styled(SectionContent)`
 
 export const SectionTitle = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
     font-size: ${theme.font.sizes.large};
     font-weight: ${theme.font.bold};
     color: ${theme.colors.lightSilver};
     padding: 2rem;
     padding-top: 1.5rem;
+  `}
+`;
+
+export const EditButtonContainer = styled.div`
+  width: 20rem;
+  align-self: flex-end;
+`;
+
+export const LightLink = styled.a`
+  ${({ theme }) => css`
+    font-size: ${theme.font.sizes.small};
+    font-weight: ${theme.font.bold};
+    color: ${theme.colors.primary};
+    text-decoration: none;
   `}
 `;

@@ -1,5 +1,5 @@
 import { Address, AddressFormData } from './Address';
-import { Contact } from './Contact';
+import { Contact, ContactFormData } from './Contact';
 
 export type Student = {
   id: string;
@@ -9,7 +9,7 @@ export type Student = {
   gender?: 'male' | 'female';
   address_id: string;
   address: Address;
-  birth_date?: Date;
+  birth_date?: Date | string;
   cpf?: string;
   rg?: string;
   nis?: string;
@@ -37,4 +37,10 @@ export type StudentForm = {
   naturalness_uf: string;
   identity_document: string;
   nationality: string;
+  cpf?: string;
+  rg?: string;
+  birth_certificate?: string;
+  nis?: string;
+  unique_code?: string;
+  contacts: ContactFormData[];
 };

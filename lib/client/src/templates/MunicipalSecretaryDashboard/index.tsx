@@ -104,6 +104,13 @@ const MunicipalSecretaryDashboard = () => {
           link="/auth/reports/total-attendances"
         />
         <Card description="Aulas registradas" link="/auth/classes" />
+        <Card description="Relatório de aulas" link={`/auth/class-reports`} />
+        <Card
+          description="Calendário Escolar"
+          link={`/auth/calendar`}
+          module="CALENDAR"
+          rule="READ"
+        />
       </S.Wrapper>
     </Base>
   );

@@ -1,9 +1,9 @@
 import { Session } from 'next-auth';
+import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { Multigrade } from 'models/Multigrade';
 
 import { initializeApi } from 'services/api';
-import { QueryObserverOptions, useQuery } from 'react-query';
 
 export const multigradesKeys = {
   all: 'multigrades' as const,

@@ -35,12 +35,16 @@ class ClassroomsController {
       school_id,
       with_in_multigrades,
       with_multigrades,
+      page,
+      size,
     } = request.query;
 
     const listClassroomsRequest: ListClassroomsRequest = {
       grade_id: grade_id as string,
       class_period_id: class_period_id as string,
       employee_id: employee_id as string,
+      page: page ? Number(page) : undefined,
+      size: size ? Number(size) : undefined,
     };
 
     if (typeof with_in_multigrades !== 'undefined') {
@@ -63,12 +67,8 @@ class ClassroomsController {
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
-    const {
-      class_period_id,
-      grade_id,
-      school_year_id,
-      school_id,
-    } = request.query;
+    const { class_period_id, grade_id, school_year_id, school_id } =
+      request.query;
 
     const countClassrooms = container.resolve(CountClassroomsService);
     const result = await countClassrooms.execute({
@@ -109,8 +109,8 @@ class ClassroomsController {
       requestPayload.school_id = school_id;
     }
 
-    const updateClassroom = container.resolve(CreateClassroomService);
-    const classroom = await updateClassroom.execute(requestPayload);
+    const createClassroom = container.resolve(CreateClassroomService);
+    const classroom = await createClassroom.execute(requestPayload);
     return response.json(classroom);
   }
 

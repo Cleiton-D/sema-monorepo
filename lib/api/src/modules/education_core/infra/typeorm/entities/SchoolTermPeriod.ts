@@ -37,6 +37,9 @@ class SchoolTermPeriod {
   @Column({ type: 'enum', enum: ['ACTIVE', 'FINISH', 'PENDING'] })
   status: TermPeriodStatus;
 
+  @Column({ default: false })
+  manually_changed: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

@@ -5,7 +5,7 @@ import { SchoolTerm } from './SchoolTerm';
 
 export type Class = {
   id: string;
-  school_subject_id: string;
+  school_subject_id?: string;
   school_subject: SchoolSubject;
   classroom_id: string;
   classroom: Classroom;
@@ -20,6 +20,7 @@ export type Class = {
   period: string;
   created_at: string;
   updated_at: string;
+  edit_available?: boolean;
 };
 
 export type FormattedClass = Class & {
@@ -28,3 +29,8 @@ export type FormattedClass = Class & {
   // formattedTimeStart: string;
   // formattedTimeEnd?: string;
 };
+
+export type MinifiedClass = Pick<
+  Class,
+  'id' | 'period' | 'class_date' | 'school_term'
+>;

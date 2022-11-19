@@ -8,6 +8,8 @@ import AppError from '@shared/errors/AppError';
 import SchoolReport from '../infra/typeorm/entities/SchoolReport';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
 import ISchoolReportsRepository from '../repositories/ISchoolReportsRepository';
+import CalcAnnualAverageService from './CalcAnnualAverageService';
+import CalcFinalAverageService from './CalcFinalAverageService';
 
 type SchoolReportRequestType = {
   enroll_id: string;
@@ -37,6 +39,8 @@ class RegisterSchoolReportsService {
     @inject('EnrollsRepository') private enrollsRepository: IEnrollsRepository,
     @inject('SchoolReportsRepository')
     private schoolReportsRepository: ISchoolReportsRepository,
+    private calcAnnualAverage: CalcAnnualAverageService,
+    private calcFinalAverage: CalcFinalAverageService,
   ) {}
 
   public async execute({
@@ -62,13 +66,14 @@ class RegisterSchoolReportsService {
     >((acc, item) => {
       const enrollAverages = Object.entries(item.averages).reduce<
         SchoolReportRequestType['averages']
-      >(
-        (accAverages, [key, value]) => ({
+      >((accAverages, [key, value]) => {
+        if (value === null) return { ...accAverages, [key]: null };
+
+        return {
           ...accAverages,
           [key]: Math.round(value * 100),
-        }),
-        {},
-      );
+        };
+      }, {});
 
       return {
         ...acc,
@@ -98,8 +103,11 @@ class RegisterSchoolReportsService {
         requestAverages,
       );
 
-      const finalAverage = this.calcFinalAverage(newSchoolReport);
-      newSchoolReport.final_average = finalAverage;
+      const annualAverage = this.calcAnnualAverage.execute(newSchoolReport);
+      const finalAverage = this.calcFinalAverage.execute(newSchoolReport);
+
+      newSchoolReport.annual_average = annualAverage as number;
+      newSchoolReport.final_average = finalAverage as number;
 
       return newSchoolReport;
     });
@@ -131,28 +139,6 @@ class RegisterSchoolReportsService {
       }, {});
 
     return Object.assign(target, filteredObject);
-  }
-
-  private calcFinalAverage(schoolReport: SchoolReport): number {
-    const first = schoolReport.first || 0;
-    const second = schoolReport.second || 0;
-    const third = schoolReport.third || 0;
-    const fourth = schoolReport.fourth || 0;
-    const first_rec = schoolReport.first_rec || 0;
-    const second_rec = schoolReport.second_rec || 0;
-    // const exam = schoolReport.exam || 0;
-
-    let firstSemAverage = (first + second) / 2;
-    firstSemAverage =
-      firstSemAverage >= first_rec ? firstSemAverage : first_rec;
-
-    let secondSemAverage = (third + fourth) / 2;
-    secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
-
-    const finalAverage = (firstSemAverage + secondSemAverage) / 2;
-
-    return Math.round(finalAverage);
   }
 }
 

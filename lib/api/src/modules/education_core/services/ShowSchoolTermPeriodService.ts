@@ -8,7 +8,9 @@ import SchoolTermPeriod, {
 import ISchoolTermPeriodsRepository from '../repositories/ISchoolTermPeriodsRepository';
 
 type ShowSchoolTermPeriodRequest = {
+  id?: string;
   school_year_id?: string;
+  contain_date?: Date;
   status?: TermPeriodStatus;
 };
 
@@ -20,11 +22,15 @@ class ShowSchoolTermPeriodService {
   ) {}
 
   public async execute({
+    id,
     school_year_id,
+    contain_date,
     status,
   }: ShowSchoolTermPeriodRequest): Promise<SchoolTermPeriod> {
     const schoolTermPeriod = await this.schoolTermPeriodsRepository.findOne({
+      id,
       school_year_id,
+      contain_date,
       status,
     });
 

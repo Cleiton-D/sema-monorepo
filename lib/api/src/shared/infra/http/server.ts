@@ -22,6 +22,7 @@ import timetablesRouter from '@modules/schools/infra/http/routes/timetables.rout
 import classroomRouter from '@modules/schools/infra/http/routes/classrooms.routes';
 import classroomTeacherSchoolSubjectsRouter from '@modules/schools/infra/http/routes/classroom_teacher_school_subjects.routes';
 import multigradesRouter from '@modules/schools/infra/http/routes/multigrades.routes';
+import calendarEventsRouter from '@modules/education_core/infra/http/routes/calendar_events.routes';
 
 import AppError from '@shared/errors/AppError';
 
@@ -52,6 +53,7 @@ app.use(
   '/classroom-teacher-school-subjects',
   classroomTeacherSchoolSubjectsRouter,
 );
+app.use('/calendar-events', calendarEventsRouter);
 
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   if (err instanceof AppError) {

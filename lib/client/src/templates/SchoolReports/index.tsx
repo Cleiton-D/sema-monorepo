@@ -5,6 +5,7 @@ import Base from 'templates/Base';
 import Heading from 'components/Heading';
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
+import EnrollSchoolReports from 'components/EnrollSchoolReports';
 
 import { Enroll } from 'models/Enroll';
 
@@ -14,7 +15,6 @@ import { translateStatus } from 'utils/translateStatus';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
-import EnrollSchoolReports from 'components/EnrollSchoolReports';
 
 const SchoolReportsTemplate = () => {
   const { data: session } = useSession();
@@ -34,7 +34,10 @@ const SchoolReportsTemplate = () => {
         <S.SectionTitle>
           <h4>Turmas</h4>
         </S.SectionTitle>
-        <Table<Enroll> items={enrolls || []} keyExtractor={(item) => item.id}>
+        <Table<Enroll>
+          items={enrolls?.items || []}
+          keyExtractor={(item) => item.id}
+        >
           <TableColumn label="Nome" tableKey="student.name">
             {(enroll) => <EnrollSchoolReports enroll={enroll} />}
           </TableColumn>

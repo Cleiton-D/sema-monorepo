@@ -1,11 +1,15 @@
-import { addMinutes, isBefore, isAfter, isEqual, format } from 'date-fns';
+import addMinutes from 'date-fns/addMinutes';
+import isBefore from 'date-fns/isBefore';
+import isAfter from 'date-fns/isAfter';
+import isEqual from 'date-fns/isEqual';
+import format from 'date-fns/format';
 
 type ClassPeriodTimes = {
   time_start: string;
   time_end: string;
   class_time: string;
-  break_time: string;
-  break_time_start: string;
+  break_time?: string;
+  break_time_start?: string;
 };
 
 const parseTime = (time: string) => {
@@ -39,38 +43,55 @@ export const generateTimetable = ({
 }: ClassPeriodTimes): TimetableItem[] => {
   const parsedTimeStart = parseTime(time_start);
   const parsedTimeEnd = parseTime(time_end);
-  const parsedBreakTimeStart = parseTime(break_time_start);
   const classTimeMinutes = getMinutes(class_time);
-  const breakTimeMinutes = getMinutes(break_time);
 
-  const breakTimeEnd = addMinutes(parsedBreakTimeStart, breakTimeMinutes);
+  const hasBreakTime = !!break_time_start && !!break_time;
 
-  const isEqualBreak = isEqual(parsedTimeStart, parsedBreakTimeStart);
-  const isBeforeBreak = isBefore(parsedTimeStart, parsedBreakTimeStart);
-  const isAfterBreak = isAfter(parsedTimeStart, breakTimeEnd);
-  const isBetweenBreak = isEqualBreak || (!isBeforeBreak && !isAfterBreak);
+  let classTimeStart = parsedTimeStart;
 
-  const classTimeStart = isBetweenBreak ? breakTimeEnd : parsedTimeStart;
-  const classTimeEnd = addMinutes(classTimeStart, classTimeMinutes);
+  if (hasBreakTime) {
+    const parsedBreakTimeStart = parseTime(break_time_start);
+    const breakTimeMinutes = getMinutes(break_time);
+    const breakTimeEnd = addMinutes(parsedBreakTimeStart, breakTimeMinutes);
 
-  const startBeforeBreak = isBefore(classTimeStart, parsedBreakTimeStart);
-  const endBeforeBreak = isBefore(classTimeEnd, parsedBreakTimeStart);
-  const classBeforeBreak = startBeforeBreak && endBeforeBreak;
+    const isEqualBreak = isEqual(parsedTimeStart, parsedBreakTimeStart);
+    const isBeforeBreak = isBefore(parsedTimeStart, parsedBreakTimeStart);
+    const isAfterBreak = isAfter(parsedTimeStart, breakTimeEnd);
+    const isBetweenBreak = isEqualBreak || (!isBeforeBreak && !isAfterBreak);
 
-  const startEqualBreakEnd = isEqual(classTimeStart, breakTimeEnd);
-  const startAfterBreak = isAfter(classTimeStart, parsedBreakTimeStart);
-  const endAfterBreak = isAfter(classTimeEnd, parsedBreakTimeStart);
-  const classAfterBreak =
-    (startAfterBreak || startEqualBreakEnd) && endAfterBreak;
+    if (isBetweenBreak) {
+      classTimeStart = breakTimeEnd;
+    }
+  }
 
-  const withBreakTimeEnd =
-    classBeforeBreak || classAfterBreak ? classTimeEnd : parsedBreakTimeStart;
+  let classTimeEnd = addMinutes(classTimeStart, classTimeMinutes);
+
+  if (hasBreakTime) {
+    const parsedBreakTimeStart = parseTime(break_time_start);
+    const breakTimeMinutes = getMinutes(break_time);
+    const breakTimeEnd = addMinutes(parsedBreakTimeStart, breakTimeMinutes);
+
+    const startBeforeBreak = isBefore(classTimeStart, parsedBreakTimeStart);
+    const endBeforeBreak = isBefore(classTimeEnd, parsedBreakTimeStart);
+    const classBeforeBreak = startBeforeBreak && endBeforeBreak;
+
+    const startEqualBreakEnd = isEqual(classTimeStart, breakTimeEnd);
+    const startAfterBreak = isAfter(classTimeStart, parsedBreakTimeStart);
+    const endAfterBreak = isAfter(classTimeEnd, parsedBreakTimeStart);
+
+    const classAfterBreak =
+      (startAfterBreak || startEqualBreakEnd) && endAfterBreak;
+
+    if (!classBeforeBreak && !classAfterBreak) {
+      classTimeEnd = parsedBreakTimeStart;
+    }
+  }
 
   const startBeforeEnd = isBefore(classTimeStart, parsedTimeEnd);
   if (!startBeforeEnd) return [];
 
-  const endBeforeEnd = isBefore(withBreakTimeEnd, parsedTimeEnd);
-  const finalClassTimeEnd = endBeforeEnd ? withBreakTimeEnd : parsedTimeEnd;
+  const endBeforeEnd = isBefore(classTimeEnd, parsedTimeEnd);
+  const finalClassTimeEnd = endBeforeEnd ? classTimeEnd : parsedTimeEnd;
 
   const startStr = format(classTimeStart, 'HH:mm');
   const endStr = format(finalClassTimeEnd, 'HH:mm');

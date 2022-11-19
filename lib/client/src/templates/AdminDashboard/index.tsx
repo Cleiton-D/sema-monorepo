@@ -114,7 +114,18 @@ const AdminDashboard = () => {
           link="/auth/reports/total-attendances"
         />
         <Card description="Aulas registradas" link="/auth/classes" />
+
+        <Card
+          description="Calendário Escolar"
+          link={`/auth/calendar`}
+          module="CALENDAR"
+          rule="READ"
+        />
+
+        <Card description="Relatório de aulas" link={`/auth/class-reports`} />
+
         <DatabaseDumpCard />
+        <Card description="Planos de fundo" link="/auth/system/backgrounds" />
       </S.Wrapper>
     </Base>
   );

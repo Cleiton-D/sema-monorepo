@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 
 export async function getMiddlewareSession<T = any>(
-  req: NextRequest
+  request: NextRequest
 ): Promise<T | null> {
   try {
-    const cookie = req.headers.get('cookie');
+    const cookie = request.headers.get('cookie');
 
     const options = cookie ? { headers: { cookie } } : {};
 

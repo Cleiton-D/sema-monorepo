@@ -1,3 +1,1 @@
-import { createConnections } from 'typeorm';
-
-createConnections();
+import './polyfill';

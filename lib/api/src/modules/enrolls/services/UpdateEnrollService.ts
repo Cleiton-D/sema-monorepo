@@ -8,6 +8,7 @@ import IEnrollClassroomsRepository from '../repositories/IEnrollClassroomsReposi
 
 type UpdateEnrollRequest = {
   enroll_id: string;
+  transfer_date?: string;
   status: EnrollStatus;
 };
 
@@ -21,6 +22,7 @@ class UpdateEnrollService {
 
   public async execute({
     enroll_id,
+    transfer_date,
     status,
   }: UpdateEnrollRequest): Promise<Enroll> {
     const enroll = await this.enrollsRepository.findOne({ id: enroll_id });
@@ -31,17 +33,17 @@ class UpdateEnrollService {
     const currentStatus = enroll.status;
     const updatedEnroll = Object.assign(enroll, {
       status,
+      transfer_date,
     });
 
     await this.enrollsRepository.update(updatedEnroll);
 
     if (currentStatus !== status) {
-      const currentEnrollClassroom = await this.enrollClassroomsRepository.findOne(
-        {
+      const currentEnrollClassroom =
+        await this.enrollClassroomsRepository.findOne({
           enroll_id,
           status: 'ACTIVE',
-        },
-      );
+        });
       if (currentEnrollClassroom) {
         const updatedEnrollClassroom = Object.assign(currentEnrollClassroom, {
           status,

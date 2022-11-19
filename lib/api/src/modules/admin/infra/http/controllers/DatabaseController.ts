@@ -6,9 +6,16 @@ import CreateDatabaseDumpService from '@modules/admin/services/CreateDatabaseDum
 class DatabaseController {
   public async dump(_request: Request, response: Response): Promise<Response> {
     const createDatabaseDump = container.resolve(CreateDatabaseDumpService);
-    const result = await createDatabaseDump.execute();
+    const { filename, stream } = await createDatabaseDump.execute();
 
-    return response.json(result);
+    response.setHeader('Content-Type', 'application/octet-stream');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename=${filename}`,
+    );
+
+    stream.pipe(response);
+    return response;
   }
 }
 

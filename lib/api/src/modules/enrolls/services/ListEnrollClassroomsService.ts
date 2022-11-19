@@ -6,6 +6,7 @@ type ListEnrollClassroomsRequest = {
   classroom_id?: string;
   enroll_id?: string | string[];
   status?: string;
+  with_old_multigrades?: boolean;
 };
 
 @injectable()
@@ -19,11 +20,13 @@ class ListEnrollClassroomsService {
     classroom_id,
     enroll_id,
     status,
+    with_old_multigrades,
   }: ListEnrollClassroomsRequest): Promise<EnrollClassroom[]> {
     const enrollClassrooms = await this.enrollClassroomsRepository.findAll({
       classroom_id,
       enroll_id,
       status,
+      with_old_multigrades,
     });
 
     return enrollClassrooms;

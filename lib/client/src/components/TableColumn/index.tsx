@@ -3,19 +3,20 @@ import { useEffect, useRef, useCallback, useState, memo } from 'react';
 import { useTable } from 'components/Table';
 
 import { getElementPositionFromParent } from 'utils/getElementPositionFromParent';
+import { withAccessComponent } from 'hooks/AccessProvider';
 
 import * as S from './styles';
-import { withAccessComponent } from 'hooks/AccessProvider';
 
 type RenderChildrenFunction = (item: any) => React.ReactNode;
 
 export type TableColumnProps = {
   tableKey: string;
-  label: string;
+  label: React.ReactNode;
   fixed?: boolean;
   contentAlign?: 'left' | 'center' | 'right';
+  border?: 'all' | 'left' | 'right' | 'none';
   actionColumn?: boolean;
-  render?: (value: any) => React.ReactNode;
+  render?: (value: any, lineIndex: number) => React.ReactNode;
   children?: React.ReactNode | RenderChildrenFunction;
   open?: boolean;
   ellipsis?: boolean;
@@ -28,7 +29,7 @@ const TableColumn = ({
   contentAlign = 'left'
 }: TableColumnProps) => {
   const [position, setPosition] = useState(0);
-  const localRef = useRef<HTMLTableHeaderCellElement>(null);
+  const localRef = useRef<HTMLTableCellElement>(null);
 
   const { eventEmitter, minimal } = useTable();
 

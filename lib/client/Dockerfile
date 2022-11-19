@@ -1,36 +1,37 @@
-# FROM node:alpine AS deps
-
-# WORKDIR /app
-# COPY . .
-# RUN yarn install --production --ignore-scripts --prefer-offline
-
-FROM node:alpine AS runner
-
-# ARG NEXTAUTH_URL
-# ARG NEXT_PUBLIC_API_URL
-# ARG SERVER_API_URL
-
-# ENV NEXTAUTH_URL $NEXTAUTH_URL
-# ENV NEXT_PUBLIC_API_URL $NEXT_PUBLIC_API_URL
-# ENV SERVER_API_URL $SERVER_API_URL
-
-ENV NODE_ENV production
+FROM node:16-alpine AS builder
 
 WORKDIR /app
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
 
-# RUN echo $NEXT_PUBLIC_API_URL
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV NODE_ENV production
 
-# COPY --from=deps /app/node_modules ./node_modules
-COPY node_modules ./node_modules
+COPY . .
+RUN yarn install
+RUN yarn add --dev typescript @types/react @types/node
+RUN yarn build
+RUN rm -rf node_modules
 
-COPY  public ./public
-COPY --chown=nextjs:nodejs .next ./.next
-COPY  package.json ./package.json
-COPY .env.local ./.env.local
+FROM node:16-slim AS runner
 
-USER nextjs
+ENV NODE_ENV production
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+WORKDIR /app
+
+#  && useradd -r -g pptruse
+# RUN addgroup -g 1001 -S nodejs
+# RUN adduser -S nextjs -u 1001
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/yarn.lock ./yarn.lock
+COPY --from=builder /app/.env.local ./.env.local
+COPY next.config.js ./next.config.js
+
+RUN yarn install --production
+
+# USER nextjs
 
 EXPOSE 3000
 

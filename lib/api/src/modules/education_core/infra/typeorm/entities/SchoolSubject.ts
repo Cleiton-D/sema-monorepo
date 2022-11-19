@@ -20,6 +20,9 @@ class SchoolSubject {
   @Column()
   index: number;
 
+  @Column()
+  is_multidisciplinary: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

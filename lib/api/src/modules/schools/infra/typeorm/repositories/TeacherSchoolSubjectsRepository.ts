@@ -1,27 +1,29 @@
-import { FindConditions, getRepository, Repository, In } from 'typeorm';
+import { FindOptionsWhere, Repository, In } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ITeacherSchoolSubjectsRepository from '@modules/schools/repositories/ITeacherSchoolSubjectsRepository';
-
 import CreateTeacherSchoolSubjectDTO from '@modules/schools/dtos/CreateTeacherSchoolSubjectDTO';
 import FindTeacherSchoolSubjectDTO from '@modules/schools/dtos/FindTeacherSchoolSubjectDTO';
 import TeacherSchoolSubject from '../entities/TeacherSchoolSubject';
 
 class TeacherSchoolSubjectsRepository
-  implements ITeacherSchoolSubjectsRepository {
+  implements ITeacherSchoolSubjectsRepository
+{
   private ormRepository: Repository<TeacherSchoolSubject>;
 
   constructor() {
-    this.ormRepository = getRepository(TeacherSchoolSubject);
+    this.ormRepository = dataSource.getRepository(TeacherSchoolSubject);
   }
 
   public async findById(
     teacher_school_subject_id: string,
   ): Promise<TeacherSchoolSubject | undefined> {
-    const teacherSchoolSubject = await this.ormRepository.findOne(
-      teacher_school_subject_id,
-    );
+    const teacherSchoolSubject = await this.ormRepository.findOne({
+      where: { id: teacher_school_subject_id },
+    });
 
-    return teacherSchoolSubject;
+    return teacherSchoolSubject ?? undefined;
   }
 
   public async findAll({
@@ -29,7 +31,7 @@ class TeacherSchoolSubjectsRepository
     school_subject_id,
     employee_id,
   }: FindTeacherSchoolSubjectDTO): Promise<TeacherSchoolSubject[]> {
-    const where: FindConditions<TeacherSchoolSubject> = {};
+    const where: FindOptionsWhere<TeacherSchoolSubject> = {};
     if (school_id) where.school_id = school_id;
     if (employee_id) where.employee_id = employee_id;
     if (school_subject_id) {

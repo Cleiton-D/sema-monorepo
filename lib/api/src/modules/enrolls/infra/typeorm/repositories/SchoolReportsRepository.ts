@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, In, Repository } from 'typeorm';
+import { FindOptionsWhere, In, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import ISchoolReportsRepository from '@modules/enrolls/repositories/ISchoolReportsRepository';
 import FindSchoolReportDTO from '@modules/enrolls/dtos/FindSchoolReportDTO';
@@ -9,14 +11,14 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
   private ormRepository: Repository<SchoolReport>;
 
   constructor() {
-    this.ormRepository = getRepository(SchoolReport);
+    this.ormRepository = dataSource.getRepository(SchoolReport);
   }
 
   public async findAll({
     enroll_id,
     school_subject_id,
   }: FindSchoolReportDTO): Promise<SchoolReport[]> {
-    const where: FindConditions<SchoolReport> = {};
+    const where: FindOptionsWhere<SchoolReport> = {};
 
     if (school_subject_id) where.school_subject_id = school_subject_id;
 
@@ -28,10 +30,20 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
       }
     }
 
-    const schoolReports = await this.ormRepository.find({
-      where,
-      relations: ['school_subject', 'enroll', 'enroll.student'],
-    });
+    // relations: ['school_subject', 'enroll', 'enroll.student'],
+
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('school_report')
+      .select()
+      .where(where)
+      .innerJoinAndSelect('school_report.school_subject', 'school_subject')
+      .innerJoinAndSelect('school_report.enroll', 'enroll')
+      .innerJoinAndSelect('enroll.student', 'student')
+      .leftJoinAndSelect('enroll.enroll_classrooms', 'enroll_classroom')
+      .leftJoinAndSelect('enroll_classroom.classroom', 'current_classroom')
+      .addOrderBy('student.name');
+
+    const schoolReports = await queryBuilder.getMany();
 
     return schoolReports;
   }
@@ -58,6 +70,7 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
         second_rec,
         exam,
         final_average,
+        annual_average,
       }) =>
         this.ormRepository.create({
           enroll_id,
@@ -70,6 +83,7 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
           second_rec,
           exam,
           final_average,
+          annual_average,
         }),
     );
 

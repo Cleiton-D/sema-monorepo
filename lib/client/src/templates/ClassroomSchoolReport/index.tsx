@@ -24,7 +24,8 @@ const ClassroomSchoolReport = (): JSX.Element => {
   const { data: classroomSchoolSubjects } =
     useListClassroomTeacherSchoolSubjects(session, {
       classroom_id: query.classroom_id as string,
-      employee_id: session?.user.employeeId
+      employee_id: session?.user.employeeId,
+      is_multidisciplinary: 0
     });
 
   const tabItems = useMemo(() => {

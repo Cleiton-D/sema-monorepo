@@ -1,20 +1,30 @@
+import { useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
+import { Edit, Printer } from '@styled-icons/feather';
+import format from 'date-fns/format';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
 import SchoolReportTable from 'components/SchoolReportTable';
+import Button from 'components/Button';
+
+import { useAccess } from 'hooks/AccessProvider';
 
 import { useGetEnrollDetails } from 'requests/queries/enrolls';
 
 import { translateStatus } from 'utils/translateStatus';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 import { translateContactType } from 'utils/mappers/contactsMapper';
+import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
 
 const StudentPageTemplate = () => {
+  const { enableAccess } = useAccess();
+
   const { query } = useRouter();
   const { data: session } = useSession();
 
@@ -23,9 +33,23 @@ const StudentPageTemplate = () => {
     session
   );
 
+  const canEditEnroll = useMemo(
+    () => enableAccess({ module: 'ENROLL', rule: 'WRITE' }),
+    [enableAccess]
+  );
+
   return (
     <Base>
       <Heading>Detalhes do aluno</Heading>
+      {enroll && canEditEnroll && (
+        <S.EditButtonContainer>
+          <Link href={`/auth/student/${enroll.id}/edit`} passHref>
+            <Button styleType="normal" size="medium" icon={<Edit />} as="a">
+              Editar aluno
+            </Button>
+          </Link>
+        </S.EditButtonContainer>
+      )}
       <S.Wrapper>
         <div>
           <S.StudentName size="md" color="primary">
@@ -63,9 +87,31 @@ const StudentPageTemplate = () => {
               </span>
             </S.GridItem>
             <S.GridItem>
+              <strong>Data da Matrícula</strong>
+              <span>
+                {enroll?.enroll_date &&
+                  format(
+                    parseDateWithoutTimezone(enroll?.enroll_date),
+                    'dd/MM/yyyy'
+                  )}
+              </span>
+            </S.GridItem>
+            <S.GridItem>
               <strong>Situação</strong>
               <span>{enroll?.status && translateStatus(enroll.status)}</span>
             </S.GridItem>
+
+            {enroll?.status === 'TRANSFERRED' && !!enroll.transfer_date && (
+              <S.GridItem>
+                <strong>Data da Transferência</strong>
+                <span>
+                  {format(
+                    parseDateWithoutTimezone(enroll.transfer_date),
+                    'dd/MM/yyyy'
+                  )}
+                </span>
+              </S.GridItem>
+            )}
           </S.Grid>
           <S.Divider style={{ marginTop: 24 }} />
           <S.Section>
@@ -118,6 +164,24 @@ const StudentPageTemplate = () => {
       <S.TableSection>
         <S.SectionTitle>
           <h4>Boletim</h4>
+
+          <Link
+            href={{
+              pathname: '/auth/exports/school-reports',
+              query: {
+                enroll_id: enroll?.id
+              }
+            }}
+            passHref
+          >
+            <S.LightLink target="_blank">
+              <Printer
+                size={18}
+                style={{ strokeWidth: 2, marginRight: '0.5rem' }}
+              />
+              Imprimir boletim
+            </S.LightLink>
+          </Link>
         </S.SectionTitle>
         <SchoolReportTable enrollId={query.enroll_id as string} isMininal />
       </S.TableSection>

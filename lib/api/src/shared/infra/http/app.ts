@@ -1,9 +1,10 @@
-import 'reflect-metadata';
+import express from 'express';
 
-import '../../container';
+import uploadConfig from '@config/storage';
+
 import server from './server';
 
-import '@shared/infra/typeorm';
+server.use('/files', express.static(uploadConfig.uploadsPath));
 
 const port = process.env.PORT || 3333;
 server.listen(port, () => {

@@ -1,4 +1,6 @@
-import { getRepository, Repository, FindConditions, ILike } from 'typeorm';
+import { Repository, FindOptionsWhere, ILike } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IStudentsRepository from '@modules/students/repositories/IStudentsRepository';
 import CreateStudentDTO from '@modules/students/dtos/CreateStudentDTO';
@@ -10,24 +12,20 @@ class StudentsRepository implements IStudentsRepository {
   private ormRepository: Repository<Student>;
 
   constructor() {
-    this.ormRepository = getRepository(Student);
+    this.ormRepository = dataSource.getRepository(Student);
   }
 
   public async findById(student_id: string): Promise<Student | undefined> {
-    const student = await this.ormRepository.findOne({
-      where: {
-        id: student_id,
-      },
-      join: {
-        alias: 'student',
-        leftJoinAndSelect: {
-          address: 'student.address',
-          contacts: 'student.student_contacts',
-          contacts_contact: 'contacts.contact',
-        },
-      },
-    });
-    return student;
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('student')
+      .select()
+      .where({ id: student_id })
+      .leftJoinAndSelect('student.address', 'address')
+      .leftJoinAndSelect('student.student_contacts', 'contacts')
+      .leftJoinAndSelect('contacts.contact', 'contacts_contact');
+
+    const student = await queryBuilder.getOne();
+    return student ?? undefined;
   }
 
   public async findAll({
@@ -36,7 +34,7 @@ class StudentsRepository implements IStudentsRepository {
     rg,
     unique_code,
   }: StudentFilterDTO): Promise<Student[]> {
-    const where: FindConditions<Student>[] = [];
+    const where: FindOptionsWhere<Student>[] = [];
 
     if (name) {
       where.push({ name: ILike(`%${name}%`) });
@@ -46,7 +44,7 @@ class StudentsRepository implements IStudentsRepository {
     if (unique_code) where.push({ unique_code });
 
     const students = await this.ormRepository.find({
-      where,
+      where: where.length ? where : undefined,
     });
 
     return students;

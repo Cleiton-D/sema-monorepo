@@ -1,7 +1,7 @@
 import { ClassPeriod } from './ClassPeriod';
 import { Classroom } from './Classroom';
-import { ContactFormData } from './Contact';
 import { Grade } from './Grade';
+import { School } from './School';
 import { Student, StudentForm } from './Student';
 
 export type EnrollStatus =
@@ -18,6 +18,7 @@ export type Enroll = {
   status: EnrollStatus | string;
   student_id: string;
   school_id: string;
+  school?: School;
   grade_id: string;
   grade?: Grade;
   school_year_id: string;
@@ -27,6 +28,9 @@ export type Enroll = {
   current_classroom?: Classroom;
   class_period?: ClassPeriod;
   enroll_date: string;
+  origin: 'NEW' | 'REPEATING';
+  unique_code: string;
+  transfer_date?: string;
 };
 
 export type EnrollCountResponse = {
@@ -37,7 +41,7 @@ export type EnrollFormData = {
   origin: 'NEW' | 'REPEATING';
   grade_id: string;
   // class_period: ClassPeriod;
-  unique_code: string;
+
   classroom_id: string;
   enroll_date: string;
   schoolReports: Record<string, Record<string, number>>;
@@ -48,15 +52,11 @@ export type EnrollDocumentsFormData = {
   rg?: string;
   nis?: string;
   birth_certificate?: string;
+  unique_code?: string;
 };
 
 export type CompleteEnrollFormData = EnrollFormData & {
-  student: StudentForm & {
-    cpf?: string;
-    rg?: string;
-    birth_certificate?: string;
-    contacts: ContactFormData[];
-  };
+  student: StudentForm;
 };
 
 export type MappedEnroll = Enroll & {

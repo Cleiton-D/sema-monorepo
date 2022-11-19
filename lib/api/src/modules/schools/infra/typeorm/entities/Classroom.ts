@@ -18,8 +18,6 @@ import ClassPeriod from '@modules/education_core/infra/typeorm/entities/ClassPer
 
 import School from './School';
 
-export type ClassPeriodType = 'MORNING' | 'EVENING' | 'NOCTURNAL';
-
 @Entity('classrooms')
 class Classroom {
   @PrimaryGeneratedColumn('uuid')

@@ -9,10 +9,14 @@ import TextInput from 'components/TextInput';
 import Heading from 'components/Heading';
 import Button from 'components/Button';
 
+import { SystemBackground } from 'models/SystemBackground';
+
 import { signInSchema } from './rules/schema';
 
+import Image from 'next/image';
+
 import * as S from './styles';
-import { SystemBackground } from 'models/SystemBackground';
+import { isUrl } from 'utils/isUrl';
 
 export type SigninFormData = {
   email: string;
@@ -39,9 +43,9 @@ const SignIn = ({ background }: SignInProps) => {
         abortEarly: false
       });
 
-      const callbackUrl = `${window.location.origin}${
-        query?.callbackUrl || '/auth'
-      }`;
+      const callbackUrl = isUrl((query?.callbackUrl as string) || '')
+        ? query?.callbackUrl
+        : `${window.location.origin}${query?.callbackUrl || '/auth'}`;
       const result = await signIn('credentials', {
         ...values,
         redirect: false,
@@ -75,6 +79,7 @@ const SignIn = ({ background }: SignInProps) => {
 
         formRef.current?.setErrors(validationError);
       } else {
+        console.log(err);
         toast.error('Não foi possível efetuar o login!', {
           position: toast.POSITION.TOP_RIGHT
         });
@@ -88,7 +93,7 @@ const SignIn = ({ background }: SignInProps) => {
     <S.Wrapper hasBackground={!!background}>
       {background && (
         <S.Background
-          src={`/img/backgrounds/${background.name}`}
+          src={background.image_url}
           layout="fill"
           objectFit="cover"
           quality={80}
@@ -98,7 +103,17 @@ const SignIn = ({ background }: SignInProps) => {
       )}
 
       <S.Content>
-        <Heading>Faça seu login</Heading>
+        <S.WfLogoContainer>
+          <Image
+            src="/img/logowf.gif"
+            layout="fill"
+            objectFit="contain"
+            quality={80}
+            sizes="120px"
+          />
+        </S.WfLogoContainer>
+        <Heading color="secondary">Faça seu login</Heading>
+
         <S.Form onSubmit={handleSubmit} ref={formRef}>
           <TextInput name="email" label="Digite seu CPF" />
           <TextInput name="password" label="Digite sua senha" type="password" />

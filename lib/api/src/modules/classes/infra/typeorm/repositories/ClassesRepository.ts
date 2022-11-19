@@ -1,19 +1,21 @@
 import {
-  FindConditions,
-  FindManyOptions,
-  getRepository,
+  FindOptionsWhere,
   ObjectLiteral,
   Repository,
-  WhereExpression,
+  WhereExpressionBuilder,
   ILike,
   Raw,
 } from 'typeorm';
+import { parseISO } from 'date-fns';
+
+import { dataSource } from '@config/data_source';
 
 import IClassesRepository from '@modules/classes/repositories/IClassesRepository';
 import CreateClassDTO from '@modules/classes/dtos/CreateClassDTO';
 import FindClassDTO from '@modules/classes/dtos/FindClassDTO';
 import CountResultDTO from '@modules/classes/dtos/CountResultDTO';
 
+import { PaginatedResponse } from '@shared/dtos';
 import Class from '../entities/Class';
 
 type AndWhere = {
@@ -25,10 +27,10 @@ class ClassesRepository implements IClassesRepository {
   private ormRepository: Repository<Class>;
 
   constructor() {
-    this.ormRepository = getRepository(Class);
+    this.ormRepository = dataSource.getRepository(Class);
   }
 
-  private makeFilterSelect({
+  private async createQueryBuilder({
     classroom_id,
     employee_id,
     school_subject_id,
@@ -38,26 +40,66 @@ class ClassesRepository implements IClassesRepository {
     grade_id,
     status,
     taught_content,
+    school_term,
     limit,
     order: orderDirection,
     sortBy,
-  }: FindClassDTO): FindManyOptions<Class> {
-    const where: FindConditions<Class> = {};
+    before,
+    period,
+    id,
+  }: FindClassDTO) {
+    const where: FindOptionsWhere<Class> = {};
     const andWhere: AndWhere[] = [];
 
-    const order: Record<string, 'ASC' | 'DESC'> = {};
-
-    if (classroom_id) where.classroom_id = classroom_id;
+    // if (classroom_id) where.classroom_id = classroom_id;
     if (employee_id) where.employee_id = employee_id;
     if (school_subject_id) where.school_subject_id = school_subject_id;
     if (status) where.status = status;
     if (taught_content) where.taught_content = ILike(`%${taught_content}%`);
+    if (period) where.period = period;
+    if (id) where.id = id;
+    if (school_term) where.school_term = school_term;
+
+    if (classroom_id) {
+      andWhere.push({
+        condition: `
+          (classroom.id = :classroomId OR
+            EXISTS (
+              SELECT 1
+                FROM multiclasses multiclass
+               WHERE multiclass.classroom_id = :classroomId
+                 AND multiclass.class_id = class.id
+            )
+          )`,
+        parameters: { classroomId: classroom_id },
+      });
+    }
+
+    if (before) {
+      const oldClass = await this.ormRepository.findOne({
+        where: { id: before },
+      });
+      if (oldClass) {
+        andWhere.push({
+          condition: 'class.class_date <= :oldClassDate',
+          parameters: { oldClassDate: oldClass?.class_date },
+        });
+      }
+    }
+
+    // if (classroom_id) {
+    //   andWhere.push({
+    //     condition:
+    //       '(classroom.id = :classroomId OR enroll_classroom.id = :classroomId)',
+    //     parameters: { classroomId: classroom_id },
+    //   });
+    // }
 
     if (class_date) {
-      const [date] = class_date.split('T');
+      const parsedDate = parseISO(class_date);
 
       where.class_date = Raw(alias => `CAST(${alias} AS DATE) = :classDate`, {
-        classDate: date,
+        classDate: parsedDate,
       });
     }
     if (school_id) {
@@ -79,45 +121,60 @@ class ClassesRepository implements IClassesRepository {
       });
     }
 
-    if (sortBy) {
-      order[sortBy] = orderDirection || 'DESC';
-    }
-
-    return {
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('class')
+      .select()
+      .addSelect(`school_term_period.status = 'ACTIVE'`, 'edit_available')
+      // .addSelect('school_term_period.status', 'edit_available')
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      order,
-      take: limit,
-      join: {
-        alias: 'class',
-        leftJoinAndSelect: {
-          classroom: 'class.classroom',
-          school_subject: 'class.school_subject',
-          employee: 'class.employee',
-        },
-      },
-    };
+      })
+      .take(limit)
+      .leftJoinAndSelect('class.classroom', 'classroom')
+      // .leftJoinAndSelect('class.enroll_classroom', 'enroll_classroom')
+      .leftJoinAndSelect('class.school_subject', 'school_subject')
+      .leftJoinAndSelect('class.employee', 'employee')
+      .leftJoin(
+        'school_term_periods',
+        'school_term_period',
+        'CAST(school_term_period.school_term AS varchar) = CAST(class.school_term AS varchar)',
+      );
+
+    if (sortBy) {
+      queryBuilder.addOrderBy(`class.${sortBy}`, orderDirection || 'DESC');
+    }
+
+    return queryBuilder;
   }
 
-  public async findById(class_id: string): Promise<Class | undefined> {
-    const classEntity = await this.ormRepository.findOne({
-      where: {
-        id: class_id,
-      },
-      relations: ['classroom', 'school_subject', 'employee'],
-    });
-    return classEntity;
+  public async findOne(filters: FindClassDTO): Promise<Class | undefined> {
+    const queryBuilder = await this.createQueryBuilder(filters);
+
+    const classEntity = await queryBuilder.getOne();
+    return classEntity || undefined;
   }
 
-  public async findAll(filters: FindClassDTO): Promise<Class[]> {
-    const classes = await this.ormRepository.find(
-      this.makeFilterSelect(filters),
-    );
-    return classes;
+  public async findAll({
+    page,
+    size,
+    ...filters
+  }: FindClassDTO): Promise<PaginatedResponse<Class>> {
+    const queryBuilder = await this.createQueryBuilder(filters);
+    const total = await queryBuilder.getCount();
+
+    if (size) {
+      queryBuilder.limit(size);
+      if (page) {
+        queryBuilder.offset((page - 1) * size);
+      }
+    }
+
+    const classes = await queryBuilder.getMany();
+
+    return { page: page || 1, size: size || total, total, items: classes };
   }
 
   public async count({
@@ -126,7 +183,7 @@ class ClassesRepository implements IClassesRepository {
     school_subject_id,
     school_id,
   }: FindClassDTO): Promise<CountResultDTO> {
-    const where: FindConditions<Class> = {};
+    const where: FindOptionsWhere<Class> = {};
     const andWhere: AndWhere[] = [];
 
     if (classroom_id) where.classroom_id = classroom_id;
@@ -139,20 +196,28 @@ class ClassesRepository implements IClassesRepository {
       });
     }
 
-    const count = await this.ormRepository.count({
-      where: (qb: WhereExpression) => {
+    // if (before) {
+    //   andWhere.push({
+    //     condition: `EXISTS (
+    //       SELECT 1
+    //         FROM classes old_class
+    //        WHERE old_class.id = before
+    //     )`,
+    //   });
+    // }
+
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('class')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
         andWhere.forEach(({ condition, parameters }) =>
           qb.andWhere(condition, parameters),
         );
-      },
-      join: {
-        alias: 'class',
-        leftJoinAndSelect: {
-          classroom: 'class.classroom',
-        },
-      },
-    });
+      })
+      .leftJoinAndSelect('class.classroom', 'classroom');
+
+    const count = await queryBuilder.getCount();
     return { count };
   }
 
@@ -165,6 +230,7 @@ class ClassesRepository implements IClassesRepository {
     class_date,
     taught_content,
     school_term,
+    multiclasses,
   }: CreateClassDTO): Promise<Class> {
     const classEntity = this.ormRepository.create({
       employee_id,
@@ -176,6 +242,7 @@ class ClassesRepository implements IClassesRepository {
       taught_content,
       status: 'PROGRESS',
       school_term,
+      multiclasses,
     });
 
     await this.ormRepository.save(classEntity);
@@ -185,6 +252,15 @@ class ClassesRepository implements IClassesRepository {
   public async update(classEntity: Class): Promise<Class> {
     await this.ormRepository.save(classEntity);
     return classEntity;
+  }
+
+  public async delete(classEntity: Class): Promise<void> {
+    const entity = await this.ormRepository.findOneOrFail({
+      where: { id: classEntity.id },
+      relations: ['attendances', 'multiclasses'],
+    });
+
+    await this.ormRepository.softRemove(entity);
   }
 }
 

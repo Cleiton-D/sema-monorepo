@@ -1,9 +1,6 @@
-import {
-  FindConditions,
-  getRepository,
-  Repository,
-  WhereExpression,
-} from 'typeorm';
+import { FindOptionsWhere, Repository, WhereExpressionBuilder } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreateEmployeeDTO from '@modules/employees/dtos/CreateEmployeeDTO';
 import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepository';
@@ -15,7 +12,7 @@ export default class EmployeesRepository implements IEmployeesRepository {
   private ormRepository: Repository<Employee>;
 
   constructor() {
-    this.ormRepository = getRepository(Employee);
+    this.ormRepository = dataSource.getRepository(Employee);
   }
 
   private mountAccessQuery(
@@ -47,22 +44,16 @@ export default class EmployeesRepository implements IEmployeesRepository {
     accessCode,
     branch,
   }: FindEmployeeDTO): Promise<Employee | undefined> {
-    const where: FindConditions<Employee> = {};
+    const where: FindOptionsWhere<Employee> = {};
     if (id) where.id = id;
     if (user_id) where.user_id = user_id;
     if (pis_pasep) where.pis_pasep = pis_pasep;
     if (education_level) where.education_level = education_level;
 
-    const employee = await this.ormRepository.findOne({
-      join: {
-        alias: 'employee',
-        leftJoinAndSelect: {
-          address: 'employee.address',
-          contacts: 'employee.employee_contacts',
-          contacts_contact: 'contacts.contact',
-        },
-      },
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('employee')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
 
         if (accessCode || branch) {
@@ -75,9 +66,14 @@ export default class EmployeesRepository implements IEmployeesRepository {
           );
           qb.andWhere(query, parameters);
         }
-      },
-    });
-    return employee;
+      })
+      .leftJoinAndSelect('employee.address', 'address')
+      .leftJoinAndSelect('employee.employee_contacts', 'contacts')
+      .leftJoinAndSelect('contacts.contact', 'contacts_contact');
+
+    const employee = await queryBuilder.getOne();
+
+    return employee ?? undefined;
   }
 
   public async findAll({
@@ -88,23 +84,16 @@ export default class EmployeesRepository implements IEmployeesRepository {
     accessCode,
     branch,
   }: FindEmployeeDTO): Promise<Employee[]> {
-    const where: FindConditions<Employee> = {};
+    const where: FindOptionsWhere<Employee> = {};
     if (id) where.id = id;
     if (user_id) where.user_id = user_id;
     if (pis_pasep) where.pis_pasep = pis_pasep;
     if (education_level) where.education_level = education_level;
 
-    const employees = await this.ormRepository.find({
-      join: {
-        alias: 'employee',
-        leftJoinAndSelect: {
-          address: 'employee.address',
-          contacts: 'employee.employee_contacts',
-          contacts_contact: 'contacts.contact',
-        },
-      },
-      order: { name: 'ASC' },
-      where: (qb: WhereExpression) => {
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('employee')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
         qb.where(where);
 
         if (accessCode || branch) {
@@ -117,8 +106,13 @@ export default class EmployeesRepository implements IEmployeesRepository {
           );
           qb.andWhere(query, parameters);
         }
-      },
-    });
+      })
+      .leftJoinAndSelect('employee.address', 'address')
+      .leftJoinAndSelect('employee.employee_contacts', 'contacts')
+      .leftJoinAndSelect('contacts.contact', 'contacts_contact')
+      .orderBy({ name: 'ASC' });
+
+    const employees = await queryBuilder.getMany();
     return employees;
   }
 

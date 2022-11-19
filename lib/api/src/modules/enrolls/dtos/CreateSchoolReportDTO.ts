@@ -1,7 +1,6 @@
 type CreateSchoolReportDTO = {
   enroll_id: string;
   school_subject_id: string;
-
   first?: number;
   second?: number;
   first_rec?: number;
@@ -10,6 +9,7 @@ type CreateSchoolReportDTO = {
   second_rec?: number;
   exam?: number;
   final_average?: number;
+  annual_average?: number;
 };
 
 export default CreateSchoolReportDTO;

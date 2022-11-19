@@ -18,6 +18,7 @@ export type Classroom = {
   updated_at: Date;
   enroll_count?: number;
   is_multigrade?: boolean;
+  is_multidisciplinary?: boolean;
 };
 
 export type ClassroomsCountResponse = {

@@ -8,7 +8,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude, Expose } from 'class-transformer';
 
+import { VirtualColumn } from '@shared/decorators/virtualColumn';
 import SchoolSubject from './SchoolSubject';
 import Grade from './Grade';
 
@@ -31,8 +33,13 @@ class GradeSchoolSubject {
   @JoinColumn({ name: 'grade_id' })
   grade: Grade;
 
+  @Exclude()
   @Column()
   workload: number;
+
+  @Exclude()
+  @VirtualColumn()
+  calculated_workload: number;
 
   @CreateDateColumn()
   created_at: Date;
@@ -42,6 +49,11 @@ class GradeSchoolSubject {
 
   @DeleteDateColumn()
   deleted_at: Date;
+
+  @Expose({ name: 'workload' })
+  getWorkload(): number {
+    return this.calculated_workload || this.workload;
+  }
 }
 
 export default GradeSchoolSubject;

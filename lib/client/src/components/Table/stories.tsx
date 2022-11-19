@@ -7,7 +7,7 @@ export default {
   title: 'Table',
   component: Table,
   argTypes: {
-    items: { type: '' }
+    items: { type: undefined }
   }
 } as Meta;
 

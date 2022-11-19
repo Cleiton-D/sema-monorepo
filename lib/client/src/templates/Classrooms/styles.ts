@@ -64,3 +64,7 @@ export const TableLink = styled.a`
     text-decoration: underline;
   `}
 `;
+
+export const PaginatorContainer = styled.div`
+  padding: 2rem 3rem;
+`;

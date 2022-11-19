@@ -12,7 +12,7 @@ const fonts = [
     style: 'italic',
     weight: 300,
     url: '/fonts/poppins/poppins-v15-latin-300italic.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -28,7 +28,7 @@ const fonts = [
     style: 'italic',
     weight: 400,
     url: '/fonts/poppins/poppins-v15-latin-italic.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -44,7 +44,7 @@ const fonts = [
     style: 'italic',
     weight: 500,
     url: '/fonts/poppins/poppins-v15-latin-500italic.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -60,7 +60,7 @@ const fonts = [
     style: 'italic',
     weight: 600,
     url: '/fonts/poppins/poppins-v15-latin-600italic.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -68,7 +68,7 @@ const fonts = [
     style: 'normal',
     weight: 300,
     url: '/fonts/inter/inter-v3-latin-300.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -76,7 +76,7 @@ const fonts = [
     style: 'normal',
     weight: 400,
     url: '/fonts/inter/inter-v3-latin-regular.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   },
   {
@@ -84,7 +84,7 @@ const fonts = [
     style: 'normal',
     weight: 600,
     url: '/fonts/inter/inter-v3-latin-600.woff2',
-    display: 'optional',
+    display: 'swap',
     format: 'woff2'
   }
 ];

@@ -3,7 +3,7 @@ import { Session } from 'next-auth';
 
 import Classrooms from 'templates/Classrooms';
 
-import { listClassrooms } from 'requests/queries/classrooms';
+import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 import protectedRoutes from 'utils/protected-routes';
@@ -17,12 +17,14 @@ const getData = async (session: Session | null, id: string) => {
   const school = await getSchool(session, { id });
 
   const filters = {
-    school_id: school.id
+    school_id: school.id,
+    page: 1,
+    size: 20
   };
 
   return prefetchQuery([
     {
-      key: `list-classrooms-${JSON.stringify(filters)}`,
+      key: classroomsKeys.list(JSON.stringify(filters)),
       fetcher: () => listClassrooms(session, filters)
     },
     {

@@ -7,7 +7,8 @@ import {
   useCallback,
   memo,
   Children,
-  isValidElement
+  isValidElement,
+  ReactNode
 } from 'react';
 import mitt, { Emitter } from 'mitt';
 import debounce from 'lodash.debounce';
@@ -68,7 +69,7 @@ function Table<T extends Record<string, any>>({
   );
 
   const newChildrens = useMemo(() => {
-    const childArray = Children.toArray(children);
+    const childArray = Children.toArray(children as ReactNode);
     const newChilds = childArray.filter(isValidElement);
     return newChilds as CommonTableColumn | CommonTableColumn[];
   }, [children]);
@@ -94,14 +95,15 @@ function Table<T extends Record<string, any>>({
       <S.Wrapper ref={containerRef} columnDivider={columnDivider}>
         <table>
           <S.TableHeader>
-            <tr>{children}</tr>
+            <tr>{children as ReactNode}</tr>
           </S.TableHeader>
           <tbody>
-            {newItems.map((item) => {
+            {newItems.map((item, index) => {
               const rowProps: TableRowProps<T> = {
                 item: item.value,
                 columns: newChildrens,
-                rowKey: item.key
+                rowKey: item.key,
+                lineIndex: index
               };
 
               if (renderRow) {

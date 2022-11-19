@@ -16,7 +16,7 @@ class ShowClassService {
   ) {}
 
   public async execute({ class_id }: ShowClassRequest): Promise<Class> {
-    const classEntity = await this.classesRepository.findById(class_id);
+    const classEntity = await this.classesRepository.findOne({ id: class_id });
     if (!classEntity) {
       throw new AppError('Class not found.');
     }

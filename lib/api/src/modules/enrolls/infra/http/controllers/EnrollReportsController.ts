@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 
 import RegisterSchoolReportsService from '@modules/enrolls/services/RegisterSchoolReportsService';
 import ListSchoolReportsService from '@modules/enrolls/services/ListSchoolReportsService';
@@ -28,7 +28,7 @@ class EnrollReportsController {
       enroll_as: enroll_as as any,
     });
 
-    return response.json(classToClass(schoolReports));
+    return response.json(instanceToInstance(schoolReports));
   }
 
   public async update(request: Request, response: Response): Promise<Response> {

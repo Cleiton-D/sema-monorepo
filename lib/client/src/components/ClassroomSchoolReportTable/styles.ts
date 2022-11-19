@@ -35,3 +35,8 @@ export const ButtonContainer = styled.div`
     align-self: flex-end;
   `}
 `;
+
+export const StudentName = styled.span`
+  display: block;
+  min-width: max-content;
+`;

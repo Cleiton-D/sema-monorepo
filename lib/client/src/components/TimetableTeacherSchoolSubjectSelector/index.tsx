@@ -12,10 +12,12 @@ import { DayOfWeek } from 'models/DafOfWeek';
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useListSchoolTeachers } from 'requests/queries/school-teachers';
 import { validateTimetable } from 'requests/queries/timetables';
+import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
+import { useShowGrade } from 'requests/queries/grades';
+import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
 
 import * as S from './styles';
 import { useAccess } from 'hooks/AccessProvider';
-import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
 
 type SelectedItems = {
   id?: string;
@@ -55,9 +57,15 @@ const TimetableTeacherSchoolSubjectSelector = ({
 
   const { data: session } = useSession();
 
-  const { data: schoolSubjects } = useListSchoolsSubjects(session, {
-    grade_id: classroom.grade_id
-  });
+  const { data: grade } = useShowGrade(session, classroom.grade_id);
+  const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(
+    session,
+    {
+      grade_id: classroom.grade_id,
+      is_multidisciplinary: !!grade?.is_multidisciplinary
+    },
+    { enabled: !!grade }
+  );
 
   const { data: schoolTeachers } = useListSchoolTeachers(session, {
     school_id: classroom?.school_id
@@ -69,7 +77,8 @@ const TimetableTeacherSchoolSubjectSelector = ({
   } = useListClassroomTeacherSchoolSubjects(session, {
     classroom_id: classroom?.id,
     school_id: classroom?.school_id,
-    school_subject_id: selectedSchoolSubject
+    school_subject_id: selectedSchoolSubject,
+    is_multidisciplinary: 1
   });
 
   const handleValidate = useCallback(
@@ -101,7 +110,10 @@ const TimetableTeacherSchoolSubjectSelector = ({
         if (response.isValid) return true;
 
         const existent = response.existent!;
-        const message = `O professor(a) ${existent.employee?.name} já está alocado para a turma ${existent.classroom?.description} na disciplina de ${existent.school_subject?.description}. \n\n Deseja realoca-lo?`;
+        const existentSchoolSubject =
+          existent.school_subject?.description || 'Interdisciplinar';
+
+        const message = `O professor(a) ${existent.employee?.name} já está alocado para a turma ${existent.classroom?.description} na disciplina ${existentSchoolSubject}. \n\n Deseja realoca-lo?`;
         return window.confirm(message);
       }
 
@@ -113,8 +125,10 @@ const TimetableTeacherSchoolSubjectSelector = ({
   const handleChange = async (values: HandleChangeParams) => {
     const { school_subject, teacher } = values;
 
-    if (!!teacher && !school_subject) return;
-    if (!!school_subject && !teacher) return;
+    if (!classroom.is_multidisciplinary) {
+      if (!!teacher && !school_subject) return;
+      if (!!school_subject && !teacher) return;
+    } else if (!teacher) return;
 
     const keepGoing = await handleValidate(teacher);
     if (!keepGoing) {
@@ -136,6 +150,8 @@ const TimetableTeacherSchoolSubjectSelector = ({
   const handleChangeSchoolSubject = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
+    if (classroom.is_multidisciplinary) return;
+
     const value = event.target.value;
     const selectedItem = value !== 'empty' ? value : undefined;
 
@@ -158,9 +174,14 @@ const TimetableTeacherSchoolSubjectSelector = ({
   };
 
   useEffect(() => {
-    setSelectedSchoolSubject(currentData?.school_subject_id);
+    if (classroom.is_multidisciplinary) {
+      setSelectedSchoolSubject(undefined);
+    } else {
+      setSelectedSchoolSubject(currentData?.school_subject_id);
+    }
+
     setSelectedTeacher(currentData?.employee_id);
-  }, [currentData]);
+  }, [currentData, classroom]);
 
   const schoolTeachersOptions = useMemo(() => {
     if (loadingClassroomTeacherSchoolSubjects)
@@ -188,29 +209,36 @@ const TimetableTeacherSchoolSubjectSelector = ({
     [enableAccess]
   );
 
+  const filteredGradeSchoolSubjects = gradeSchoolSubjects?.filter(
+    ({ school_subject }) => !!school_subject
+  );
+
   return (
     <S.Wrapper>
-      <S.InputContainer>
-        <span>Disciplina:</span>
-        <select
-          onChange={handleChangeSchoolSubject}
-          disabled={!canChangeClassroomTeacher}
-        >
-          <option value="empty" selected={!selectedSchoolSubject}>
-            &nbsp;
-          </option>
-
-          {schoolSubjects?.map((schoolSubject) => (
-            <option
-              key={schoolSubject.id}
-              value={schoolSubject.id}
-              selected={selectedSchoolSubject === schoolSubject.id}
-            >
-              {schoolSubject.description}
+      {!classroom.is_multidisciplinary && (
+        <S.InputContainer>
+          <span>Disciplina:</span>
+          <select
+            onChange={handleChangeSchoolSubject}
+            disabled={!canChangeClassroomTeacher}
+          >
+            <option value="empty" selected={!selectedSchoolSubject}>
+              &nbsp;
             </option>
-          ))}
-        </select>
-      </S.InputContainer>
+
+            {filteredGradeSchoolSubjects?.map(({ school_subject }) => (
+              <option
+                key={school_subject?.id}
+                value={school_subject?.id}
+                selected={selectedSchoolSubject === school_subject?.id}
+              >
+                {school_subject?.description}
+              </option>
+            ))}
+          </select>
+        </S.InputContainer>
+      )}
+
       <S.InputContainer>
         <span>Professor:</span>
         <select

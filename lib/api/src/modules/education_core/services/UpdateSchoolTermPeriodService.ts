@@ -13,6 +13,7 @@ type UpdateSchoolTermPeriodRequest = {
   date_start?: Date;
   date_end?: Date;
   status?: TermPeriodStatus;
+  manually_changed?: boolean;
 };
 
 @injectable()
@@ -27,6 +28,7 @@ class UpdateSchoolTermPeriodService {
     date_start,
     date_end,
     status,
+    manually_changed,
   }: UpdateSchoolTermPeriodRequest): Promise<SchoolTermPeriod> {
     const schoolTermPeriod = await this.schoolTermPeriodsRepository.findOne({
       id,
@@ -43,6 +45,9 @@ class UpdateSchoolTermPeriodService {
     }
     if (status) {
       schoolTermPeriod.status = status;
+    }
+    if (typeof manually_changed !== 'undefined') {
+      schoolTermPeriod.manually_changed = manually_changed;
     }
 
     await this.schoolTermPeriodsRepository.updateMany([schoolTermPeriod]);

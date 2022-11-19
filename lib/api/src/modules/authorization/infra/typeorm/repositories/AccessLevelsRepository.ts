@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreateAccessLevelDTO from '@modules/authorization/dtos/CreateAccessLevelDTO';
 import IAccessLevelsRepository from '@modules/authorization/repositories/IAccessLevelsRepository';
@@ -10,7 +12,7 @@ class AccessLevelsRepository implements IAccessLevelsRepository {
   private ormRepository: Repository<AccessLevel>;
 
   constructor() {
-    this.ormRepository = getRepository(AccessLevel);
+    this.ormRepository = dataSource.getRepository(AccessLevel);
   }
 
   public async findOne({
@@ -18,14 +20,14 @@ class AccessLevelsRepository implements IAccessLevelsRepository {
     description,
     code,
   }: FindAccessLevelDTO): Promise<AccessLevel | undefined> {
-    const where: FindConditions<AccessLevel> = {};
+    const where: FindOptionsWhere<AccessLevel> = {};
 
     if (id) where.id = id;
     if (description) where.description = description;
     if (code) where.code = code;
 
     const accessLevel = await this.ormRepository.findOne({ where });
-    return accessLevel;
+    return accessLevel ?? undefined;
   }
 
   public async findAll({
@@ -33,7 +35,7 @@ class AccessLevelsRepository implements IAccessLevelsRepository {
     description,
     code,
   }: FindAccessLevelDTO): Promise<AccessLevel[]> {
-    const where: FindConditions<AccessLevel> = {};
+    const where: FindOptionsWhere<AccessLevel> = {};
 
     if (id) where.id = id;
     if (description) where.description = description;

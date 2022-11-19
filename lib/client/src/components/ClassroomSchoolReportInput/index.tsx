@@ -1,3 +1,6 @@
+import { useState, useEffect } from 'react';
+import { X } from '@styled-icons/feather';
+
 import TextInput from 'components/TextInput';
 
 import { Classroom } from 'models/Classroom';
@@ -21,6 +24,25 @@ const ClassroomSchoolReportInput = ({
   classroom,
   reportKey
 }: ClassroomSchoolReportInputProps): JSX.Element => {
+  const [fieldValue, setFieldValue] = useState(
+    schoolReport.formattedAverages[reportKey] !== '-'
+      ? schoolReport.formattedAverages[reportKey]
+      : undefined
+  );
+
+  useEffect(() => {
+    setFieldValue(
+      schoolReport.formattedAverages[reportKey] !== '-'
+        ? schoolReport.formattedAverages[reportKey]
+        : undefined
+    );
+  }, [schoolReport, reportKey]);
+
+  const isDisabled =
+    !enabled ||
+    schoolReport.enroll.status !== 'ACTIVE' ||
+    schoolReport.enroll.current_classroom?.id !== classroom.id;
+
   return (
     <S.InputContainer
       isDisabled={!enabled}
@@ -29,18 +51,21 @@ const ClassroomSchoolReportInput = ({
       <TextInput
         label=""
         size="medium"
-        mask="school-report"
-        disabled={
-          !enabled ||
-          schoolReport.enroll.status !== 'ACTIVE' ||
-          schoolReport.enroll.current_classroom?.id !== classroom.id
-        }
+        mask="school-report-field"
+        disabled={isDisabled}
         containerStyle={{ maxWidth: 80 }}
         name={`${schoolReport.enroll.id}.${reportKey}`}
-        value={
-          schoolReport.formattedAverages[reportKey] !== '-'
-            ? schoolReport.formattedAverages[reportKey]
-            : undefined
+        value={fieldValue}
+        icon={
+          !isDisabled && (
+            <S.ClearButton
+              type="button"
+              title="Limpar"
+              onClick={() => setFieldValue(undefined)}
+            >
+              <X title="Limpar" />
+            </S.ClearButton>
+          )
         }
       />
     </S.InputContainer>

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 
@@ -6,13 +7,13 @@ import Base from 'templates/Base';
 import Heading from 'components/Heading';
 import { AttendancesTable } from 'components/AttendancesTable';
 import Button from 'components/Button';
+import Tab from 'components/Tab';
+import ClassroomSchoolReportTable from 'components/ClassroomSchoolReportTable';
 
 import { useShowClass } from 'requests/queries/class';
 import { useFinishClass } from 'requests/mutations/classes';
 
 import * as S from './styles';
-import Tab from 'components/Tab';
-import ClassroomSchoolReportTable from 'components/ClassroomSchoolReportTable';
 
 const ClassTemplate = () => {
   const { query, push } = useRouter();
@@ -27,6 +28,35 @@ const ClassTemplate = () => {
     await finishClass.mutateAsync(classEntity);
     push('/auth/classes');
   };
+
+  const tabItems = useMemo(() => {
+    if (classEntity?.school_subject?.is_multidisciplinary) {
+      return [
+        {
+          title: 'Frequência',
+          element: <AttendancesTable class={classEntity} />
+        }
+      ];
+    }
+
+    return [
+      {
+        title: 'Frequência',
+        element: <AttendancesTable class={classEntity} />
+      },
+      {
+        title: 'Notas',
+        element: classEntity ? (
+          <ClassroomSchoolReportTable
+            classroom={classEntity.classroom}
+            schoolSubject={classEntity.school_subject}
+          />
+        ) : (
+          <></>
+        )
+      }
+    ];
+  }, [classEntity]);
 
   return (
     <Base>
@@ -48,7 +78,11 @@ const ClassTemplate = () => {
             </S.GridItem>
             <S.GridItem>
               <strong>Disciplina: </strong>
-              <span>{classEntity?.school_subject.description}</span>
+              {classEntity?.classroom.is_multidisciplinary ? (
+                <span>Interdisciplinar</span>
+              ) : (
+                <span>{classEntity?.school_subject?.description}</span>
+              )}
             </S.GridItem>
             <S.GridItem>
               <strong>Professor: </strong>
@@ -67,23 +101,7 @@ const ClassTemplate = () => {
         )}
       </S.Wrapper>
 
-      <Tab
-        items={[
-          {
-            title: 'Frequência',
-            element: <AttendancesTable class={classEntity} />
-          },
-          {
-            title: 'Notas',
-            element: (
-              <ClassroomSchoolReportTable
-                classroom={classEntity!.classroom}
-                schoolSubject={classEntity!.school_subject}
-              />
-            )
-          }
-        ]}
-      />
+      <Tab items={tabItems} />
     </Base>
   );
 };

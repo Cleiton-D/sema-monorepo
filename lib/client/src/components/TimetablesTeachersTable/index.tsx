@@ -65,7 +65,7 @@ const TimetablesTeachersTable = ({
           timetables: [timetableItem]
         };
 
-        const response = await updateTimetables.mutateAsync(requestData);
+        await updateTimetables.mutateAsync(requestData);
 
         await Promise.all([
           queryClient.refetchQueries('timetables', { active: true }),
@@ -74,8 +74,6 @@ const TimetablesTeachersTable = ({
             { active: true }
           )
         ]);
-
-        console.log(response);
       } catch (err) {
         console.log(err);
       }

@@ -50,7 +50,7 @@ class RegisterClassAttendancesService {
       throw new AppError('You cannot register an class');
     }
 
-    const classEntity = await this.classesRepository.findById(class_id);
+    const classEntity = await this.classesRepository.findOne({ id: class_id });
     if (!classEntity) {
       throw new AppError('class not found');
     }

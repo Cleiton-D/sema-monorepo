@@ -36,12 +36,7 @@ const DatabaseDumpCard = () => {
         }
       );
 
-      const { filename, content } = await getDatabaseDump(session);
-
-      const buff = Buffer.from(content);
-      const blob = new Blob([buff]);
-
-      downloadFile(blob, filename);
+      await getDatabaseDump(session);
 
       toast.dismiss(toastKey);
     } catch (err) {

@@ -37,20 +37,18 @@ export function useAddSchoolSubjectMutation(
     renderLoading: function render(newSchoolSubject) {
       return (
         <ToastContent showSpinner>
-          Salvando a matéria escolar {newSchoolSubject.description}
+          Salvando disciplina {newSchoolSubject.description}
         </ToastContent>
       );
     },
-    renderError: (newSchoolSubject) =>
-      `Falha ao inserir matéria escolar ${newSchoolSubject.description}`,
-    renderSuccess: (newSchoolSubject) =>
-      `${newSchoolSubject.description} inserida com sucesso`
+    renderError: () => `Falha ao registrar alterações`,
+    renderSuccess: () => `Alterações registradas com sucesso`
   });
 }
 
 export function useDeleteSchoolSubjectMutation(session?: Session | null) {
   const deleteSchoolSubject = useCallback(
-    async (schoolSubject) => {
+    async (schoolSubject: any) => {
       const api = initializeApi(session);
 
       return api.delete(`/education/admin/school-subjects/${schoolSubject.id}`);

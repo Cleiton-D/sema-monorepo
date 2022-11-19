@@ -1,20 +1,18 @@
-import {
-  getRepository,
-  MigrationInterface,
-  QueryRunner,
-  Repository,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import AppModule from '@modules/authorization/infra/typeorm/entities/AppModule';
 
 export default class CreateAppModules1624716457647
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   private repository: Repository<AppModule>;
 
   private modules: string[] = [];
 
   constructor() {
-    this.repository = getRepository(AppModule);
+    this.repository = dataSource.getRepository(AppModule);
 
     this.modules = [
       'BRANCH',

@@ -10,6 +10,7 @@ export type ClassroomTeacherSchoolSubject = {
   employee: Employee;
   school_subject_id: string;
   school_subject: SchoolSubject;
+  is_multidisciplinary: boolean;
   created_at: string;
   updated_at: string;
 };

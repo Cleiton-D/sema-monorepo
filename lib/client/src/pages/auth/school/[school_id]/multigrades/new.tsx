@@ -3,7 +3,7 @@ import { Session } from 'next-auth';
 
 import NewMultigradeTemplate from 'templates/Multigrades/New';
 
-import { listClassrooms } from 'requests/queries/classrooms';
+import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 import prefetchQuery from 'utils/prefetch-query';
@@ -22,7 +22,7 @@ const getData = async (session: Session | null, id: string) => {
 
   return prefetchQuery([
     {
-      key: `list-classrooms-${JSON.stringify(filters)}`,
+      key: classroomsKeys.list(JSON.stringify(filters)),
       fetcher: () => listClassrooms(session, filters)
     },
     {

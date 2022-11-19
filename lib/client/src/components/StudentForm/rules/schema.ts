@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { isValid } from 'date-fns';
+import isValid from 'date-fns/isValid';
 
 const testBirthDate = (value: any) => {
   if (!value) return false;

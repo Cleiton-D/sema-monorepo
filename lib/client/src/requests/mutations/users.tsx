@@ -14,7 +14,7 @@ export function useAddUserMutation(
   session?: Session | null
 ) {
   const addUser = useCallback(
-    async (values) => {
+    async (values: any) => {
       const api = initializeApi(session);
       return api.post('/users', values);
     },

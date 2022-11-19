@@ -5,16 +5,28 @@ import { Employee } from 'models/Employee';
 
 import { initializeApi } from 'services/api';
 
-export const listTeachers = async (session?: Session | null) => {
-  const api = initializeApi(session);
-
-  return api.get<Employee[]>('/teachers').then((response) => response.data);
+type ListTeachersFilter = {
+  school_id?: string;
 };
 
-export const useListTeachers = (session?: Session | null) => {
-  const key = `list-teachers`;
+export const listTeachers = async (
+  session?: Session | null,
+  filters: ListTeachersFilter = {}
+) => {
+  const api = initializeApi(session);
 
-  const result = useQuery(key, () => listTeachers(session));
+  return api
+    .get<Employee[]>('/teachers', { params: filters })
+    .then((response) => response.data);
+};
+
+export const useListTeachers = (
+  session?: Session | null,
+  filters: ListTeachersFilter = {}
+) => {
+  const key = `list-teachers-${JSON.stringify(filters)}`;
+
+  const result = useQuery(key, () => listTeachers(session, filters));
 
   return { ...result, key };
 };

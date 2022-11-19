@@ -13,4 +13,5 @@ export default interface ISystemBackgroundsRepository {
   updateMany: (
     systemBackgrounds: SystemBackground[],
   ) => Promise<SystemBackground[]>;
+  delete: (systemBackground: SystemBackground) => Promise<void>;
 }

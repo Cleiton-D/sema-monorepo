@@ -1,4 +1,6 @@
-import { getRepository, Raw, Repository } from 'typeorm';
+import { Raw, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import CreateAppModuleDTO from '@modules/authorization/dtos/CreateAppModuleDTO';
 import IAppModulesRepository from '@modules/authorization/repositories/IAppModulesRepository';
@@ -9,12 +11,14 @@ class AppModulesRepository implements IAppModulesRepository {
   private ormRepository: Repository<AppModule>;
 
   constructor() {
-    this.ormRepository = getRepository(AppModule);
+    this.ormRepository = dataSource.getRepository(AppModule);
   }
 
   public async findById(id: string): Promise<AppModule | undefined> {
-    const appModule = await this.ormRepository.findOne(id);
-    return appModule;
+    const appModule = await this.ormRepository.findOne({
+      where: { id },
+    });
+    return appModule ?? undefined;
   }
 
   public async findByName(name: string): Promise<AppModule | undefined> {
@@ -26,11 +30,11 @@ class AppModulesRepository implements IAppModulesRepository {
       },
     });
 
-    return appModule;
+    return appModule ?? undefined;
   }
 
   public async findAll(): Promise<AppModule[]> {
-    const appModules = await this.ormRepository.find();
+    const appModules = await this.ormRepository.find({});
     return appModules;
   }
 

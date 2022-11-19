@@ -1,4 +1,6 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IBranchRepository from '@modules/authorization/repositories/IBranchRepository';
 import CreateBranchDTO from '@modules/authorization/dtos/CreateBranchDTO';
@@ -10,14 +12,14 @@ class BranchRepository implements IBranchRepository {
   private ormRepository: Repository<Branch>;
 
   constructor() {
-    this.ormRepository = getRepository(Branch);
+    this.ormRepository = dataSource.getRepository(Branch);
   }
 
   public async findOne({
     id,
     type,
   }: FindBranchDTO): Promise<Branch | undefined> {
-    const where: FindConditions<Branch> = {};
+    const where: FindOptionsWhere<Branch> = {};
 
     if (id) where.id = id;
     if (type) where.type = type;
@@ -25,11 +27,11 @@ class BranchRepository implements IBranchRepository {
     const branch = await this.ormRepository.findOne({
       where,
     });
-    return branch;
+    return branch ?? undefined;
   }
 
   public async findAll({ id, type }: FindBranchDTO): Promise<Branch[]> {
-    const where: FindConditions<Branch> = {};
+    const where: FindOptionsWhere<Branch> = {};
 
     if (id) where.id = id;
     if (type) where.type = type;

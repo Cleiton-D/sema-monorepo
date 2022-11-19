@@ -1,24 +1,34 @@
-import { FindConditions, getRepository, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { dataSource } from '@config/data_source';
 
 import IClassroomsRepository from '@modules/schools/repositories/IClassroomsRepository';
 import CreateClassroomDTO from '@modules/schools/dtos/CreateClassroomDTO';
 import CountResultDTO from '@modules/schools/dtos/CountResultDTO';
 import FindClassroomsDTO from '@modules/schools/dtos/FindClassroomsDTO';
 
+import { PaginatedResponse } from '@shared/dtos';
 import Classroom from '../entities/Classroom';
 
 class ClassroomsRepository implements IClassroomsRepository {
   private ormRepository: Repository<Classroom>;
 
   constructor() {
-    this.ormRepository = getRepository(Classroom);
+    this.ormRepository = dataSource.getRepository(Classroom);
   }
 
   public async findById(classroom_id: string): Promise<Classroom | undefined> {
-    const classroom = await this.ormRepository.findOne(classroom_id, {
-      relations: ['school', 'grade', 'class_period', 'school_year'],
+    const classroom = await this.ormRepository.findOne({
+      where: { id: classroom_id },
+      relations: {
+        school: true,
+        grade: true,
+        class_period: true,
+        school_year: true,
+      },
     });
-    return classroom;
+
+    return classroom ?? undefined;
   }
 
   public async count({
@@ -28,7 +38,7 @@ class ClassroomsRepository implements IClassroomsRepository {
     school_id,
     school_year_id,
   }: FindClassroomsDTO): Promise<CountResultDTO> {
-    const where: FindConditions<Classroom> = {
+    const where: FindOptionsWhere<Classroom> = {
       is_multigrade: false,
     };
 
@@ -51,7 +61,9 @@ class ClassroomsRepository implements IClassroomsRepository {
     employee_id,
     with_in_multigrades,
     with_multigrades,
-  }: FindClassroomsDTO): Promise<Classroom[]> {
+    page,
+    size,
+  }: FindClassroomsDTO): Promise<PaginatedResponse<Classroom>> {
     const queryBuilder = this.ormRepository.createQueryBuilder('classroom');
 
     if (!with_multigrades) {
@@ -96,6 +108,7 @@ class ClassroomsRepository implements IClassroomsRepository {
           JOIN classrooms as owner ON (owner.id = multigrade_classroom.owner_id)
          WHERE multigrade_classroom.classroom_id = classroom.id
            AND owner.deleted_at IS NULL
+           AND multigrade_classroom.deleted_at IS NULL
       )`);
     }
 
@@ -130,8 +143,16 @@ class ClassroomsRepository implements IClassroomsRepository {
             .andWhere("enroll_classroom.status = 'ACTIVE'"),
       );
 
+    const total = await queryBuilder.getCount();
+    if (size) {
+      queryBuilder.limit(size);
+      if (page) {
+        queryBuilder.offset((page - 1) * size);
+      }
+    }
+
     const classrooms = await queryBuilder.getMany();
-    return classrooms;
+    return { page: page || 1, size: size || total, total, items: classrooms };
   }
 
   public async create({

@@ -31,7 +31,7 @@ const Sidebar = () => {
     <S.Wrapper>
       <Link href="/auth" passHref>
         <S.Logo>
-          <Image src="/img/logo.png" width={150} height={60} quality={80} />
+          <Image src="/img/new-logo.svg" width={160} height={90} />
         </S.Logo>
       </Link>
       <S.Menu>

@@ -1,8 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 
+import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISchoolSubjectsRepository';
+
 import CreateSchoolReportDTO from '../dtos/CreateSchoolReportDTO';
 import SchoolReport from '../infra/typeorm/entities/SchoolReport';
 import ISchoolReportsRepository from '../repositories/ISchoolReportsRepository';
+import CalcAnnualAverageService from './CalcAnnualAverageService';
+import CalcFinalAverageService from './CalcFinalAverageService';
 
 type CreateSchoolReportsToEnrollRequest = {
   enroll_id: string | string[];
@@ -15,6 +19,10 @@ class CreateSchoolReportsToEnrollService {
   constructor(
     @inject('SchoolReportsRepository')
     private schoolReportsRepository: ISchoolReportsRepository,
+    @inject('SchoolSubjectsRepository')
+    private schoolSubjectsRepository: ISchoolSubjectsRepository,
+    private calcAnnualAverage: CalcAnnualAverageService,
+    private calcFinalAverage: CalcFinalAverageService,
   ) {}
 
   public async execute({
@@ -23,32 +31,41 @@ class CreateSchoolReportsToEnrollService {
     reports,
   }: CreateSchoolReportsToEnrollRequest): Promise<SchoolReport[]> {
     const enrolls = Array.isArray(enroll_id) ? enroll_id : Array.of(enroll_id);
-    const schoolSubjects = Array.isArray(school_subject_id)
-      ? school_subject_id
-      : Array.of(school_subject_id);
+
+    const schoolSubjects = await this.schoolSubjectsRepository.findAll({
+      id: school_subject_id,
+      is_multidisciplinary: false,
+    });
 
     const createSchoolReportsData = enrolls.reduce<CreateSchoolReportDTO[]>(
       (acc, enroll) => {
         const items = schoolSubjects.reduce<CreateSchoolReportDTO[]>(
           (subjectAcc, schoolSubject) => {
-            const existentReports = reports ? reports[schoolSubject] || {} : {};
+            const key = schoolSubject.id;
+            const existentReports = reports ? reports[key] || {} : {};
 
             const common = {
               enroll_id: enroll,
-              school_subject_id: schoolSubject,
+              school_subject_id: schoolSubject.id,
             };
 
-            const newSchoolReport = this.assignSchoolReport(
-              common,
-              this.roundAverages(existentReports),
+            const newSchoolReport =
+              this.assignSchoolReport<CreateSchoolReportDTO>(
+                common,
+                this.roundAverages(existentReports),
+              );
+
+            const annualAverage = this.calcAnnualAverage.execute(
+              common as unknown as SchoolReport,
+            );
+            const finalAverage = this.calcFinalAverage.execute(
+              common as unknown as SchoolReport,
             );
 
-            const finalAverage = this.calcFinalAverage(
-              (newSchoolReport as unknown) as SchoolReport,
-            );
-            newSchoolReport.final_average = finalAverage;
+            newSchoolReport.annual_average = annualAverage as number;
+            newSchoolReport.final_average = finalAverage as number;
 
-            return [...subjectAcc, common];
+            return [...subjectAcc, newSchoolReport];
           },
           [],
         );
@@ -72,10 +89,10 @@ class CreateSchoolReportsToEnrollService {
     }, {});
   }
 
-  private assignSchoolReport(
-    target: Record<string, unknown>,
+  private assignSchoolReport<T extends Record<string, unknown>>(
+    target: T,
     source: Record<string, number>,
-  ): Record<string, unknown> {
+  ): T {
     const keys = [
       'first',
       'second',
@@ -96,28 +113,6 @@ class CreateSchoolReportsToEnrollService {
       }, {});
 
     return Object.assign(target, filteredObject);
-  }
-
-  private calcFinalAverage(schoolReport: SchoolReport): number {
-    const first = schoolReport.first || 0;
-    const second = schoolReport.second || 0;
-    const third = schoolReport.third || 0;
-    const fourth = schoolReport.fourth || 0;
-    const first_rec = schoolReport.first_rec || 0;
-    const second_rec = schoolReport.second_rec || 0;
-    // const exam = schoolReport.exam || 0;
-
-    let firstSemAverage = (first + second) / 2;
-    firstSemAverage =
-      firstSemAverage >= first_rec ? firstSemAverage : first_rec;
-
-    let secondSemAverage = (third + fourth) / 2;
-    secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
-
-    const finalAverage = (firstSemAverage + secondSemAverage) / 2;
-
-    return Math.round(finalAverage);
   }
 }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+	<fontFamily name="EB Garamond">
+		<normal><![CDATA[fonts/ebgaramond/ebgaramond-regular.ttf]]></normal>
+		<bold><![CDATA[fonts/ebgaramond/ebgaramond-bold.ttf]]></bold>
+		<italic><![CDATA[fonts/ebgaramond/ebgaramond-italic.ttf]]></italic>
+    <medium><![CDATA[fonts/ebgaramond/ebgaramond-medium.ttf]]></medium>
+    <mediumitalic><![CDATA[fonts/ebgaramond/ebgaramond-medium-italic.ttf]]></mediumitalic>
+    <semibold><![CDATA[fonts/ebgaramond/ebgaramond-semi-bold.ttf]]></semibold>
+    <semibolditalic><![CDATA[fonts/ebgaramond/ebgaramond-semi-bold-italic.ttf]]></semibolditalic>
+    <bold><![CDATA[fonts/ebgaramond/ebgaramond-bold.ttf]]></bold>
+		<bolditalic><![CDATA[fonts/ebgaramond/ebgaramond-bold-italic.ttf]]></bolditalic>
+    <extrabold><![CDATA[fonts/ebgaramond/ebgaramond-extra-bold.ttf]]></extrabold>
+    <extrabolditalic><![CDATA[fonts/ebgaramond/ebgaramond-extra-bold-italic.ttf]]></extrabolditalic>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+</fontFamilies>
