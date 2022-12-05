@@ -19,8 +19,9 @@ const ClassroomSchoolReportTableLine = ({
       {...rest}
       item={schoolReport}
       isActive={
-        schoolReport.enroll.status === 'ACTIVE' &&
-        schoolReport.enroll.current_classroom?.id === classroom?.id
+        !['INACTIVE', 'TRANSFERRED', 'QUITTER', 'DECEASED'].includes(
+          schoolReport.enroll.status
+        ) && schoolReport.enroll.current_classroom?.id === classroom?.id
       }
     />
   );

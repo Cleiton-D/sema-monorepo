@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
   workflow_dispatch:
 
@@ -19,107 +17,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: build api
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
-      - run: cd lib/api && npm install
-      - run: cd lib/api && npm run build
-
-      - name: setup client
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
-
-      - name: build client
+      - name: docker login
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          cd lib/client
-          npm install
-          npm run build
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        
+      - name: Build docker image
+        run: cd api && docker build . --tag ${{ secrets.DOCKER_USER }}/sema:api-${{ github.sha }}
 
-      - name: down previous version
-        id: deploy
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: |
-            DIR="$HOME/app"
-            if [ -d "$DIR" ]; then
-              cd app
-              docker-compose down
-              cd ..
-              mv app app_backup
-            fi
-
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: copy new version
-        if: success()
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          source: "docker-compose.yaml, lib/api/Dockerfile, lib/api/dist, lib/api/package.json, lib/api/init.sh, lib/api/ormconfig.js, lib/client/Dockerfile, lib/client/node_modules, lib/client/public, lib/client/.next, lib/client/package.json"
-          target: "app"
-
-      - name: deploy new version
-        if: success()
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: |
-            export POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
-            export POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            export POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
-            export POSTGRES_USERNAME=${{ secrets.POSTGRES_USERNAME }}
-            export POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}
-            export APP_URL=${{ secrets.APP_URL }}
-            export API_URL=${{ secrets.API_URL }}
-
-            cd app && docker-compose up --build -d
-
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: delete previous version
-        if: success()
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: |
-            BK_DIR="$HOME/app_backup"
-            if [ -d "$BK_DIR" ]; then
-              rm -rf app_backup
-            fi
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: restore previous version
-        if: failure()
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: |
-            DIR="$HOME/app"
-            BK_DIR="$HOME/app_backup"
-
-            if [ -d "$DIR" ]; then
-              cd app
-              docker-compose down
-              cd ..
-              rm -rf app
-              
-              if [ -d "$BK_DIR" ]; then
-                mv app_backup app
-                cd app
-                docker-compose up --build; 
-              fi
-            fi
-
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Docker push
+        run: docker push ${{ secrets.DOCKER_USER }}/sema:api-${{ github.sha }}
+      

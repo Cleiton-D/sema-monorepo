@@ -40,8 +40,10 @@ const ClassroomSchoolReportInput = ({
 
   const isDisabled =
     !enabled ||
-    schoolReport.enroll.status !== 'ACTIVE' ||
-    schoolReport.enroll.current_classroom?.id !== classroom.id;
+    schoolReport.enroll.current_classroom?.id !== classroom.id ||
+    ['INACTIVE', 'TRANSFERRED', 'QUITTER', 'DECEASED'].includes(
+      schoolReport.enroll.status
+    );
 
   return (
     <S.InputContainer
