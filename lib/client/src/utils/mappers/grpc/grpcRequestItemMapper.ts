@@ -4,6 +4,7 @@ import { AttendanceCount, MinifiedAttendance } from 'models/Attendance';
 import { FormattedClass, MinifiedClass } from 'models/Class';
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
 import { EnrollClassroom } from 'models/EnrollClassroom';
+import { Grade } from 'models/Grade';
 import { GradeSchoolSubject } from 'models/GradeSchoolSubject';
 import { SchoolReport } from 'models/SchoolReport';
 import { SchoolSubject } from 'models/SchoolSubject';
@@ -22,6 +23,7 @@ type Params = {
   schoolReports: SchoolReport[];
   enrollClassrooms: EnrollClassroom[];
   schoolTermPeriods: SchoolTermPeriod[];
+  grade: Grade;
 };
 
 export const grpcRequestItemMapper = ({
@@ -34,13 +36,14 @@ export const grpcRequestItemMapper = ({
   minifiedClasses,
   schoolTermPeriods,
   gradeSchoolSubject,
-  schoolReports
+  schoolReports,
+  grade
 }: Params): SchoolSubjectClassDiary => {
-  const schoolReportsOfThisSchoolSubject = schoolReports.filter(
-    (schoolReport) => {
-      return schoolReport.school_subject_id === school_subject.id;
-    }
-  );
+  const schoolReportsOfThisSchoolSubject = grade.is_multidisciplinary
+    ? schoolReports
+    : schoolReports.filter((schoolReport) => {
+        return schoolReport.school_subject_id === school_subject.id;
+      });
 
   const result = new SchoolSubjectClassDiary();
   result.setSchoolsubject(school_subject.description);

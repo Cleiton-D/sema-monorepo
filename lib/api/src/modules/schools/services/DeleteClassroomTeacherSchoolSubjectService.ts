@@ -22,11 +22,10 @@ class DeleteClassroomTeacherSchoolSubjectService {
   public async execute({
     classroom_teacher_school_subject_id,
   }: DeleteClassroomTeacherSchoolSubjectRequest): Promise<void> {
-    const classroomTeacherSchoolSubject = await this.classroomTeacherSchoolSubjectsRepository.findOne(
-      {
+    const classroomTeacherSchoolSubject =
+      await this.classroomTeacherSchoolSubjectsRepository.findOne({
         id: classroom_teacher_school_subject_id,
-      },
-    );
+      });
     if (!classroomTeacherSchoolSubject) {
       throw new AppError('Classroom teacher school subject not found');
     }

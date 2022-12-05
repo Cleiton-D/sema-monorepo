@@ -11,6 +11,15 @@ import {
 import SchoolSubject from '@modules/education_core/infra/typeorm/entities/SchoolSubject';
 import Enroll from './Enroll';
 
+export type SchoolReportStatus =
+  | 'ACTIVE'
+  | 'CLOSED'
+  | 'APPROVED'
+  | 'DISAPPROVED'
+  | 'RECOVERY'
+  | 'EXAM'
+  | 'DISAPPROVED_FOR_ABSENCES';
+
 @Entity('school_reports')
 class SchoolReport {
   @PrimaryGeneratedColumn('uuid')
@@ -56,6 +65,20 @@ class SchoolReport {
 
   @Column()
   annual_average: number;
+
+  @Column({
+    type: 'enum',
+    enum: [
+      'ACTIVE',
+      'CLOSED',
+      'APPROVED',
+      'DISAPPROVED',
+      'RECOVERY',
+      'EXAM',
+      'DISAPPROVED_FOR_ABSENCES',
+    ],
+  })
+  status: SchoolReportStatus;
 
   @CreateDateColumn()
   created_at: Date;

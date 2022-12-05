@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import IEnrollClassroomsRepository from '@modules/enrolls/repositories/IEnrollClassroomsRepository';
 import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepository';
+import UpdateSchoolReportStatusByAttendancesService from '@modules/enrolls/services/UpdateSchoolReportStatusByAttendancesService';
 
 import AppError from '@shared/errors/AppError';
 
@@ -30,6 +31,7 @@ class RegisterClassAttendancesService {
     private enrollClassroomsRepository: IEnrollClassroomsRepository,
     @inject('AttendancesRepository')
     private attendancesRepository: IAttendancesRepository,
+    private updateSchoolReportStatusByAttendances: UpdateSchoolReportStatusByAttendancesService,
   ) {}
 
   public async execute({
@@ -86,7 +88,18 @@ class RegisterClassAttendancesService {
       });
     });
 
-    return this.attendancesRepository.updateMany(newAttendances);
+    const updatedAttendances = await this.attendancesRepository.updateMany(
+      newAttendances,
+    );
+
+    updatedAttendances.forEach(attendance => {
+      this.updateSchoolReportStatusByAttendances.execute({
+        enroll_id: attendance.enroll_id,
+        school_subject_id: classEntity.school_subject_id,
+      });
+    });
+
+    return updatedAttendances;
   }
 }
 

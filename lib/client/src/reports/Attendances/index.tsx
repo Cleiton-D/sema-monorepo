@@ -112,9 +112,16 @@ const AttendancesReport = ({
                 {item.enroll.student.name}
               </td>
 
-              {sortedClasses.map(({ id }) => (
-                <td key={id}>{item.attendances[id] ? 'X' : '-'}</td>
-              ))}
+              {sortedClasses.map(({ id }) =>
+                typeof item.attendances[id] === 'undefined' ? (
+                  <td
+                    key={id}
+                    style={{ borderLeft: 'none', borderRight: 'none' }}
+                  ></td>
+                ) : (
+                  <td key={id}>{item.attendances[id] ? 'X' : '-'}</td>
+                )
+              )}
             </tr>
           ))}
         </tbody>

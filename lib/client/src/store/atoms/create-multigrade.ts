@@ -16,22 +16,3 @@ type MultigradeClassroomsAtomParams = {
 };
 
 export const classroomsAtom = atomWithReset<MultigradeClassroom[]>([]);
-
-export const multigradeClassroomsAtom = atomFamily(
-  ({ session, multigradeId }: MultigradeClassroomsAtomParams) => {
-    if (!multigradeId) {
-      return classroomsAtom;
-    }
-
-    const filters = { multigrade_id: multigradeId };
-
-    return atomWithQuery({
-      queryKey: multigradesClassroomsKeys.list(JSON.stringify(filters)),
-      queryFn: () =>
-        listMultigradeClassrooms(session, filters).catch(
-          () => [] as MultigradeClassroom[]
-        )
-    });
-  },
-  deepEqual
-);

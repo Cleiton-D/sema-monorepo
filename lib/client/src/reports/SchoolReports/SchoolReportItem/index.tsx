@@ -153,7 +153,7 @@ const SchoolReportItem = ({ completeEnroll }: SchoolReportItem) => {
                   : masks['school-report'](String(item.finalAverage))}
               </td>
 
-              <td>Cursando</td>
+              <td>{item.status}</td>
             </tr>
           ))}
 

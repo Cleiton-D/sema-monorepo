@@ -10,6 +10,8 @@ import IEnrollsRepository from '../repositories/IEnrollsRepository';
 import ISchoolReportsRepository from '../repositories/ISchoolReportsRepository';
 import CalcAnnualAverageService from './CalcAnnualAverageService';
 import CalcFinalAverageService from './CalcFinalAverageService';
+import ValidateSchoolReportStatusService from './ValidateSchoolReportStatusService';
+import UpdateEnrollStatusService from './UpdateEnrollStatusService';
 
 type SchoolReportRequestType = {
   enroll_id: string;
@@ -29,6 +31,8 @@ type RegisterSchoolReportsRequest = {
   reports: SchoolReportRequestType[];
 };
 
+type ReportAveragesDTO = Record<string, SchoolReportRequestType['averages']>;
+
 @injectable()
 class RegisterSchoolReportsService {
   constructor(
@@ -41,6 +45,8 @@ class RegisterSchoolReportsService {
     private schoolReportsRepository: ISchoolReportsRepository,
     private calcAnnualAverage: CalcAnnualAverageService,
     private calcFinalAverage: CalcFinalAverageService,
+    private validateSchoolReportStatus: ValidateSchoolReportStatusService,
+    private updateEnrollStatus: UpdateEnrollStatusService,
   ) {}
 
   public async execute({
@@ -61,9 +67,7 @@ class RegisterSchoolReportsService {
       gradeSchoolSubject => gradeSchoolSubject.grade_id,
     );
 
-    const reportsObject = reports.reduce<
-      Record<string, SchoolReportRequestType['averages']>
-    >((acc, item) => {
+    const reportsObject = reports.reduce<ReportAveragesDTO>((acc, item) => {
       const enrollAverages = Object.entries(item.averages).reduce<
         SchoolReportRequestType['averages']
       >((accAverages, [key, value]) => {
@@ -95,24 +99,49 @@ class RegisterSchoolReportsService {
       school_subject_id,
     });
 
-    const newSchoolReports = currentSchoolReports.map(schoolReport => {
-      const requestAverages = reportsObject[schoolReport.enroll_id];
+    const newSchoolReports = await Promise.all(
+      currentSchoolReports.map(schoolReport => {
+        return this.createNewSchoolReport(schoolReport, reportsObject);
+      }),
+    );
 
-      const newSchoolReport = this.assignSchoolReport(
-        schoolReport,
-        requestAverages,
-      );
+    const updatedSchoolReports = await this.schoolReportsRepository.updateMany(
+      newSchoolReports,
+    );
 
-      const annualAverage = this.calcAnnualAverage.execute(newSchoolReport);
-      const finalAverage = this.calcFinalAverage.execute(newSchoolReport);
-
-      newSchoolReport.annual_average = annualAverage as number;
-      newSchoolReport.final_average = finalAverage as number;
-
-      return newSchoolReport;
+    enrollIds.forEach(enroll_id => {
+      this.updateEnrollStatus.execute({ enroll_id });
     });
 
-    return this.schoolReportsRepository.updateMany(newSchoolReports);
+    return updatedSchoolReports;
+  }
+
+  private async createNewSchoolReport(
+    schoolReport: SchoolReport,
+    reportsObject: ReportAveragesDTO,
+  ): Promise<SchoolReport> {
+    const requestAverages = reportsObject[schoolReport.enroll_id];
+
+    const newSchoolReport = this.assignSchoolReport(
+      schoolReport,
+      requestAverages,
+    );
+
+    const annualAverage = this.calcAnnualAverage.execute(newSchoolReport);
+    const finalAverage = this.calcFinalAverage.execute(newSchoolReport);
+
+    newSchoolReport.annual_average = annualAverage as number;
+    newSchoolReport.final_average = finalAverage as number;
+
+    const schoolReportStatus = await this.validateSchoolReportStatus.execute({
+      schoolReport: newSchoolReport,
+    });
+
+    if (!schoolReportStatus) return newSchoolReport;
+
+    return Object.assign(newSchoolReport, {
+      status: schoolReportStatus,
+    });
   }
 
   private assignSchoolReport(

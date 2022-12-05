@@ -106,7 +106,11 @@ const AttendancesReportTable = ({
               label={item.date}
               tableKey={`attendances.${item.id}`}
               contentAlign="center"
-              render={(value) => <Checkbox isChecked={value} disabled />}
+              render={(value) => {
+                if (typeof value === 'undefined') return null;
+
+                return <Checkbox isChecked={value} disabled />;
+              }}
             />
           ))
         ]}

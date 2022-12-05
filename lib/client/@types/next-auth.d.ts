@@ -38,6 +38,7 @@ declare module 'next-auth' {
     schoolId: string;
     branchId: string;
     branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';
+    employeeId: string;
   }
 }
 

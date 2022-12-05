@@ -91,36 +91,6 @@ const ClassroomAttendancesReportItem = ({
           schoolTermPeriod={schoolTermPeriod}
         />
       )}
-
-      {/* {classes?.items && (
-        <S.TableSection>
-          <Table
-            items={classes?.items || []}
-            keyExtractor={(classEntity) => classEntity.id}
-          >
-            <TableColumn
-              label="Dia"
-              tableKey="class_date"
-              render={(value) =>
-                format(parseDateWithoutTimezone(value), 'dd/MM')
-              }
-            />
-            <TableColumn label="Conteúdo" tableKey="taught_content" />
-          </Table>
-          <S.PaginatorContainer>
-            <Paginator
-              total={classes?.total || 0}
-              currentPage={classes?.page || 1}
-              currentSize={classes?.size || 20}
-              onChangeSize={(size: number) => {
-                setPage(1);
-                setSize(size);
-              }}
-              onChangePage={setPage}
-            />
-          </S.PaginatorContainer>
-        </S.TableSection>
-      )} */}
     </S.Wrapper>
   );
 };

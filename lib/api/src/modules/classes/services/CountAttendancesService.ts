@@ -15,7 +15,11 @@ type CountAttendancesResquest = {
 type CountAttendancesResponse = {
   enroll_id: string;
   school_subject_id?: string;
+  total: number;
   attendances: number;
+  absences: number;
+  attendances_percent: number;
+  absences_percent: number;
 };
 
 @injectable()

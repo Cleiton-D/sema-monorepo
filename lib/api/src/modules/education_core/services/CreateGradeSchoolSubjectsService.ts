@@ -2,6 +2,10 @@ import { inject, injectable } from 'tsyringe';
 
 import CreateSchoolReportsToEnrollService from '@modules/enrolls/services/CreateSchoolReportsToEnrollService';
 import IEnrollsRepository from '@modules/enrolls/repositories/IEnrollsRepository';
+import Classroom from '@modules/schools/infra/typeorm/entities/Classroom';
+import IClassroomsRepository from '@modules/schools/repositories/IClassroomsRepository';
+import ShowClassroomTeacherSchoolSubjectsService from '@modules/schools/services/ShowClassroomTeacherSchoolSubjectsService';
+import LinkClassroomTeacherSchoolSubjectsService from '@modules/schools/services/LinkClassroomTeacherSchoolSubjectsService';
 
 import AppError from '@shared/errors/AppError';
 
@@ -9,6 +13,7 @@ import GradeSchoolSubject from '../infra/typeorm/entities/GradeSchoolSubject';
 import IGradeSchoolSubjectsRepository from '../repositories/IGradeSchoolSubjectsRepository';
 import IGradesRepository from '../repositories/IGradesRepository';
 import ISchoolSubjectsRepository from '../repositories/ISchoolSubjectsRepository';
+import Grade from '../infra/typeorm/entities/Grade';
 
 type SchoolSubject = {
   school_subject_id: string;
@@ -30,6 +35,10 @@ class CreateGradeSchoolSubjectsService {
     private createSchoolReportsToEnrollService: CreateSchoolReportsToEnrollService,
     @inject('SchoolSubjectsRepository')
     private schoolSubjectsRepository: ISchoolSubjectsRepository,
+    @inject('ClassroomsRepository')
+    private classroomsRepository: IClassroomsRepository,
+    private showClassroomTeacherSchoolSubjects: ShowClassroomTeacherSchoolSubjectsService,
+    private linkClassroomTeacherSchoolSubjects: LinkClassroomTeacherSchoolSubjectsService,
   ) {}
 
   public async execute({
@@ -117,7 +126,62 @@ class CreateGradeSchoolSubjectsService {
       school_subject_id: schoolSubjectIds,
     });
 
+    if (grade.is_multidisciplinary) {
+      await this.createClassroomsTeacherSchoolSubjects(grade, schoolSubjectIds);
+    }
+
     return gradeSchoolSubjects;
+  }
+
+  private async createClassroomTeacherSchoolSubjects(
+    classroom: Classroom,
+    multidisciplinaryGradeSchoolSubject: GradeSchoolSubject,
+    schoolSubjectIds: string[],
+  ) {
+    const classroomTeacherSchoolSubject =
+      await this.showClassroomTeacherSchoolSubjects.execute({
+        classroom_id: classroom.id,
+        school_subject_id:
+          multidisciplinaryGradeSchoolSubject.school_subject_id,
+      });
+    if (!classroomTeacherSchoolSubject) return;
+
+    const requestObject = schoolSubjectIds.map(schoolSubjectId => ({
+      employee_id: classroomTeacherSchoolSubject.employee_id,
+      school_subject_id: schoolSubjectId,
+    }));
+
+    await this.linkClassroomTeacherSchoolSubjects.execute({
+      classroom_id: classroom.id,
+      teacher_school_subjects: requestObject,
+    });
+  }
+
+  private async createClassroomsTeacherSchoolSubjects(
+    grade: Grade,
+    schoolSubjectIds: string[],
+  ) {
+    const gradeSchoolSubject = await this.gradeSchoolSubjectsRepository.findOne(
+      {
+        grade_id: grade.id,
+        is_multidisciplinary: true,
+      },
+    );
+    if (!gradeSchoolSubject) return;
+
+    const { items: classrooms } = await this.classroomsRepository.findAll({
+      grade_id: grade.id,
+    });
+
+    const promises = classrooms.map(classroom =>
+      this.createClassroomTeacherSchoolSubjects(
+        classroom,
+        gradeSchoolSubject,
+        schoolSubjectIds,
+      ),
+    );
+
+    await Promise.all(promises);
   }
 }
 

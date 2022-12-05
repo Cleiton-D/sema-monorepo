@@ -17,7 +17,10 @@ export const statusMap: Record<EnrollStatus | string, string> = {
   DECEASED: 'Falecido',
   APPROVED: 'Aprovado',
   DISAPPROVED: 'Reprovado',
-  RELOCATED: 'Remanejado'
+  RELOCATED: 'Remanejado',
+  DISAPPROVED_FOR_ABSENCES: 'Reprovado por faltas',
+  EXAM: 'Exame',
+  RECOVERY: 'Recuperação'
 };
 
 export const enrollMapper = (enroll: Enroll): MappedEnroll => {

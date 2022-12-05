@@ -99,5 +99,8 @@
     "scripts": [
       ".next/**/*.js"
     ]
+  },
+  "resolutions": {
+    "**/@types/react": "^18.0.16"
   }
 }

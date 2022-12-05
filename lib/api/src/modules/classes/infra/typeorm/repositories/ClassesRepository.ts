@@ -34,6 +34,7 @@ class ClassesRepository implements IClassesRepository {
     classroom_id,
     employee_id,
     school_subject_id,
+    school_year_id,
     school_id,
     class_date,
     class_period_id,
@@ -59,6 +60,13 @@ class ClassesRepository implements IClassesRepository {
     if (period) where.period = period;
     if (id) where.id = id;
     if (school_term) where.school_term = school_term;
+
+    if (school_year_id) {
+      andWhere.push({
+        condition: 'classroom.school_year_id = :schoolYearId',
+        parameters: { schoolYearId: school_year_id },
+      });
+    }
 
     if (classroom_id) {
       andWhere.push({

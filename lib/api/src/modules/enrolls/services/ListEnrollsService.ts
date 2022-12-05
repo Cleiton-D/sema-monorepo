@@ -12,6 +12,7 @@ import IEnrollsRepository from '../repositories/IEnrollsRepository';
 export type ListEnrollsRequest = {
   classroom_id?: string;
   school_id?: string;
+  school_year_id?: string;
   branch_id?: string;
   grade_id?: string;
   status?: EnrollStatus;
@@ -36,6 +37,7 @@ class ListEnrollsService {
     classroom_id,
     grade_id,
     school_id,
+    school_year_id,
     branch_id,
     class_period_id,
     student_name,
@@ -63,6 +65,7 @@ class ListEnrollsService {
       student_cpf,
       student_nis,
       student_birth_certificate,
+      school_year_id,
       order: orderArray,
       page,
       size,

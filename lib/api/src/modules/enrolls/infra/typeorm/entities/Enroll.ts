@@ -27,7 +27,10 @@ export type EnrollStatus =
   | 'QUITTER'
   | 'DECEASED'
   | 'APPROVED'
-  | 'DISAPPROVED';
+  | 'DISAPPROVED'
+  | 'RECOVERY'
+  | 'EXAM'
+  | 'DISAPPROVED_FOR_ABSENCES';
 
 export type EnrollOrigin = 'NEW' | 'REPEATING';
 @Entity('enrolls')
@@ -35,7 +38,21 @@ class Enroll {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum', enum: ['ACTIVE', 'INACTIVE', 'TRANSFERRED'] })
+  @Column({
+    type: 'enum',
+    enum: [
+      'ACTIVE',
+      'INACTIVE',
+      'TRANSFERRED',
+      'QUITTER',
+      'DECEASED',
+      'APPROVED',
+      'DISAPPROVED',
+      'RECOVERY',
+      'EXAM',
+      'DISAPPROVED_FOR_ABSENCES',
+    ],
+  })
   status: EnrollStatus;
 
   @Column()

@@ -12,10 +12,7 @@ import { multigradesClassroomsKeys } from 'requests/queries/multigrade-classroom
 import { useDeleteMultigradeClassroom } from 'requests/mutations/multigrade-classrooms';
 import { multigradesKeys } from 'requests/queries/multigrades';
 
-import {
-  multigradeClassroomsAtom,
-  classroomsAtom
-} from 'store/atoms/create-multigrade';
+import { classroomsAtom } from 'store/atoms/create-multigrade';
 
 import * as S from './styles';
 
@@ -40,9 +37,9 @@ const MultigradeClassroomsList = ({
     return { session, multigradeId };
   }, [session, multigradeId]);
 
-  const multigradesClassrooms = useAtomValue(
-    multigradeClassroomsAtom(multigradeParams)
-  );
+  // const multigradesClassrooms = useAtomValue(
+  //   multigradeClassroomsAtom(multigradeParams)
+  // );
   const setMultigradesClassrooms = useUpdateAtom(classroomsAtom);
 
   const deleteMultigradeClassroom = useDeleteMultigradeClassroom();
@@ -67,19 +64,19 @@ const MultigradeClassroomsList = ({
     return <S.Message>Carregando...</S.Message>;
   }
 
-  if (!multigradesClassrooms.length) {
-    return (
-      <S.Message>
-        Ainda não temos nenhuma turma vinculada a esse seriado, clique no botão
-        &quot;Adicionar turma&quot;.
-        <br /> (Caso o botão não apareça, selecione um período no campo ao lado)
-      </S.Message>
-    );
-  }
+  // if (!multigradesClassrooms.length) {
+  //   return (
+  //     <S.Message>
+  //       Ainda não temos nenhuma turma vinculada a esse seriado, clique no botão
+  //       &quot;Adicionar turma&quot;.
+  //       <br /> (Caso o botão não apareça, selecione um período no campo ao lado)
+  //     </S.Message>
+  //   );
+  // }
 
   return (
     <S.List>
-      {multigradesClassrooms.map((item) => (
+      {/* {multigradesClassrooms.map((item) => (
         <ListItem key={item.id}>
           <S.ItemContent>
             <span>{item.classroom.description}</span>
@@ -89,7 +86,7 @@ const MultigradeClassroomsList = ({
             </S.ActionButton>
           </S.ItemContent>
         </ListItem>
-      ))}
+      ))} */}
     </S.List>
   );
 };

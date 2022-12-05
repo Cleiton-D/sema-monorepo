@@ -2,6 +2,15 @@ import { Enroll } from './Enroll';
 import { SchoolSubject } from './SchoolSubject';
 import { SchoolTerm } from './SchoolTerm';
 
+export type SchoolReportStatus =
+  | 'ACTIVE'
+  | 'CLOSED'
+  | 'APPROVED'
+  | 'DISAPPROVED'
+  | 'RECOVERY'
+  | 'EXAM'
+  | 'DISAPPROVED_FOR_ABSENCES';
+
 export type SchoolReport = {
   id: string;
   enroll_id: string;
@@ -17,6 +26,7 @@ export type SchoolReport = {
   exam?: number;
   final_average?: number;
   annual_average?: number;
+  status: SchoolReportStatus;
   created_at: string;
   updated_at: string;
 };
@@ -32,6 +42,7 @@ export type MappedSchoolReportSubject = Record<SchoolTerm, string | number> & {
   school_subject: string;
   finalAverage: number | string;
   annualAverage: number | string;
+  status: string;
 };
 
 export type MappedSchoolReport = SchoolReport & {

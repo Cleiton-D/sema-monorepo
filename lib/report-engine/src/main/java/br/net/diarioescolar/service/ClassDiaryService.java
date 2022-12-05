@@ -34,7 +34,7 @@ public class ClassDiaryService {
       .filter(item -> item != null)
       .collect(Collectors.toList());
 
-      List<JasperPrint> pages = reports.stream().flatMap(List::stream).collect(Collectors.toList());
+    List<JasperPrint> pages = reports.stream().flatMap(List::stream).collect(Collectors.toList());
 
 
     try {
@@ -54,7 +54,6 @@ public class ClassDiaryService {
     }
 
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
 
     JRPdfExporter exporter = new JRPdfExporter();
     exporter.setExporterInput(SimpleExporterInput.getInstance(pages));
@@ -85,6 +84,7 @@ public class ClassDiaryService {
         .setParam("school_name", data.getSchoolName())
         .setParam("class_period", data.getClassPeriod())
         .setParam("classroom", data.getClassroom())
+        .setParam("reference_year", data.getReferenceYear())
         .build();
 
       List<JasperPrint> bySchoolTermPages = schoolSubjectClassDiary

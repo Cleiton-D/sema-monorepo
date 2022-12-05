@@ -13,6 +13,7 @@ type ListClassesRequest = {
   school_id?: string;
   class_date?: string;
   class_period_id?: string;
+  school_year_id?: string;
   grade_id?: string;
   status?: ClassStatus;
   taught_content?: string;
@@ -35,6 +36,7 @@ class ListClassesService {
     classroom_id,
     employee_id,
     school_subject_id,
+    school_year_id,
     school_id,
     class_date,
     class_period_id,
@@ -56,6 +58,7 @@ class ListClassesService {
       school_id,
       class_date,
       class_period_id,
+      school_year_id,
       grade_id,
       status,
       taught_content,

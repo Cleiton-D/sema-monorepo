@@ -2,11 +2,13 @@ import { AttendanceCount } from 'models/Attendance';
 import {
   SchoolReport,
   MappedSchoolReportSubject,
-  MappedSchoolReportSubjectWithAttendances
+  MappedSchoolReportSubjectWithAttendances,
+  SchoolReportStatus
 } from 'models/SchoolReport';
 import { SchoolSubject } from 'models/SchoolSubject';
 import { SchoolTerm } from 'models/SchoolTerm';
 import { masks } from 'utils/masks';
+import { statusMap } from './enrollMapper';
 
 type AttendancesKey = `attendances-${SchoolTerm}`;
 
@@ -36,6 +38,12 @@ export const schoolReportsSubjectsMapper = (
     };
   }, {});
 
+  const INACTIVE_ENROLL_STATUS = [
+    'INACTIVE',
+    'TRANSFERRED',
+    'QUITTER',
+    'DECEASED'
+  ];
   const groupedSchoolReports = schoolReports.reduce<
     Record<string, MappedSchoolReportSubject>
   >((acc, schoolReport) => {
@@ -43,8 +51,13 @@ export const schoolReportsSubjectsMapper = (
 
     const item = acc[school_subject_id] || {};
 
+    const status = INACTIVE_ENROLL_STATUS.includes(schoolReport.enroll.status)
+      ? statusMap[schoolReport.enroll.status]
+      : schoolReportStatusMap[schoolReport.status];
+
     const newItem = {
       ...item,
+      status: status,
       school_subject: school_subject.description,
       FIRST: schoolReport.first || '-',
       SECOND: schoolReport.second || '-',
@@ -116,4 +129,17 @@ export const schoolReportsEnrollsMapper = (schoolReport: SchoolReport) => {
         : '-'
     }
   };
+};
+
+export const schoolReportStatusMap: Record<
+  SchoolReportStatus | string,
+  string
+> = {
+  ACTIVE: 'Cursando',
+  CLOSED: 'Inativo',
+  APPROVED: 'Aprovado',
+  DISAPPROVED: 'Reprovado',
+  DISAPPROVED_FOR_ABSENCES: 'Reprovado por faltas',
+  EXAM: 'Exame',
+  RECOVERY: 'Recuperação'
 };
