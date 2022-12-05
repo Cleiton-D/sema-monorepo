@@ -30,7 +30,7 @@ jobs:
       - name: Docker push
         run: docker push ${{ secrets.DOCKER_USER }}/sema:api-${{ github.sha }}
 
-  build-api:
+  build-client:
     runs-on: ubuntu-latest
 
     steps:
