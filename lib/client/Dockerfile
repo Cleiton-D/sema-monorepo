@@ -30,7 +30,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/yarn.lock ./yarn.lock
-COPY --from=builder /app/.env.local ./.env.local
+# COPY --from=builder /app/.env.local ./.env.local
 COPY next.config.js ./next.config.js
 
 RUN yarn install --production
