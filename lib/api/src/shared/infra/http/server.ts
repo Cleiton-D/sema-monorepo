@@ -30,6 +30,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/healthy', (_, res) => res.json({ api: 'ok' }));
 app.use('/contacts', contactsRoutes);
 app.use('/adresses', adressesRoutes);
 app.use('/employees', employeesRoutes);
