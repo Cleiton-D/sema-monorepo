@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import getConfig from 'next/config';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import axios, { AxiosError } from 'axios';
@@ -11,6 +12,8 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
 // import { serverSignOut } from 'utils/serverSignOut';
+
+const { publicRuntimeConfig } = getConfig();
 
 const isChrome =
   typeof navigator !== 'undefined' &&
@@ -25,7 +28,7 @@ const createApi = (session?: Session | null) => {
   const api = axios.create({
     baseURL: isServer
       ? process.env.SERVER_API_URL
-      : process.env.NEXT_PUBLIC_API_URL,
+      : publicRuntimeConfig.NEXT_PUBLIC_API_URL,
     headers: {
       authorization: jwt ? `Bearer ${jwt}` : ''
     }
