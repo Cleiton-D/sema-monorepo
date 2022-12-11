@@ -7,9 +7,9 @@ type DatabaseDumpResponse = {
   content: Buffer;
 };
 
-const { publicRuntimeConfig } = getConfig();
-
 export const getDatabaseDump = async (session: Session | null) => {
+  const { publicRuntimeConfig } = getConfig();
+
   const now = new Date();
   const currentDate = `${now.getFullYear()}.${
     now.getMonth() + 1

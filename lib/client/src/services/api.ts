@@ -13,8 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
 // import { serverSignOut } from 'utils/serverSignOut';
 
-const { publicRuntimeConfig } = getConfig();
-
 const isChrome =
   typeof navigator !== 'undefined' &&
   /Chrome/.test(navigator.userAgent) &&
@@ -24,6 +22,8 @@ const isServer = typeof window === 'undefined' || (isChrome && !window.chrome);
 
 const createApi = (session?: Session | null) => {
   const jwt = session?.jwt;
+
+  const { publicRuntimeConfig } = getConfig();
 
   const api = axios.create({
     baseURL: isServer

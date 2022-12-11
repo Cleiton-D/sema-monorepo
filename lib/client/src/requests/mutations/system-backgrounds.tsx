@@ -13,14 +13,14 @@ type SetCurrentSystemBackgroundRequestData = {
   is_defined: boolean;
 };
 
-const { publicRuntimeConfig } = getConfig();
-
 export function useChangeCurrentSystemBackgroundMutation() {
   const { data: session } = useSession();
 
   const changeCurrentSystemBackground = useCallback(
     async (values: SetCurrentSystemBackgroundRequestData) => {
       const api = initializeApi(session);
+
+      const { publicRuntimeConfig } = getConfig();
 
       const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background`;
       const { data: responseData } = await api.patch<SystemBackground>(
@@ -61,6 +61,7 @@ export function useCreateCurrentSystemBackgroundMutation() {
         formData.append(key, value);
       });
 
+      const { publicRuntimeConfig } = getConfig();
       const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background`;
       const { data: responseData } = await api.post<SystemBackground>(
         url,
@@ -93,6 +94,7 @@ export function useDeleteSystemBackgroundMutation() {
     ({ id }: SystemBackground) => {
       const api = initializeApi(session);
 
+      const { publicRuntimeConfig } = getConfig();
       const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background/${id}`;
       return api.delete(url);
     },
