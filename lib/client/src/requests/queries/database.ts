@@ -1,4 +1,3 @@
-import getConfig from 'next/config';
 import { Session } from 'next-auth';
 import { initializeApi } from 'services/api';
 
@@ -8,8 +7,6 @@ type DatabaseDumpResponse = {
 };
 
 export const getDatabaseDump = async (session: Session | null) => {
-  const { publicRuntimeConfig } = getConfig();
-
   const now = new Date();
   const currentDate = `${now.getFullYear()}.${
     now.getMonth() + 1
@@ -18,7 +15,7 @@ export const getDatabaseDump = async (session: Session | null) => {
   const filename = `database-backup-${currentDate}.sql`;
 
   const link = document.createElement('a');
-  link.href = `${publicRuntimeConfig.NEXT_PUBLIC_API_URL}/admin/database/dump`;
+  link.href = `${process.env.NEXT_PUBLIC_API_URL}/admin/database/dump`;
   link.download = filename;
   link.target = '_blank';
   link.click();

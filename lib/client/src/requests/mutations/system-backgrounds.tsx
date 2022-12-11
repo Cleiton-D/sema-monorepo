@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import getConfig from 'next/config';
 import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
@@ -20,9 +19,7 @@ export function useChangeCurrentSystemBackgroundMutation() {
     async (values: SetCurrentSystemBackgroundRequestData) => {
       const api = initializeApi(session);
 
-      const { publicRuntimeConfig } = getConfig();
-
-      const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background`;
+      const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background`;
       const { data: responseData } = await api.patch<SystemBackground>(
         url,
         values
@@ -61,8 +58,7 @@ export function useCreateCurrentSystemBackgroundMutation() {
         formData.append(key, value);
       });
 
-      const { publicRuntimeConfig } = getConfig();
-      const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background`;
+      const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background`;
       const { data: responseData } = await api.post<SystemBackground>(
         url,
         formData,
@@ -94,8 +90,7 @@ export function useDeleteSystemBackgroundMutation() {
     ({ id }: SystemBackground) => {
       const api = initializeApi(session);
 
-      const { publicRuntimeConfig } = getConfig();
-      const url = `${publicRuntimeConfig.NEXT_PUBLIC_APP_URL}/api/background/${id}`;
+      const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background/${id}`;
       return api.delete(url);
     },
     [session]

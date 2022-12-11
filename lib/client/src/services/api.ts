@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import getConfig from 'next/config';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import axios, { AxiosError } from 'axios';
@@ -23,12 +22,10 @@ const isServer = typeof window === 'undefined' || (isChrome && !window.chrome);
 const createApi = (session?: Session | null) => {
   const jwt = session?.jwt;
 
-  const { publicRuntimeConfig } = getConfig();
-
   const api = axios.create({
     baseURL: isServer
       ? process.env.SERVER_API_URL
-      : publicRuntimeConfig.NEXT_PUBLIC_API_URL,
+      : process.env.NEXT_PUBLIC_API_URL,
     headers: {
       authorization: jwt ? `Bearer ${jwt}` : ''
     }
