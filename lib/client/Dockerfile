@@ -31,13 +31,18 @@ WORKDIR /app
 # RUN adduser -S nextjs -u 1001
 
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
-# COPY --from=builder /app/.env.local ./.env.local
-COPY next.config.js ./next.config.js
 
-RUN yarn install --production
+# COPY --from=builder /app/.next ./.next
+
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# COPY --from=builder /app/yarn.lock ./yarn.lock
+## COPY --from=builder /app/.env.local ./.env.local
+# COPY next.config.js ./next.config.js
+
+# RUN yarn install --production
 
 # USER nextjs
 
@@ -45,4 +50,4 @@ EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]
