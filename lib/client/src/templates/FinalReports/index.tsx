@@ -85,23 +85,15 @@ const FinalReportsTemplate = () => {
             contentAlign="center"
             actionColumn
             render={(classroom) => (
-              <Link
-                href={{
-                  pathname: '/api/reports/class-diary',
-                  query: {
-                    classroom_id: classroom.id
-                  }
-                }}
-                prefetch={false}
-                passHref
+              <S.ActionButton
+                title="Imprimir relatório final"
+                target="_blank"
+                href={`/api/reports/class-diary?classroom_id=${encodeURIComponent(
+                  classroom.id
+                )}`}
               >
-                <S.ActionButton
-                  title="Imprimir relatório final"
-                  target="_blank"
-                >
-                  <FileText title="Imprimir relatório final" />
-                </S.ActionButton>
-              </Link>
+                <FileText title="Imprimir relatório final" />
+              </S.ActionButton>
             )}
           />
         </Table>
