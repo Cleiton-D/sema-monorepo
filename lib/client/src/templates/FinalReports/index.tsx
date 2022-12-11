@@ -92,6 +92,7 @@ const FinalReportsTemplate = () => {
                     classroom_id: classroom.id
                   }
                 }}
+                prefetch={false}
                 passHref
               >
                 <S.ActionButton
