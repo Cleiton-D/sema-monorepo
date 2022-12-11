@@ -95,4 +95,21 @@ jobs:
 
       - name: Docker push
         run: docker push ${{ secrets.DOCKER_USER }}/sema:report-engine-${{ github.sha }}-$BUILD_ID
+
+
+  deploy-on-kubernetes:
+    runs-on: ubuntu-latest
+    needs: [build-api, build-client, build-report-engine]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 'Deploy'
+        uses: 'deliverybot/helm@master'
+        with:
+          chart: ci/app
+          release: app
+          namespace: prod
+        env: 
+          KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
       

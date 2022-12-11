@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: diarioonline-front-configmap
+data:
+  NEXTAUTH_URL: {{ .Values.env.APP_URL }}
+  NEXTAUTH_URL_INTERNAL: http://localhost:3000
+  APP_URL: {{ .Values.env.APP_URL }}
+  NEXT_PUBLIC_APP_URL: {{ .Values.env.APP_URL }}
+  APP_URL_INTERNAL: http://{{ .Values.service.name }}.{{ .Release.Namespace }}.svc.cluster.local:3000
+  REPORT_ENGINE_URL:  {{ .Values.reportServiceName }}.{{ .Release.Namespace }}.svc.cluster.local:9000
+  NEXT_PUBLIC_API_URL: {{ .Values.env.API_URL }}
+  SERVER_API_URL: http://{{ .Values.apiServiceName }}.{{ .Release.Namespace }}.svc.cluster.local:3333
+  SERVER_HOSTNAME: {{ .Values.env.SERVER_HOSTNAME }}

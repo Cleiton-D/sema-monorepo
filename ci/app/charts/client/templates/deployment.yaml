@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "front.fullname" . }}
+  labels:
+    {{- include "front.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "front.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "front.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "front.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: NEXTAUTH_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: NEXTAUTH_URL
+            - name: NEXTAUTH_URL_INTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: NEXTAUTH_URL_INTERNAL
+            - name: APP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: APP_URL
+            - name: NEXT_PUBLIC_APP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: NEXT_PUBLIC_APP_URL
+            - name: APP_URL_INTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: APP_URL_INTERNAL
+            - name: REPORT_ENGINE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: REPORT_ENGINE_URL
+            - name: NEXT_PUBLIC_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: NEXT_PUBLIC_API_URL
+            - name: SERVER_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: SERVER_API_URL
+            - name: SERVER_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-front-configmap
+                  key: SERVER_HOSTNAME
+            - name: JWT_SIGNING_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: diarioonline-front-secret
+                  key: JWT_SIGNING_PRIVATE_KEY
+            - name: API_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: diarioonline-front-secret
+                  key: API_SECRET_KEY
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
