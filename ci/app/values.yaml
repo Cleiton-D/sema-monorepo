@@ -1,12 +1,12 @@
 api:
   env:
-    API_URL: https://api.cleitonkiper.com.br
+    API_URL: http://api.cleitonkiper.com.br
     API_DOMAIN: api.cleitonkiper.com.br
 
 client:
   env:
-    API_URL: https://api.cleitonkiper.com.br
-    APP_URL: https://diario.cleitonkiper.com.br
+    API_URL: http://api.cleitonkiper.com.br
+    APP_URL: http://diario.cleitonkiper.com.br
     APP_DOMAIN: diario.cleitonkiper.com.br
     SERVER_HOSTNAME: api.cleitonkiper.com.br
   apiServiceName: app-api

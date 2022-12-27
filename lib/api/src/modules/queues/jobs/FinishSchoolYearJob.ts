@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { endOfDay, endOfToday } from 'date-fns';
+import { endOfDay, addDays, endOfToday } from 'date-fns';
 
 import IQueueJob from '@shared/container/providers/QueueProvider/models/IQueueJob';
 import queueJobHO from '@shared/decorators/queueJobHO';
@@ -113,7 +113,7 @@ class FinishSchoolYearJob implements IQueueJob {
 
     const currentDate = endOfToday();
     const filteredSchoolYears = schoolYears.filter(schoolYear => {
-      const endOfSchoolYear = endOfDay(schoolYear.date_end);
+      const endOfSchoolYear = endOfDay(addDays(schoolYear.date_end, 10));
 
       return endOfSchoolYear.getTime() <= currentDate.getTime();
     });

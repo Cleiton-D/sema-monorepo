@@ -29,14 +29,14 @@ class ControlSchoolYearJob implements IQueueJob {
         });
       }
 
-      if (
-        schoolYear.status === 'ACTIVE' &&
-        isAfter(currentDate, schoolYear.date_end)
-      ) {
-        return Object.assign(schoolYear, {
-          status: 'INACTIVE',
-        });
-      }
+      // if (
+      //   schoolYear.status === 'ACTIVE' &&
+      //   isAfter(currentDate, schoolYear.date_end)
+      // ) {
+      //   return Object.assign(schoolYear, {
+      //     status: 'INACTIVE',
+      //   });
+      // }
 
       return schoolYear;
     });

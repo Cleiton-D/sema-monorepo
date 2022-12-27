@@ -2,7 +2,6 @@ import { useMemo, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import format from 'date-fns/format';
-import isBefore from 'date-fns/isBefore';
 import ptBr from 'date-fns/locale/pt-BR';
 
 import { GroupedCalendarEvents } from 'models/CalendarEvent';

@@ -11,4 +11,13 @@ attendancesRouter.get('/', attendancesController.index);
 attendancesRouter.get('/by-classes', attendancesController.indexByClasses);
 attendancesRouter.get('/count', attendancesController.count);
 
+attendancesRouter.patch(
+  '/:attendance_id/justify',
+  attendancesController.justify,
+);
+attendancesRouter.delete(
+  '/:attendance_id/justify',
+  attendancesController.removeJustify,
+);
+
 export default attendancesRouter;

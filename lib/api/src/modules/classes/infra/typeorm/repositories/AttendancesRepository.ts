@@ -35,6 +35,7 @@ class AttendancesRepository implements IAttendancesRepository {
     class_id,
     attendance,
     classroom_id,
+    justified,
   }: FindAttendanceDTO): Promise<Attendance[]> {
     const where: FindOptionsWhere<Attendance> = {};
     const andWhere: AndWhere[] = [];
@@ -53,7 +54,14 @@ class AttendancesRepository implements IAttendancesRepository {
         where.class_id = class_id;
       }
     }
-    if (attendance) where.attendance = attendance;
+
+    if (typeof attendance !== 'undefined') {
+      where.attendance = attendance;
+    }
+    if (typeof justified !== 'undefined') {
+      where.justified = justified;
+    }
+
     // if (classroom_id) {
     //   // TESTAR class.classroom_id IN
     //   andWhere.push({
@@ -110,9 +118,66 @@ class AttendancesRepository implements IAttendancesRepository {
       .leftJoinAndSelect('enroll.enroll_classrooms', 'enroll_classrooms')
       .leftJoinAndSelect('class.school_subject', 'schoolSubject')
       .leftJoinAndSelect('attendance.enroll_classroom', 'enroll_classroom')
-      .leftJoinAndSelect('enroll_classroom.classroom', 'classroom');
+      .leftJoinAndSelect('enroll_classroom.classroom', 'classroom')
+      .orderBy('class.class_date', 'DESC');
 
     return queryBuilder.getMany();
+  }
+
+  public async findOne({
+    id,
+    enroll_id,
+    class_id,
+    attendance,
+    classroom_id,
+    justified,
+  }: FindAttendanceDTO): Promise<Attendance | undefined> {
+    const where: FindOptionsWhere<Attendance> = {};
+    const andWhere: AndWhere[] = [];
+
+    if (id) where.id = id;
+    if (classroom_id) {
+      andWhere.push({
+        condition: 'class.classroom_id = :classroomId',
+        parameters: { classroomId: classroom_id },
+      });
+    }
+    if (enroll_id) where.enroll_id = enroll_id;
+    if (class_id) {
+      if (Array.isArray(class_id)) {
+        where.class_id = In(class_id);
+      } else {
+        where.class_id = class_id;
+      }
+    }
+    if (typeof attendance !== 'undefined') {
+      where.attendance = attendance;
+    }
+    if (typeof justified !== 'undefined') {
+      where.justified = justified;
+    }
+
+    const queryBuilder = this.ormRepository
+      .createQueryBuilder('attendance')
+      .select()
+      .where((qb: WhereExpressionBuilder) => {
+        qb.where(where);
+        andWhere.forEach(({ condition, parameters }) =>
+          qb.andWhere(condition, parameters),
+        );
+      })
+      .leftJoinAndSelect('attendance.enroll', 'enroll')
+      .leftJoinAndSelect('enroll.student', 'student')
+      .leftJoinAndSelect('attendance.class', 'class')
+      .leftJoinAndSelect('class.classroom', 'class_classroom')
+      .leftJoinAndSelect('enroll.enroll_classrooms', 'enroll_classrooms')
+      .leftJoinAndSelect('class.school_subject', 'schoolSubject')
+      .leftJoinAndSelect('attendance.enroll_classroom', 'enroll_classroom')
+      .leftJoinAndSelect('enroll_classroom.classroom', 'classroom');
+
+    const attendanceEntity = await queryBuilder.getOne();
+
+    return attendanceEntity || undefined;
   }
 
   private createCountSubquery(
@@ -124,6 +189,7 @@ class AttendancesRepository implements IAttendancesRepository {
       attendance,
       split_by_school_subject,
       split_by_school_term,
+      justified,
     }: CountAttendancesDTO,
     queryBuilder: SelectQueryBuilder<any>,
   ): SelectQueryBuilder<any> {
@@ -159,6 +225,7 @@ class AttendancesRepository implements IAttendancesRepository {
       }
     }
     if (typeof attendance !== 'undefined') where.attendance = attendance;
+    if (typeof justified !== 'undefined') where.justified = justified;
 
     queryBuilder
       .from('attendances', 'attendance')

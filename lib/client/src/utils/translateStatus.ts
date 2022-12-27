@@ -13,7 +13,10 @@ export const translateStatus = (
     DECEASED: 'Falecido',
     APPROVED: 'Aprovado',
     DISAPPROVED: 'Reprovado',
-    RELOCATED: 'Remanejado'
+    RELOCATED: 'Remanejado',
+    DISAPPROVED_FOR_ABSENCES: 'Reprovado por faltas',
+    EXAM: 'Exame',
+    RECOVERY: 'Recuperação'
   };
 
   return obj[status] || status;

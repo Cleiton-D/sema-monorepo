@@ -13,7 +13,9 @@ type SchoolReport = {
   exam?: number;
 };
 
-export default class FixAverages1666652858601 implements MigrationInterface {
+export default class FixRecoverySchoolReports1671103317136
+  implements MigrationInterface
+{
   private getBimonthlyAverage(schoolReport: SchoolReport) {
     const fistIsNull = schoolReport.first === null;
     const secondIsNull = schoolReport.second === null;
@@ -114,7 +116,7 @@ export default class FixAverages1666652858601 implements MigrationInterface {
 
     let secondSemAverage = (third + fourth) / lengthSecond;
     secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
+      secondSemAverage >= second_rec ? secondSemAverage : second_rec;
     secondSemAverage *= lengthSecond;
 
     const totalReports = lengthFirst + lengthSecond;

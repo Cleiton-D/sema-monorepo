@@ -5,22 +5,32 @@ import privateRoute from '@shared/decorators/privateRoute';
 import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
 
 import RegisterClassAttendancesService from '@modules/classes/services/RegisterClassAttendancesService';
-import ListAttendancesService from '@modules/classes/services/ListAttendancesService';
+import ListAttendancesService, {
+  ListAttendancesRequest,
+} from '@modules/classes/services/ListAttendancesService';
 import CountAttendancesService from '@modules/classes/services/CountAttendancesService';
 import ListAttendancesByClassesService from '@modules/classes/services/ListAttendancesByClassesService';
+import JustifyAbsenceService from '@modules/classes/services/JustifyAbsenceService';
+import RemoveAbsenceJustificationService from '@modules/classes/services/RemoveAbsenceJustificationService';
 
 import { ClassStatus } from '../../typeorm/entities/Class';
 
 class AttendancesController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { classroom_id, enroll_id, class_id } = request.query;
+    const { classroom_id, enroll_id, class_id, attendance } = request.query;
 
-    const listAttendances = container.resolve(ListAttendancesService);
-    const attendances = await listAttendances.execute({
+    const listAttendancesRequest: ListAttendancesRequest = {
       class_id: class_id as string,
       classroom_id: classroom_id as string,
       enroll_id: enroll_id as string,
-    });
+    };
+
+    if (typeof attendance !== undefined && attendance !== null) {
+      listAttendancesRequest.attendance = Boolean(Number(attendance));
+    }
+
+    const listAttendances = container.resolve(ListAttendancesService);
+    const attendances = await listAttendances.execute(listAttendancesRequest);
 
     return response.json(attendances);
   }
@@ -114,6 +124,38 @@ class AttendancesController {
     });
 
     return response.json(updatedAttendances);
+  }
+
+  public async justify(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { attendance_id } = request.params;
+    const { description } = request.body;
+
+    const justifyAbsence = container.resolve(JustifyAbsenceService);
+    const updatedAttendance = await justifyAbsence.execute({
+      attendanceId: attendance_id,
+      description,
+    });
+
+    return response.json(updatedAttendance);
+  }
+
+  public async removeJustify(
+    request: Request,
+    response: Response,
+  ): Promise<Response> {
+    const { attendance_id } = request.params;
+
+    const removeAbsenceJustification = container.resolve(
+      RemoveAbsenceJustificationService,
+    );
+    const updatedAttendance = await removeAbsenceJustification.execute({
+      attendance_id,
+    });
+
+    return response.json(updatedAttendance);
   }
 }
 

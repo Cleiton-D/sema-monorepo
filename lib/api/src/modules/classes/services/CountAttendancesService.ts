@@ -8,6 +8,7 @@ type CountAttendancesResquest = {
   enroll_id?: string;
   school_subject_id?: string | string[];
   attendance?: boolean;
+  justified?: boolean;
   split_by_school_subject?: boolean;
   split_by_school_term?: boolean;
 };
@@ -35,6 +36,7 @@ class CountAttendancesService {
     enroll_id,
     school_subject_id,
     attendance,
+    justified,
     split_by_school_subject,
     split_by_school_term,
   }: CountAttendancesResquest): Promise<CountAttendancesResponse[]> {
@@ -44,6 +46,7 @@ class CountAttendancesService {
       enroll_id,
       school_subject_id,
       attendance,
+      justified,
       split_by_school_subject,
       split_by_school_term,
     });

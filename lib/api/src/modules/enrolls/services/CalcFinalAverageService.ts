@@ -49,7 +49,7 @@ class CalcFinalAverageService {
 
     let secondSemAverage = (third + fourth) / 2;
     secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
+      secondSemAverage >= second_rec ? secondSemAverage : second_rec;
 
     const finalAverage = (firstSemAverage + secondSemAverage) / 2;
     return Math.round(finalAverage);

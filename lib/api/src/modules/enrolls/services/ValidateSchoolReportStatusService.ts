@@ -25,8 +25,13 @@ class ValidateSchoolReportStatusService {
     }
 
     if (schoolReport.final_average >= 600) return 'APPROVED';
+    if (schoolReport.exam !== null && schoolReport.final_average >= 500) {
+      return 'APPROVED';
+    }
+    if (schoolReport.exam !== null && schoolReport.final_average < 500) {
+      return 'DISAPPROVED';
+    }
 
-    if (schoolReport.exam !== null) return 'DISAPPROVED';
     if (schoolReport.first_rec !== null || schoolReport.second_rec !== null) {
       return 'EXAM';
     }

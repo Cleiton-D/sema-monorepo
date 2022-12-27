@@ -14,6 +14,7 @@ type ListAttendancesFilters = {
   class_id?: string | string[];
   classroom_id?: string;
   enroll_id?: string;
+  attendance?: boolean | number;
 };
 
 export const listAttendances = (
@@ -21,6 +22,11 @@ export const listAttendances = (
   params: ListAttendancesFilters = {}
 ) => {
   const api = initializeApi(session);
+
+  const { attendance } = params;
+  if (typeof attendance !== 'undefined' && attendance !== null) {
+    params.attendance = Number(attendance);
+  }
 
   return api
     .get<Attendance[]>(`/attendances`, { params })

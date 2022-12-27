@@ -41,6 +41,9 @@ class GradeSchoolSubject {
   @VirtualColumn()
   calculated_workload: number;
 
+  @Column()
+  is_required: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

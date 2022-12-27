@@ -22,6 +22,10 @@ export const masks = {
     return newValue;
   },
   'school-report-field': (value: string) => {
+    if (String(value) === '100') {
+      return '1.0';
+    }
+
     const newValue = value
       .replace(/\D/g, '')
       .replace(/(^10)(0)/, '$1.$2')
@@ -32,14 +36,19 @@ export const masks = {
     return newValue;
   },
   'school-report': (value: string) => {
-    const normalizedValue = value.padStart(3, '0');
+    const normalizedValue = value.padStart(4, '0');
 
     const newValue = normalizedValue
       .replace(/\D/g, '')
       .replace(/(^10)(0)/, '$1.$2')
       .replace(/(^10\.0)([1-9])/, '$1')
-      .replace(/(^(?!^10)[0-9])([0-9])/, '$1.$2')
-      .replace(/(^10|[0-9]\.[0-9])(\d+?$)/, '$1');
+      .replace(/(^0)([0-9])/, '$2')
+      .replace(/(^(?!^10)[0-9])([0-9])/, '$1.$2');
+    // .replace(/(^10|[0-9]\.[0-9])(\d+?$)/, '$1');
+
+    if (String(value) === '100') {
+      console.log(value, newValue);
+    }
 
     return newValue;
   }

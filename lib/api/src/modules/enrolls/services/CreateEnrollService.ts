@@ -5,10 +5,10 @@ import { Gender } from '@modules/persons/infra/typeorm/entities/Person';
 import IGradeSchoolSubjectsRepository from '@modules/education_core/repositories/IGradeSchoolSubjectsRepository';
 import ISchoolsRepository from '@modules/schools/repositories/ISchoolsRepository';
 import CreateStudentService from '@modules/students/services/CreateStudentService';
+import UpdateStudentService from '@modules/students/services/UpdateStudentService';
 
 import AppError from '@shared/errors/AppError';
 
-import UpdateStudentService from '@modules/students/services/UpdateStudentService';
 import Enroll, { EnrollOrigin } from '../infra/typeorm/entities/Enroll';
 import IEnrollsRepository from '../repositories/IEnrollsRepository';
 import CreateSchoolReportsToEnrollService from './CreateSchoolReportsToEnrollService';

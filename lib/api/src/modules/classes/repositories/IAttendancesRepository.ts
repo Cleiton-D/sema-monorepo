@@ -8,6 +8,7 @@ import Attendance from '../infra/typeorm/entities/Attendance';
 
 export default interface IAttendancesRepository {
   findAll: (filters: FindAttendanceDTO) => Promise<Attendance[]>;
+  findOne: (filters: FindAttendanceDTO) => Promise<Attendance | undefined>;
   count: (filters: CountAttendancesDTO) => Promise<CountAttendancesResponse[]>;
   createMany: (data: CreateAttendanceDTO[]) => Promise<Attendance[]>;
   updateMany: (attendances: Attendance[]) => Promise<Attendance[]>;

@@ -3,6 +3,7 @@ export type CountAttendancesDTO = {
   enroll_id?: string;
   school_subject_id?: string | string[];
   attendance?: boolean;
+  justified?: boolean;
   class_id?: string | string[];
   split_by_school_subject?: boolean;
   split_by_school_term?: boolean;

@@ -21,6 +21,7 @@ import { translateContactType } from 'utils/mappers/contactsMapper';
 import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
 import * as S from './styles';
+import EnrollAbsencesTable from 'components/EnrollAbsencesTable';
 
 const StudentPageTemplate = () => {
   const { enableAccess } = useAccess();
@@ -184,6 +185,14 @@ const StudentPageTemplate = () => {
           </Link>
         </S.SectionTitle>
         <SchoolReportTable enrollId={query.enroll_id as string} isMininal />
+      </S.TableSection>
+
+      <S.TableSection>
+        <S.SectionTitle>
+          <h4>Faltas</h4>
+        </S.SectionTitle>
+
+        <EnrollAbsencesTable enrollId={query.enroll_id as string} />
       </S.TableSection>
     </Base>
   );

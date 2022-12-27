@@ -53,12 +53,12 @@ class CalcAnnualAverageService {
 
     let secondSemAverage = (third + fourth) / lengthSecond;
     secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : first_rec;
+      secondSemAverage >= second_rec ? secondSemAverage : second_rec;
     secondSemAverage *= lengthSecond;
 
     const totalReports = lengthFirst + lengthSecond;
-    const finalAverage = (firstSemAverage + secondSemAverage) / totalReports;
-    return Math.round(finalAverage);
+    const annualAverage = (firstSemAverage + secondSemAverage) / totalReports;
+    return Math.round(annualAverage);
   }
 }
 

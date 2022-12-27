@@ -89,6 +89,7 @@ class UpdateSchoolReportStatusByAttendancesService {
 
     const [absences] = await this.countAttendances.execute({
       attendance: false,
+      justified: false,
       enroll_id: enroll.id,
       school_subject_id: gradeSchoolSubject.school_subject_id,
       split_by_school_subject: true,
