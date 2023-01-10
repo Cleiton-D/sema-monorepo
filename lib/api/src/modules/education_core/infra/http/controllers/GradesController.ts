@@ -11,8 +11,12 @@ import ShowGradeService from '@modules/education_core/services/ShowGradeService'
 
 class GradesController {
   public async index(request: Request, response: Response): Promise<Response> {
+    const { school_year_id } = request.query;
+
     const listGrades = container.resolve(ListGradeService);
-    const grades = await listGrades.execute();
+    const grades = await listGrades.execute({
+      school_year_id: school_year_id as string,
+    });
 
     return response.json(grades);
   }
@@ -29,19 +33,24 @@ class GradesController {
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
+    const { school_year_id } = request.query;
+
     const countGrades = container.resolve(CountGradesService);
-    const countResult = await countGrades.execute();
+    const countResult = await countGrades.execute({
+      school_year_id: school_year_id as string,
+    });
 
     return response.json(countResult);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const { description, after_of } = request.body;
+    const { description, after_of, school_year_id } = request.body;
 
     const createGrade = container.resolve(CreateGradeService);
     const grade = await createGrade.execute({
       description,
       after_of,
+      school_year_id,
     });
 
     return response.json(grade);
@@ -50,7 +59,6 @@ class GradesController {
   @privateRoute()
   public async delete(request: Request, response: Response): Promise<Response> {
     const { grade_id } = request.params;
-    // const { id: authenticated_grade } = request.grade;
 
     const deleteGrade = container.resolve(DeleteGradeService);
     await deleteGrade.execute({ grade_id });

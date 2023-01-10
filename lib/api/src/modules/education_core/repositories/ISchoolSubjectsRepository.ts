@@ -9,7 +9,7 @@ export default interface ISchoolSubjectsRepository {
     filters?: FindSchoolSubjectDTO,
   ) => Promise<SchoolSubject | undefined>;
   findAll: (filters?: FindSchoolSubjectDTO) => Promise<SchoolSubject[]>;
-  count: () => Promise<CountResultDTO>;
+  count: (filters?: FindSchoolSubjectDTO) => Promise<CountResultDTO>;
   create: (data: CreateSchoolSubjectDTO) => Promise<SchoolSubject>;
   update: (schoolSubject: SchoolSubject) => Promise<SchoolSubject>;
   delete: (schoolSubject: SchoolSubject) => Promise<void>;

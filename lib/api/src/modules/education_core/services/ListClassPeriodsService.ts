@@ -5,6 +5,7 @@ import IClassPeriodsRepository from '../repositories/IClassPeriodsRepository';
 
 type ListClassPeriodsRequest = {
   school_id?: string;
+  school_year_id?: string;
 };
 
 @injectable()
@@ -16,9 +17,11 @@ class ListClassPeriodsService {
 
   public async execute({
     school_id,
+    school_year_id,
   }: ListClassPeriodsRequest): Promise<ClassPeriod[]> {
     const classPeriods = await this.classPeriodsRepository.findAll({
       school_id,
+      school_year_id,
     });
     return classPeriods;
   }

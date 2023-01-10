@@ -36,11 +36,13 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
   public async findAll({
     id,
     school_id,
+    school_year_id,
   }: FindSchoolTeacherDTO): Promise<SchoolTeacher[]> {
     const where: FindOptionsWhere<SchoolTeacher> = {};
 
     if (id) where.id = id;
     if (school_id) where.school_id = school_id;
+    if (school_year_id) where.school_year_id = school_year_id;
 
     const schoolTeachers = await this.ormRepository.find({
       where,
@@ -60,11 +62,13 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
   public async count({
     id,
     school_id,
+    school_year_id,
   }: FindSchoolTeacherDTO): Promise<CountResultDTO> {
     const where: FindOptionsWhere<SchoolTeacher> = {};
 
     if (id) where.id = id;
     if (school_id) where.school_id = school_id;
+    if (school_year_id) where.school_year_id = school_year_id;
 
     const count = await this.ormRepository.count({
       where,
@@ -76,8 +80,13 @@ class SchoolTeachersRepository implements ISchoolTeachersRepository {
   public async create({
     employee_id,
     school_id,
+    school_year_id,
   }: CreateSchoolTeacherDTO): Promise<SchoolTeacher> {
-    const schoolTeacher = this.ormRepository.create({ employee_id, school_id });
+    const schoolTeacher = this.ormRepository.create({
+      employee_id,
+      school_id,
+      school_year_id,
+    });
     await this.ormRepository.save(schoolTeacher);
 
     return schoolTeacher;

@@ -5,6 +5,7 @@ import { dataSource } from '@config/data_source';
 import IGradesRepository from '@modules/education_core/repositories/IGradesRepository';
 import CreateGradeDTO from '@modules/education_core/dtos/CreateGradeDTO';
 import CountResultDTO from '@modules/education_core/dtos/CountResultDTO';
+import FindGradeDTO from '@modules/education_core/dtos/FindGradeDTO';
 import Grade from '../entities/Grade';
 
 class GradesRepository implements IGradesRepository {
@@ -42,8 +43,13 @@ class GradesRepository implements IGradesRepository {
     return grade ?? undefined;
   }
 
-  public async findAll(): Promise<Grade[]> {
-    const queryBuilder = this.createQueryBuilder({});
+  public async findAll({ school_year_id }: FindGradeDTO = {}): Promise<
+    Grade[]
+  > {
+    const where: FindOptionsWhere<Grade> = {};
+    if (school_year_id) where.school_year_id = school_year_id;
+
+    const queryBuilder = this.createQueryBuilder(where);
     const grades = await queryBuilder.getMany();
     return grades;
   }
@@ -54,8 +60,13 @@ class GradesRepository implements IGradesRepository {
     return grade ?? undefined;
   }
 
-  public async count(): Promise<CountResultDTO> {
-    const queryBuilder = this.createQueryBuilder({});
+  public async count({
+    school_year_id,
+  }: FindGradeDTO = {}): Promise<CountResultDTO> {
+    const where: FindOptionsWhere<Grade> = {};
+    if (school_year_id) where.school_year_id = school_year_id;
+
+    const queryBuilder = this.createQueryBuilder(where);
 
     const count = await queryBuilder.getCount();
     return { count };
@@ -64,10 +75,12 @@ class GradesRepository implements IGradesRepository {
   public async create({
     description,
     after_of,
+    school_year_id,
   }: CreateGradeDTO): Promise<Grade> {
     const grade = this.ormRepository.create({
       description,
       after_of,
+      school_year_id,
     });
     await this.ormRepository.save(grade);
 

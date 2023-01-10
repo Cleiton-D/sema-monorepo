@@ -4,6 +4,7 @@ import ISchoolTeachersRepository from '../repositories/ISchoolTeachersRepository
 
 type CountSchoolTeachersRequest = {
   school_id?: string;
+  school_year_id?: string;
 };
 
 type CountSchoolTeachersResponse = {
@@ -19,9 +20,11 @@ class CountSchoolTeachersService {
 
   public async execute({
     school_id,
+    school_year_id,
   }: CountSchoolTeachersRequest): Promise<CountSchoolTeachersResponse> {
     const { count } = await this.schoolTeachersRepository.count({
       school_id,
+      school_year_id,
     });
 
     return { count };

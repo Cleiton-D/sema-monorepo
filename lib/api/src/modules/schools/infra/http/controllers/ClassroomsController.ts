@@ -33,6 +33,7 @@ class ClassroomsController {
       class_period_id,
       employee_id,
       school_id,
+      school_year_id,
       with_in_multigrades,
       with_multigrades,
       page,
@@ -43,6 +44,7 @@ class ClassroomsController {
       grade_id: grade_id as string,
       class_period_id: class_period_id as string,
       employee_id: employee_id as string,
+      school_year_id: school_year_id as string,
       page: page ? Number(page) : undefined,
       size: size ? Number(size) : undefined,
     };

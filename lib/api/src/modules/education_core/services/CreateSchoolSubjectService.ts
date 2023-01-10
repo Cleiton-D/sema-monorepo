@@ -9,6 +9,7 @@ type CreateSchoolSubjectRequest = {
   additional_description: string;
   index: number;
   is_multidisciplinary?: boolean;
+  school_year_id?: string;
 };
 
 @injectable()
@@ -23,12 +24,14 @@ class CreateSchoolSubjectService {
     additional_description,
     index,
     is_multidisciplinary,
+    school_year_id,
   }: CreateSchoolSubjectRequest): Promise<SchoolSubject> {
     const schoolSubject = await this.schoolSubjectsRepository.create({
       description,
       additional_description,
       index,
       is_multidisciplinary,
+      school_year_id,
     });
 
     return schoolSubject;

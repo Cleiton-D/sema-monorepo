@@ -8,6 +8,7 @@ export type ListSchoolSubjectsRequest = {
   grade_id?: string;
   include_multidisciplinary?: boolean;
   is_multidisciplinary?: boolean;
+  school_year_id?: string;
 };
 
 @injectable()
@@ -22,6 +23,7 @@ class ListSchoolSubjectService {
     grade_id,
     include_multidisciplinary,
     is_multidisciplinary,
+    school_year_id,
   }: ListSchoolSubjectsRequest): Promise<SchoolSubject[]> {
     if (grade_id) {
       const gradeSchoolSubjects = await this.listGradeSchoolSubjects.execute({
@@ -33,6 +35,7 @@ class ListSchoolSubjectService {
     }
 
     const schoolSubject = await this.schoolSubjectsRepository.findAll({
+      school_year_id,
       include_multidisciplinary,
       is_multidisciplinary,
     });

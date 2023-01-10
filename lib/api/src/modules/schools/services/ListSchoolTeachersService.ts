@@ -5,6 +5,7 @@ import ISchoolTeachersRepository from '../repositories/ISchoolTeachersRepository
 
 type ListSchoolTeachersRequest = {
   school_id: string;
+  school_year_id?: string;
 };
 
 @injectable()
@@ -16,9 +17,11 @@ class ListSchoolTeachersService {
 
   public async execute({
     school_id,
+    school_year_id,
   }: ListSchoolTeachersRequest): Promise<SchoolTeacher[]> {
     const schoolTeachers = await this.schoolTeachersRepository.findAll({
       school_id,
+      school_year_id,
     });
 
     return schoolTeachers;

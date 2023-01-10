@@ -31,6 +31,9 @@ class SchoolTeacher {
   @JoinColumn({ name: 'school_id' })
   school: School;
 
+  @Column()
+  school_year_id?: string;
+
   @CreateDateColumn()
   created_at: Date;
 

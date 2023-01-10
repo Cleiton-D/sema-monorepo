@@ -16,6 +16,7 @@ export type ListClassroomsRequest = {
   employee_id?: string;
   with_in_multigrades?: boolean;
   with_multigrades?: boolean;
+  school_year_id?: string;
   page?: number;
   size?: number;
 };
@@ -34,6 +35,7 @@ class ListClassroomsService {
     grade_id,
     class_period_id,
     employee_id,
+    school_year_id,
     with_in_multigrades = true,
     with_multigrades = false,
     page,
@@ -43,6 +45,7 @@ class ListClassroomsService {
       grade_id,
       class_period_id,
       employee_id,
+      school_year_id,
       with_in_multigrades: !with_in_multigrades ? false : undefined,
       with_multigrades,
       page,

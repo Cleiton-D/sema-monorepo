@@ -23,11 +23,16 @@ class SchoolSubjectsController {
   }
 
   public async index(request: Request, response: Response): Promise<Response> {
-    const { grade_id, include_multidisciplinary, is_multidisciplinary } =
-      request.query;
+    const {
+      grade_id,
+      include_multidisciplinary,
+      is_multidisciplinary,
+      school_year_id,
+    } = request.query;
 
     const listSchoolSubjectsRequest: ListSchoolSubjectsRequest = {
       grade_id: grade_id as string,
+      school_year_id: school_year_id as string,
     };
 
     if (typeof include_multidisciplinary !== 'undefined') {
@@ -51,15 +56,24 @@ class SchoolSubjectsController {
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
+    const { school_year_id } = request.query;
+
     const countSchoolSubjects = container.resolve(CountSchoolSubjectsService);
-    const countResult = await countSchoolSubjects.execute();
+    const countResult = await countSchoolSubjects.execute({
+      school_year_id: school_year_id as string,
+    });
 
     return response.json(countResult);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const { description, additional_description, index, is_multidisciplinary } =
-      request.body;
+    const {
+      description,
+      additional_description,
+      index,
+      is_multidisciplinary,
+      school_year_id,
+    } = request.body;
 
     const createSchoolSubject = container.resolve(CreateSchoolSubjectService);
     const schoolSubject = await createSchoolSubject.execute({
@@ -67,6 +81,7 @@ class SchoolSubjectsController {
       additional_description,
       index,
       is_multidisciplinary,
+      school_year_id,
     });
 
     return response.json(schoolSubject);

@@ -12,6 +12,7 @@ import ISchoolTeachersRepository from '../repositories/ISchoolTeachersRepository
 type CreateSchoolTeacherRequest = {
   school_id: string;
   employee_id: string;
+  school_year_id: string;
 };
 
 @injectable()
@@ -28,6 +29,7 @@ class CreateSchoolTeacherService {
   public async execute({
     school_id,
     employee_id,
+    school_year_id,
   }: CreateSchoolTeacherRequest): Promise<SchoolTeacher> {
     const school = await this.schoolsRepository.findOne({ id: school_id });
     if (!school) {
@@ -44,6 +46,7 @@ class CreateSchoolTeacherService {
     const schoolTeacher = await this.schoolTeachersRepository.create({
       school_id,
       employee_id,
+      school_year_id,
     });
 
     await this.createUserprofile.execute({

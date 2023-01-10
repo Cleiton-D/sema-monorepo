@@ -5,6 +5,7 @@ type CreateClassPeriodDTO = {
   class_time: string;
   break_time: string;
   break_time_start: string;
+  school_year_id: string;
 };
 
 export default CreateClassPeriodDTO;

@@ -21,6 +21,9 @@ class SchoolSubject {
   index: number;
 
   @Column()
+  school_year_id: string;
+
+  @Column()
   is_multidisciplinary: boolean;
 
   @CreateDateColumn()

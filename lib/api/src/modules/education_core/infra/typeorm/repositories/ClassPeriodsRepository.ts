@@ -46,9 +46,11 @@ class ClassPeriodsRepository implements IClassPeriodsRepository {
   public async findAll({
     id,
     school_id,
+    school_year_id,
   }: FindClassPeriodFiltersDTO = {}): Promise<ClassPeriod[]> {
     const where: FindOptionsWhere<ClassPeriod> = {};
     if (id) where.id = id;
+    if (school_year_id) where.school_year_id = school_year_id;
 
     const queryBuilder = this.ormRepository
       .createQueryBuilder('class_period')
@@ -62,8 +64,13 @@ class ClassPeriodsRepository implements IClassPeriodsRepository {
             FROM classrooms as classroom
            WHERE classroom.school_id = :schoolId
              AND classroom.class_period_id = class_period.id
+             ${
+               school_year_id
+                 ? `AND classroom.school_year_id = :schoolYearId`
+                 : ''
+             }
         )`,
-        { schoolId: school_id },
+        { schoolId: school_id, schoolYearId: school_year_id },
       );
     }
 
@@ -83,6 +90,7 @@ class ClassPeriodsRepository implements IClassPeriodsRepository {
         class_time,
         break_time,
         break_time_start,
+        school_year_id,
       }) =>
         this.ormRepository.create({
           description,
@@ -91,6 +99,7 @@ class ClassPeriodsRepository implements IClassPeriodsRepository {
           class_time,
           break_time,
           break_time_start,
+          school_year_id,
         }),
     );
 

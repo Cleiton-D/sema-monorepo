@@ -12,7 +12,7 @@ const queue = container.resolve<IQueueProvider>('QueueProvider');
 // queue.add(ListStudentsJob);
 queue.add(ControlSchoolTermPeriodsJob);
 queue.add(ControlSchoolYearJob);
-queue.add(FinishSchoolYearJob);
-queue.add(StartSchoolYearJob);
+// queue.add(FinishSchoolYearJob);
+// queue.add(StartSchoolYearJob);
 
 queue.init();

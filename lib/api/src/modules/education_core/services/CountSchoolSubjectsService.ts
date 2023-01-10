@@ -6,6 +6,10 @@ type CountSchoolSubjectsResponse = {
   count: number;
 };
 
+type CountSchoolSubjectsRequest = {
+  school_year_id?: string;
+};
+
 @injectable()
 class CountSchoolSubjectsService {
   constructor(
@@ -13,8 +17,12 @@ class CountSchoolSubjectsService {
     private schoolSubjectsRepository: ISchoolSubjectsRepository,
   ) {}
 
-  public async execute(): Promise<CountSchoolSubjectsResponse> {
-    const { count } = await this.schoolSubjectsRepository.count();
+  public async execute({
+    school_year_id,
+  }: CountSchoolSubjectsRequest): Promise<CountSchoolSubjectsResponse> {
+    const { count } = await this.schoolSubjectsRepository.count({
+      school_year_id,
+    });
     return { count };
   }
 }

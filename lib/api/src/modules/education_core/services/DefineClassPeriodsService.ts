@@ -6,13 +6,18 @@ import IClassPeriodsRepository from '../repositories/IClassPeriodsRepository';
 import CreateClassPeriodDTO from '../dtos/CreateClassPeriodDTO';
 
 type DefineClassPeriodRequest = {
-  [k: string]: {
-    time_start: string;
-    time_end: string;
-    class_time: string;
-    break_time: string;
-    break_time_start: string;
-  };
+  school_year_id: string;
+  class_periods: Record<
+    string,
+    {
+      time_start: string;
+      time_end: string;
+      class_time: string;
+      break_time: string;
+      break_time_start: string;
+      school_year_id: string;
+    }
+  >;
 };
 
 type MappedUpdateAndCreateClassPeriods = {
@@ -27,13 +32,16 @@ class DefineClassPeriodsService {
     private classPeriodsRepository: IClassPeriodsRepository,
   ) {}
 
-  public async execute(
-    periods: DefineClassPeriodRequest,
-  ): Promise<ClassPeriod[]> {
-    const existentClassPeriods = await this.classPeriodsRepository.findAll();
+  public async execute({
+    class_periods,
+    school_year_id,
+  }: DefineClassPeriodRequest): Promise<ClassPeriod[]> {
+    const existentClassPeriods = await this.classPeriodsRepository.findAll({
+      school_year_id,
+    });
 
     const { newItems, updateItems } = Object.entries(
-      periods,
+      class_periods,
     ).reduce<MappedUpdateAndCreateClassPeriods>(
       (acc, [key, value]) => {
         const {
@@ -58,6 +66,7 @@ class DefineClassPeriodsService {
             class_time,
             break_time,
             break_time_start,
+            school_year_id,
           });
           upItems.push(newClassPeriod);
         } else {
@@ -68,6 +77,7 @@ class DefineClassPeriodsService {
             class_time,
             break_time,
             break_time_start,
+            school_year_id,
           });
         }
 

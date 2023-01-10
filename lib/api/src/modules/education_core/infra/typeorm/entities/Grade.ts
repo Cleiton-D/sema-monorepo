@@ -22,6 +22,9 @@ class Grade {
   @VirtualColumn()
   is_multidisciplinary: boolean;
 
+  @Column()
+  school_year_id: string;
+
   @CreateDateColumn()
   created_at: Date;
 

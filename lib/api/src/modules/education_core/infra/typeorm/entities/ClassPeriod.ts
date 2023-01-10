@@ -29,6 +29,9 @@ class ClassPeriod {
   @Column({ type: 'time' })
   break_time_start: string;
 
+  @Column()
+  school_year_id: string;
+
   @CreateDateColumn()
   created_at: Date;
 

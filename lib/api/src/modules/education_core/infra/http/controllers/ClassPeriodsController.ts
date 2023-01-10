@@ -7,21 +7,25 @@ import DeleteClassPeriodService from '@modules/education_core/services/DeleteCla
 
 class ClassPeriodsController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { school_id } = request.query;
+    const { school_id, school_year_id } = request.query;
 
     const listClassPeriods = container.resolve(ListClassPeriodsService);
     const classPeriods = await listClassPeriods.execute({
       school_id: school_id as string,
+      school_year_id: school_year_id as string,
     });
 
     return response.json(classPeriods);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const requestData = request.body;
+    const { class_periods, school_year_id } = request.body;
 
     const defineClassPeriods = container.resolve(DefineClassPeriodsService);
-    const classPeriods = await defineClassPeriods.execute(requestData);
+    const classPeriods = await defineClassPeriods.execute({
+      class_periods,
+      school_year_id,
+    });
 
     return response.json(classPeriods);
   }

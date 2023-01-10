@@ -54,7 +54,12 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
   public async findAll(
     filters: FindSchoolSubjectDTO = {},
   ): Promise<SchoolSubject[]> {
-    const { id, is_multidisciplinary, include_multidisciplinary } = filters;
+    const {
+      id,
+      is_multidisciplinary,
+      include_multidisciplinary,
+      school_year_id,
+    } = filters;
 
     const where: FindOptionsWhere<SchoolSubject> = {};
     if (id) {
@@ -64,6 +69,7 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
         where.id = id;
       }
     }
+    if (school_year_id) where.school_year_id = school_year_id;
 
     if (
       !include_multidisciplinary &&
@@ -79,8 +85,16 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
     return schoolSubject;
   }
 
-  public async count(): Promise<CountResultDTO> {
-    const count = await this.ormRepository.count();
+  public async count(
+    filters: FindSchoolSubjectDTO = {},
+  ): Promise<CountResultDTO> {
+    const where: FindOptionsWhere<SchoolSubject> = {};
+
+    if (filters.school_year_id) where.school_year_id = filters.school_year_id;
+
+    const count = await this.ormRepository.count({
+      where,
+    });
     return { count };
   }
 
@@ -89,12 +103,14 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
     additional_description,
     index,
     is_multidisciplinary,
+    school_year_id,
   }: CreateSchoolSubjectDTO): Promise<SchoolSubject> {
     const schoolSubject = this.ormRepository.create({
       description,
       additional_description,
       index,
       is_multidisciplinary,
+      school_year_id,
     });
     await this.ormRepository.save(schoolSubject);
 
