@@ -43,6 +43,7 @@ const FinalReportsTemplate = () => {
     return {
       school_id: session?.schoolId,
       employee_id,
+      school_year_id: session?.configs.school_year_id,
       ...filters
     };
   }, [session, filters]);

@@ -49,7 +49,11 @@ export const getSchool = (
     .then((response) => response.data);
 };
 
-export const getSchoolDetail = async (id: string, session?: Session | null) => {
+export const getSchoolDetail = async (
+  id: string,
+  session?: Session | null,
+  school_year_id?: string
+) => {
   const api = initializeApi(session);
 
   const school = await getSchool(session, { id });
@@ -57,10 +61,10 @@ export const getSchoolDetail = async (id: string, session?: Session | null) => {
   const [enrollsCountResponse, classroomsCountResponse, multigradesResponse] =
     await Promise.all([
       api.get<EnrollCountResponse>(`/enrolls/count`, {
-        params: { school_id: school.id, status: 'ACTIVE' }
+        params: { school_id: school.id, status: 'ACTIVE', school_year_id }
       }),
       api.get<ClassroomsCountResponse>(`/classrooms/count`, {
-        params: { school_id: school.id }
+        params: { school_id: school.id, school_year_id }
       }),
       api.get<Multigrade[]>(`/multigrades`, {
         params: { school_id: school.id }
@@ -108,10 +112,14 @@ export const useGetSchool = (
   );
 };
 
-export const useGetSchoolDetail = (id: string, session?: Session | null) => {
+export const useGetSchoolDetail = (
+  id: string,
+  session?: Session | null,
+  school_year_id?: string
+) => {
   return useQuery<CompleteSchool>(
-    schoolKeys.detail(JSON.stringify({ id })),
-    () => getSchoolDetail(id, session)
+    schoolKeys.detail(JSON.stringify({ id, school_year_id })),
+    () => getSchoolDetail(id, session, school_year_id)
   );
 };
 

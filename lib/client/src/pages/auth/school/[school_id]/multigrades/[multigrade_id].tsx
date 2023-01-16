@@ -3,7 +3,10 @@ import { Session } from 'next-auth';
 
 import NewMultigradeTemplate from 'templates/Multigrades/New';
 
-import { listClassPeriods, queryKeys } from 'requests/queries/class-periods';
+import {
+  listClassPeriods,
+  classPeriodsKeys
+} from 'requests/queries/class-periods';
 import { multigradesKeys, showMultigrade } from 'requests/queries/multigrades';
 
 import prefetchQuery from 'utils/prefetch-query';
@@ -22,8 +25,15 @@ const getData = async (
 
   return prefetchQuery([
     {
-      key: queryKeys.LIST_CLASS_PERIODS,
-      fetcher: () => listClassPeriods(session)
+      key: classPeriodsKeys.list(
+        JSON.stringify({
+          school_year_id: session?.configs.school_year_id
+        })
+      ),
+      fetcher: () =>
+        listClassPeriods(session, {
+          school_year_id: session?.configs.school_year_id
+        })
     },
     {
       key: multigradesKeys.show(JSON.stringify(multigradeFilters)),

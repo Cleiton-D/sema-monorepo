@@ -7,6 +7,7 @@ import { initializeApi } from 'services/api';
 
 type SchoolTeachersFilters = {
   school_id?: string;
+  school_year_id?: string;
 };
 
 type CountSchoolTeachersResponse = {

@@ -41,6 +41,7 @@ const ClassReportsTemplate = () => {
 
     return {
       school_id: session?.schoolId,
+      school_year_id: session?.configs.school_year_id,
       employee_id,
       ...filters
     };

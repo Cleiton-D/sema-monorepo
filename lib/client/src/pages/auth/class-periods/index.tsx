@@ -15,7 +15,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const dehydratedState = await prefetchQuery({
     key: 'get-class-periods',
-    fetcher: () => listClassPeriods(session)
+    fetcher: () =>
+      listClassPeriods(session, {
+        school_year_id: session?.configs.school_year_id
+      })
   });
 
   return {

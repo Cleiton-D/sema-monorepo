@@ -2,7 +2,10 @@ import { GetServerSidePropsContext } from 'next';
 
 import Multigrades from 'templates/Multigrades';
 
-import { listClassPeriods, queryKeys } from 'requests/queries/class-periods';
+import {
+  listClassPeriods,
+  classPeriodsKeys
+} from 'requests/queries/class-periods';
 
 import prefetchQuery from 'utils/prefetch-query';
 import protectedRoutes from 'utils/protected-routes';
@@ -16,8 +19,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const dehydratedState = await prefetchQuery([
     {
-      key: queryKeys.LIST_CLASS_PERIODS,
-      fetcher: () => listClassPeriods(session)
+      key: classPeriodsKeys.list(
+        JSON.stringify({
+          school_year_id: session?.configs.school_year_id
+        })
+      ),
+      fetcher: () =>
+        listClassPeriods(session, {
+          school_year_id: session?.configs.school_year_id
+        })
     }
   ]);
 

@@ -71,13 +71,14 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
 
       await addTeacherToSchool.mutateAsync({
         employee_id,
-        school_id: schoolId
+        school_id: schoolId,
+        school_year_id: session?.configs.school_year_id
       });
       refetchFn();
 
       setSaving(false);
     },
-    [addTeacherToSchool, schoolId, refetchFn]
+    [addTeacherToSchool, session, schoolId, refetchFn]
   );
 
   const handleBack = () => {

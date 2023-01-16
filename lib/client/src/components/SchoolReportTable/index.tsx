@@ -43,7 +43,8 @@ const SchoolReportTable = ({
     session,
     {
       grade_id: enroll?.grade_id,
-      include_multidisciplinary: true
+      include_multidisciplinary: true,
+      school_year_id: session?.configs.school_year_id
     },
     { enabled: !!enroll?.grade_id }
   );

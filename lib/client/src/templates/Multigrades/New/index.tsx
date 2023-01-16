@@ -42,7 +42,9 @@ const NewMultigradeTemplate = ({ type }: NewMultigradeTemplateProps) => {
   const router = useRouter();
   const { data: session } = useSession();
 
-  const { data: classPeriods, isLoading } = useListClassPeriods(session);
+  const { data: classPeriods, isLoading } = useListClassPeriods(session, {
+    school_year_id: session?.configs.school_year_id
+  });
   const { data: currentMultigrade } = useShowMultigrade(
     session,
     {

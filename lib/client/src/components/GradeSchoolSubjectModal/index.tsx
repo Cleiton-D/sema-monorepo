@@ -56,7 +56,9 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
 
   const { data: session } = useSession();
 
-  const { data: schoolSubjects, isLoading } = useListSchoolsSubjects(session);
+  const { data: schoolSubjects, isLoading } = useListSchoolsSubjects(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const { data: grade } = useShowGrade(session, gradeId);
   const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(session, {

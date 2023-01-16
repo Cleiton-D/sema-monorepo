@@ -1,9 +1,7 @@
 import { RefObject, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
-import { v4 as uuidv4 } from 'uuid';
 
 import { initializeApi, useApi, useMutation } from 'services/api';
-import { queryKeys } from 'requests/queries/class-periods';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -16,40 +14,6 @@ import {
 import { ModalRef } from 'components/Modal';
 import ToastContent from 'components/ToastContent';
 
-const oldToNewClassPeriods = (
-  old: FormattedClassPeriod[],
-  newClassPeriod: ClassPeriodForm
-) => {
-  if (!old) return old;
-
-  const existentIndex = old.findIndex(
-    ({ description }) => description === newClassPeriod.description
-  );
-
-  if (existentIndex !== -1) {
-    const existentItem = old[existentIndex];
-    const newItem = {
-      ...existentItem,
-      ...newClassPeriod,
-      translated_description: translateDescription(newClassPeriod.description),
-      disabled: true
-    } as FormattedClassPeriod;
-
-    old.splice(existentIndex, 1, newItem);
-    return old;
-  }
-
-  return [
-    ...old,
-    {
-      ...newClassPeriod,
-      translated_description: translateDescription(newClassPeriod.description),
-      id: uuidv4(),
-      disabled: true
-    }
-  ];
-};
-
 export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
   const { data: session } = useSession();
 
@@ -57,14 +21,9 @@ export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
     async (values: ClassPeriodForm) => {
       const api = initializeApi(session);
 
-      const { description, ...newValues } = values;
-      const data = {
-        [description]: newValues
-      };
-
       const { data: responseData } = await api.post<ClassPeriod[]>(
         '/education/admin/class-periods',
-        data
+        values
       );
 
       return responseData;
@@ -73,9 +32,6 @@ export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
   );
 
   return useMutation('create-class-period', mutateClassPeriod, {
-    linkedQueries: {
-      [queryKeys.LIST_CLASS_PERIODS]: oldToNewClassPeriods
-    },
     onMutate: () => modalRef.current?.closeModal(),
     renderLoading: function render(newClassPeriod) {
       return (
@@ -84,14 +40,8 @@ export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
         </ToastContent>
       );
     },
-    renderError: (newClassPeriod) =>
-      `Falha ao salvar período ${translateDescription(
-        newClassPeriod.description
-      )}`,
-    renderSuccess: (newClassPeriod) =>
-      `Período ${translateDescription(
-        newClassPeriod.description
-      )} cadastrado com sucesso`
+    renderError: () => `Falha ao salvar período`,
+    renderSuccess: () => `Período cadastrado com sucesso`
   });
 }
 
@@ -108,17 +58,6 @@ export function useDeleteClassPeriod() {
   );
 
   return useMutation('delete-class-period', deleteClassPeriod, {
-    linkedQueries: {
-      [queryKeys.LIST_CLASS_PERIODS]: (
-        old: FormattedClassPeriod[],
-        removed: FormattedClassPeriod
-      ) => {
-        if (!old) return;
-        return old.map((item) =>
-          item.id === removed.id ? { ...item, disabled: true } : item
-        );
-      }
-    },
     renderLoading: function render(newClassPeriod) {
       return (
         <ToastContent showSpinner>

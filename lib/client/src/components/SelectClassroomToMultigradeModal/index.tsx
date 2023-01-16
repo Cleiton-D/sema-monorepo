@@ -51,6 +51,7 @@ const SelectClassroomToMultigradeModal: React.ForwardRefRenderFunction<
   const { data: classrooms, isLoading } = useListClassrooms(session, {
     class_period_id: classPeriodId,
     school_id: schoolId,
+    school_year_id: session?.configs.school_year_id,
     with_in_multigrades: false
   });
 

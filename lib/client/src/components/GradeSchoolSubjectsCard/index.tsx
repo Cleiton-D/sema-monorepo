@@ -14,7 +14,7 @@ import { useAccess } from 'hooks/AccessProvider';
 import { GradeSchoolSubject } from 'models/GradeSchoolSubject';
 
 import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
-import { useShowGrade } from 'requests/queries/grades';
+import { gradesKeys, useShowGrade } from 'requests/queries/grades';
 import { useDeleteGradeSchoolSubject } from 'requests/mutations/grade-school-subject';
 
 import * as S from './styles';
@@ -43,8 +43,7 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
 
   const refetchData = async () => {
     refetch();
-    queryClient.invalidateQueries('get-grades');
-    queryClient.invalidateQueries(`show-grade-${gradeId}`);
+    queryClient.invalidateQueries(gradesKeys.all);
   };
   const handleRemove = async (gradeSchoolSubject: GradeSchoolSubject) => {
     const confirm = window.confirm(

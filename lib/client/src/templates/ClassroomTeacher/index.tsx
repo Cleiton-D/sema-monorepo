@@ -37,8 +37,12 @@ const ClassroomTeacher = () => {
   }, [query, session]);
 
   const classroomsFilters = useMemo(() => {
-    return { school_id: schoolId, ...filters };
-  }, [filters, schoolId]);
+    return {
+      school_id: schoolId,
+      school_year_id: session?.configs.school_year_id,
+      ...filters
+    };
+  }, [filters, schoolId, session]);
   const { data: classrooms } = useListClassrooms(session, classroomsFilters);
 
   return (

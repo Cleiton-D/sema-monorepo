@@ -57,9 +57,10 @@ const Classrooms = () => {
   const classroomsFilters = useMemo(() => {
     return {
       school_id: schoolId,
+      school_year_id: session?.configs.school_year_id,
       ...filters
     };
-  }, [filters, schoolId]);
+  }, [filters, schoolId, session]);
 
   const { data: classrooms } = useListClassrooms(session, classroomsFilters);
 

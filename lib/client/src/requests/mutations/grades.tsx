@@ -1,6 +1,5 @@
-import { RefObject, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Session } from 'next-auth';
-import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
 
@@ -21,12 +20,6 @@ export function useAddGradeMutation(
   );
 
   return useMutation('add-grades', addGrade, {
-    linkedQueries: {
-      'get-grades': (old, newGrade) => [
-        ...old,
-        { ...newGrade, id: uuidv4(), disabled: true }
-      ]
-    },
     onMutate: onMutate,
     renderLoading: function render(newGrade) {
       return (
@@ -52,12 +45,6 @@ export function useDeleteGradeMutation(session?: Session | null) {
   );
 
   return useMutation('delete-grade', deleteGrade, {
-    linkedQueries: {
-      'get-grades': (old: Grade[], deletedGrade: Grade) =>
-        old.map((grade) =>
-          grade.id === deletedGrade.id ? { ...grade, disabled: true } : grade
-        )
-    },
     renderLoading: function render(deletedGrade) {
       return (
         <ToastContent showSpinner>

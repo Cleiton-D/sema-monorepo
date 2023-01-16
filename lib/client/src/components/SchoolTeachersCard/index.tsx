@@ -27,12 +27,14 @@ const SchoolTeachersCard = ({ schoolId }: SchoolTeachersCardProps) => {
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: schoolTeachers, isLoading, refetch } = useListSchoolTeachers(
-    session,
-    {
-      school_id: schoolId
-    }
-  );
+  const {
+    data: schoolTeachers,
+    isLoading,
+    refetch
+  } = useListSchoolTeachers(session, {
+    school_id: schoolId,
+    school_year_id: session?.configs.school_year_id
+  });
   const deleteSchoolTeacher = useDeleteSchoolTeacher();
 
   const handleRemove = async (schoolTeacher: SchoolTeacher) => {

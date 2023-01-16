@@ -1,4 +1,5 @@
 import { useRef, useState, useMemo } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/react';
 import { PlusCircle, X } from '@styled-icons/feather';
 
@@ -13,7 +14,7 @@ import { useAccess } from 'hooks/AccessProvider';
 
 import { Grade } from 'models/Grade';
 
-import { useListGrades } from 'requests/queries/grades';
+import { gradesKeys, useListGrades } from 'requests/queries/grades';
 import { useDeleteGradeMutation } from 'requests/mutations/grades';
 
 import * as S from './styles';
@@ -27,17 +28,22 @@ const Grades = () => {
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: grades } = useListGrades(session);
+  const queryClient = useQueryClient();
+
+  const { data: grades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const mutation = useDeleteGradeMutation(session);
-  const handleDelete = (event: React.MouseEvent, grade: Grade) => {
+  const handleDelete = async (event: React.MouseEvent, grade: Grade) => {
     event.stopPropagation();
 
     const confirmation = window.confirm(
       `Deseja excluir a ${grade.description}?`
     );
     if (confirmation) {
-      mutation.mutate(grade);
+      await mutation.mutateAsync(grade);
+      queryClient.invalidateQueries(...gradesKeys.all);
     }
   };
 
@@ -104,7 +110,10 @@ const Grades = () => {
         active={!!selectedGrade}
         onClick={() => setSelectedGrade(undefined)}
       />
-      <AddGradeModal ref={modalRef} />
+      <AddGradeModal
+        ref={modalRef}
+        schoolYearId={session?.configs.school_year_id}
+      />
     </Base>
   );
 };

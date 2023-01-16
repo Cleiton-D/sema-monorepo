@@ -6,6 +6,7 @@ import {
   useState,
   useImperativeHandle
 } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -17,6 +18,7 @@ import TextInput from 'components/TextInput';
 import Button from 'components/Button';
 
 import { useAddGradeMutation } from 'requests/mutations/grades';
+import { gradesKeys } from 'requests/queries/grades';
 
 import { addGradeSchema } from './rules/schema';
 
@@ -26,18 +28,26 @@ export type ModalRef = {
   openModal: (grade?: Grade) => void;
 };
 
+type AddGradeModalProps = {
+  schoolYearId?: string;
+};
+
 type AddGradeFormData = {
   description: string;
   workload?: string;
 };
 
-const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
+const AddGradeModal: ForwardRefRenderFunction<ModalRef, AddGradeModalProps> = (
+  { schoolYearId },
+  ref
+) => {
   const [grade, setGrade] = useState<Grade>();
 
   const modalRef = useRef<DefaultModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
 
   const openModal = useCallback((item?: Grade) => {
     setGrade(item);
@@ -58,10 +68,12 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
         await addGradeSchema.validate(values, { abortEarly: false });
 
         const requestData = {
-          description: values.description
+          description: values.description,
+          school_year_id: schoolYearId
         };
 
-        mutation.mutate(requestData);
+        await mutation.mutateAsync(requestData);
+        queryClient.invalidateQueries(...gradesKeys.all);
       } catch (err) {
         if (err instanceof ValidationError) {
           const validationErrors: Record<string, string> = {};
@@ -75,7 +87,7 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
         }
       }
     },
-    [mutation]
+    [mutation, schoolYearId]
   );
 
   useImperativeHandle(ref, () => ({ openModal }));

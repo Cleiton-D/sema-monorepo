@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useSession } from 'next-auth/react';
+import { useQueryClient } from 'react-query';
 import { X, Edit3, PlusCircle } from '@styled-icons/feather';
 
 import Table from 'components/Table';
@@ -12,8 +13,11 @@ import Button from 'components/Button';
 import { FormHandles } from 'models/Form';
 import { FormattedClassPeriod } from 'models/ClassPeriod';
 
-import { useListClassPeriods } from 'requests/queries/class-periods';
 import { useDeleteClassPeriod } from 'requests/mutations/class-period';
+import {
+  classPeriodsKeys,
+  useListClassPeriods
+} from 'requests/queries/class-periods';
 
 import * as S from './styles';
 
@@ -21,19 +25,20 @@ const SchoolYearClassPeriodForm: React.ForwardRefRenderFunction<FormHandles> = (
   _,
   ref
 ) => {
+  const queryClient = useQueryClient();
   const { data: session } = useSession();
 
-  const { data: classPeriods } = useListClassPeriods(session);
+  const { data: classPeriods } = useListClassPeriods(session, {});
   const deleteClassPeriodMutation = useDeleteClassPeriod();
 
-  const handleDelete = (item: FormattedClassPeriod) => {
+  const handleDelete = async (item: FormattedClassPeriod) => {
     const confirmation = window.confirm(
       `Deseja apagar o período ${item.translated_description}?`
     );
 
     if (confirmation) {
-      deleteClassPeriodMutation.mutate(item);
-      return;
+      await deleteClassPeriodMutation.mutateAsync(item);
+      queryClient.invalidateQueries(...classPeriodsKeys.all);
     }
   };
 

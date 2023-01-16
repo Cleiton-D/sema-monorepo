@@ -78,12 +78,16 @@ const EditClassForm = ({ classEntity }: EditClassFormProps) => {
       school_id: session?.schoolId,
       employee_id: session?.user.employeeId,
       with_in_multigrades: false,
-      with_multigrades: true
+      with_multigrades: true,
+      school_year_id: session?.configs.school_year_id
     }
   );
 
   const { data: classPeriods, isLoading: loadingClassPeriods } =
-    useListClassPeriods(session, { school_id: session?.schoolId });
+    useListClassPeriods(session, {
+      school_id: session?.schoolId,
+      school_year_id: session?.configs.school_year_id
+    });
 
   const { data: schoolTermPeriod } = useShowSchoolTermPeriod(session, {
     school_year_id: session?.configs.school_year_id,

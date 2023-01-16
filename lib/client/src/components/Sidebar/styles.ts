@@ -27,6 +27,7 @@ export const Menu = styled.ul`
   ${({ theme }) => css`
     padding-top: ${theme.spacings.small};
     list-style-type: none;
+    overflow-y: auto;
   `}
 `;
 

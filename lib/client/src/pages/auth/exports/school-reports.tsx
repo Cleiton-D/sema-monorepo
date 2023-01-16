@@ -28,7 +28,8 @@ const createEnrollClassroom = async (
 
   const schoolSubjects = await listSchoolSubjects(session, {
     grade_id: enroll.grade_id,
-    include_multidisciplinary: true
+    include_multidisciplinary: true,
+    school_year_id: session.configs.school_year_id
   });
 
   const schoolReports = await listSchoolReports(session, {

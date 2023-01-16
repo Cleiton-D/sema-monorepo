@@ -1,16 +1,20 @@
 import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
-import { initializeApi, queryClient } from 'services/api';
+import { initializeApi } from 'services/api';
 import { ClassPeriod, FormattedClassPeriod } from 'models/ClassPeriod';
 import { classPeriodsMapper } from 'utils/mappers/classPeriodMapper';
+import { useMemo } from 'react';
 
-export const queryKeys = {
-  LIST_CLASS_PERIODS: 'get-class-periods'
+export const classPeriodsKeys = {
+  all: 'class_periods' as const,
+  lists: () => [...classPeriodsKeys.all, 'list'] as const,
+  list: (filters: string) => [...classPeriodsKeys.lists(), { filters }] as const
 };
 
 type ClassPeriodsFilters = {
   school_id?: string;
+  school_year_id?: string;
 };
 
 export const listClassPeriods = (
@@ -24,20 +28,14 @@ export const listClassPeriods = (
     .then((response) => response.data.map(classPeriodsMapper));
 };
 
-export const fetchClassPeriods = (
-  session?: Session | null,
-  filters: ClassPeriodsFilters = {}
-) => {
-  return queryClient.fetchQuery(queryKeys.LIST_CLASS_PERIODS, () =>
-    listClassPeriods(session, filters)
-  );
-};
-
 export const useListClassPeriods = (
   session?: Session | null,
   filters: ClassPeriodsFilters = {}
 ) => {
-  return useQuery(queryKeys.LIST_CLASS_PERIODS, () =>
-    listClassPeriods(session, filters)
+  const key = useMemo(
+    () => classPeriodsKeys.list(JSON.stringify(filters)),
+    [filters]
   );
+
+  return useQuery(key, () => listClassPeriods(session, filters));
 };

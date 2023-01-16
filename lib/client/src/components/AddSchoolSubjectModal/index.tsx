@@ -59,6 +59,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
         await mutation.mutateAsync({
           id: schoolSubject?.id,
           is_multidisciplinary: isMultidisciplinary,
+          school_year_id: session?.configs.school_year_id,
           ...values
         });
         refetchFn && refetchFn();
@@ -76,7 +77,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
         }
       }
     },
-    [mutation, schoolSubject, isMultidisciplinary, refetchFn]
+    [mutation, schoolSubject, isMultidisciplinary, refetchFn, session]
   );
 
   const handleBack = useCallback(() => {

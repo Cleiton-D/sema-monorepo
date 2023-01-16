@@ -33,7 +33,11 @@ const TotalAttendancesTemplate = (): JSX.Element => {
 
   const searchFilters = useMemo(() => {
     const school_id = session?.schoolId || filters.school_id;
-    const resultFilters = { ...filters, school_id };
+    const resultFilters = {
+      ...filters,
+      school_id,
+      school_year_id: session?.configs.school_year_id
+    };
     if (session?.accessLevel?.code === 'teacher') {
       return { ...resultFilters, employee_id: session.user.employeeId };
     }

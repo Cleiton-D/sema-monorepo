@@ -76,13 +76,17 @@ const NewClass = () => {
     {
       school_id: session?.schoolId,
       employee_id: session?.user.employeeId,
+      school_year_id: session?.configs.school_year_id,
       with_in_multigrades: false,
       with_multigrades: true
     }
   );
 
   const { data: classPeriods, isLoading: loadingClassPeriods } =
-    useListClassPeriods(session, { school_id: session?.schoolId });
+    useListClassPeriods(session, {
+      school_id: session?.schoolId,
+      school_year_id: session?.configs.school_year_id
+    });
 
   const { data: schoolTermPeriod } = useShowSchoolTermPeriod(session, {
     school_year_id: session?.configs.school_year_id,

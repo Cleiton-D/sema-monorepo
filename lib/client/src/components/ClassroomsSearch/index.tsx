@@ -27,10 +27,14 @@ const ClassroomsSearch = ({
   const { data: schools, isLoading: isLoadingSchools } =
     useListSchools(session);
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session);
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session);
+    useListClassPeriods(session, {
+      school_year_id: session?.configs.school_year_id
+    });
 
   const schoolsOptions = useMemo(() => {
     if (isLoadingSchools) return [{ label: 'Carregando...', value: '' }];

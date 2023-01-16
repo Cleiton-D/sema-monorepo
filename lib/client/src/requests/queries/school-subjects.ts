@@ -71,18 +71,31 @@ export const useShowSchoolSubject = (session: Session | null, id: string) => {
 type CountSchoolSubjectsResponse = {
   count: number;
 };
-export const countSchoolSubjects = (session: Session | null) => {
+export const countSchoolSubjects = (
+  session: Session | null,
+  filters: CountSchoolSubjectsFilters = {}
+) => {
   const api = initializeApi(session);
 
   return api
-    .get<CountSchoolSubjectsResponse>(`/education/admin/school-subjects/count`)
+    .get<CountSchoolSubjectsResponse>(
+      `/education/admin/school-subjects/count`,
+      { params: filters }
+    )
     .then((response) => response.data)
     .catch(() => undefined);
 };
 
-export const useCountSchoolSubjects = (session: Session | null) => {
-  const key = `count-school-subjects`;
-  const result = useQuery(key, () => countSchoolSubjects(session));
+type CountSchoolSubjectsFilters = {
+  school_year_id?: string;
+};
+
+export const useCountSchoolSubjects = (
+  session: Session | null,
+  filters: CountSchoolSubjectsFilters = {}
+) => {
+  const key = `count-school-subjects-${JSON.stringify(filters)}`;
+  const result = useQuery(key, () => countSchoolSubjects(session, filters));
 
   return { ...result, key };
 };

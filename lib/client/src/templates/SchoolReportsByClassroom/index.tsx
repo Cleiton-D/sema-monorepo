@@ -34,6 +34,7 @@ const SchoolReportsByClassroomTemplate = () => {
     return {
       school_id: session?.schoolId,
       employee_id: session?.user.employeeId,
+      school_year_id: session?.configs.school_year_id,
       ...filters
     };
   }, [session, filters]);

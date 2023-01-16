@@ -29,10 +29,14 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
   const { data: schools, isLoading: isLoadingSchools } =
     useListSchools(session);
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session);
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session);
+    useListClassPeriods(session, {
+      school_year_id: session?.configs.school_year_id
+    });
 
   const { data: classrooms, isLoading: isLoadingClassrooms } =
     useListClassrooms(
@@ -40,7 +44,8 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
       {
         school_id: school,
         grade_id: grade,
-        class_period_id: classPeriod
+        class_period_id: classPeriod,
+        school_year_id: session?.configs.school_year_id
       },
       { enabled: !!school }
     );

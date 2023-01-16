@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { PlusCircle, Edit3, Power } from '@styled-icons/feather';
+import { PlusCircle, Edit3, Power, XCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -13,8 +13,12 @@ import TableColumn from 'components/TableColumn';
 import ChangeSchoolTermModal, {
   ChangeSchoolTermModalRef
 } from 'components/ChangeSchoolTermModal';
+import FinishSchoolYearConfirmationModal, {
+  FinishSchoolYearConfirmationModalRef
+} from 'components/FinishSchoolYearConfirmationModal';
 
 import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
+import { FormattedSchoolYear } from 'models/SchoolYear';
 
 import { useAccess } from 'hooks/AccessProvider';
 
@@ -25,6 +29,8 @@ import * as S from './styles';
 
 const SchoolYear = () => {
   const modalRef = useRef<ChangeSchoolTermModalRef>(null);
+  const finishSchoolYearModalRef =
+    useRef<FinishSchoolYearConfirmationModalRef>(null);
 
   const { enableAccess } = useAccess();
 
@@ -39,6 +45,12 @@ const SchoolYear = () => {
       push(`/auth/administration/school-year/${schoolYear.id}/edit`);
       return;
     }
+
+    if (!!schoolYear?.id && schoolYear?.status === 'ACTIVE') {
+      finishSchoolYearModalRef.current?.openModal();
+      return;
+    }
+
     push('/auth/administration/school-year/new');
   };
 
@@ -82,12 +94,21 @@ const SchoolYear = () => {
           <Button
             size="medium"
             styleType="normal"
-            icon={schoolYear?.status === 'PENDING' ? <Edit3 /> : <PlusCircle />}
+            icon={
+              schoolYear?.status === 'PENDING' ? (
+                <Edit3 />
+              ) : schoolYear?.status === 'ACTIVE' ? (
+                <XCircle />
+              ) : (
+                <PlusCircle />
+              )
+            }
             onClick={handleAddSchoolYear}
-            disabled={schoolYear?.status === 'ACTIVE'}
           >
             {schoolYear?.status === 'PENDING'
               ? 'Alterar ano letivo'
+              : schoolYear?.status === 'ACTIVE'
+              ? 'Encerrar ano letivo'
               : 'Cadastrar ano letivo'}
           </Button>
         </S.AddButtonContainer>
@@ -191,6 +212,12 @@ const SchoolYear = () => {
         </S.TableSection>
       )}
       <ChangeSchoolTermModal ref={modalRef} />
+      {schoolYear && (
+        <FinishSchoolYearConfirmationModal
+          ref={finishSchoolYearModalRef}
+          schoolYear={schoolYear as FormattedSchoolYear}
+        />
+      )}
     </Base>
   );
 };

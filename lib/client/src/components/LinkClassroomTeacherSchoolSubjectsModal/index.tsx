@@ -25,29 +25,26 @@ export type LinkClassroomTeacherSchoolSubjectsModalRef = {
   openModal: (classroom: Classroom) => void;
 };
 
-const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<LinkClassroomTeacherSchoolSubjectsModalRef> = (
-  _,
-  ref
-) => {
+const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<
+  LinkClassroomTeacherSchoolSubjectsModalRef
+> = (_, ref) => {
   const [classroom, setClassroom] = useState<Classroom>();
 
   const modalRef = useRef<ModalRef>(null);
 
-  const linkClassroomTeacherSchoolSubjects = useLinkClassroomTeacherSchoolSubject(
-    modalRef
-  );
+  const linkClassroomTeacherSchoolSubjects =
+    useLinkClassroomTeacherSchoolSubject(modalRef);
 
   const { data: session } = useSession();
   const { data: schoolSubjects } = useListSchoolsSubjects(session, {
-    grade_id: classroom?.grade_id
+    grade_id: classroom?.grade_id,
+    school_year_id: session?.configs.school_year_id
   });
 
-  const {
-    data: classroomTeacherSchoolSubjects,
-    refetch
-  } = useListClassroomTeacherSchoolSubjects(session, {
-    classroom_id: classroom?.id
-  });
+  const { data: classroomTeacherSchoolSubjects, refetch } =
+    useListClassroomTeacherSchoolSubjects(session, {
+      classroom_id: classroom?.id
+    });
 
   const teacherSchoolSubjectsFilters = useMemo(() => {
     if (!schoolSubjects) return {};
@@ -58,10 +55,8 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<Li
     };
   }, [schoolSubjects, classroom]);
 
-  const {
-    data: teacherSchoolSubjects,
-    isLoading
-  } = useListTeacherSchoolSubjects(session, teacherSchoolSubjectsFilters);
+  const { data: teacherSchoolSubjects, isLoading } =
+    useListTeacherSchoolSubjects(session, teacherSchoolSubjectsFilters);
 
   const selectOptions = useMemo(() => {
     if (!schoolSubjects) return {};
@@ -92,7 +87,12 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<Li
   }, [schoolSubjects, teacherSchoolSubjects, isLoading]);
 
   const initialFormData = useMemo(() => {
-    if (!classroomTeacherSchoolSubjects || selectOptions === {}) return {};
+    if (
+      !classroomTeacherSchoolSubjects ||
+      Object.keys(selectOptions).length === 0
+    ) {
+      return {};
+    }
 
     return classroomTeacherSchoolSubjects.reduce<Record<string, string>>(
       (acc, item) => {

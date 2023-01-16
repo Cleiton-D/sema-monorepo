@@ -49,8 +49,12 @@ const ClassroomModal: React.ForwardRefRenderFunction<
   const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  const { data: grades } = useListGrades(session);
-  const { data: classPeriods, isLoading } = useListClassPeriods(session);
+  const { data: grades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
+  const { data: classPeriods, isLoading } = useListClassPeriods(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const addClassroomMutation = useAddClassroom({});
 

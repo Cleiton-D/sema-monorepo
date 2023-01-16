@@ -23,7 +23,8 @@ const SchoolAdministrationDashboard = () => {
     school_id: school?.id
   });
   const { data: classroomsCount } = useCountClassrooms(session, {
-    school_id: school?.id
+    school_id: school?.id,
+    school_year_id: session?.configs.school_year_id
   });
 
   return (

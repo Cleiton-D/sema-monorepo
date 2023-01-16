@@ -21,9 +21,13 @@ const MunicipalSecretaryDashboard = () => {
   });
   const { data: enrollCount } = useEnrollCount(session, {});
   const { data: schoolsCount } = useCountSchools(session);
-  const { data: gradesCount } = useGradesCount(session);
+  const { data: gradesCount } = useGradesCount(session, {
+    school_year_id: session?.configs.school_year_id
+  });
   const { data: employeesCount } = useEmployeesCount(session);
-  const { data: schoolSubjectsCount } = useCountSchoolSubjects(session);
+  const { data: schoolSubjectsCount } = useCountSchoolSubjects(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   return (
     <Base>

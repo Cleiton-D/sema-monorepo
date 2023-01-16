@@ -20,7 +20,9 @@ const TeacherSchoolSubjects = () => {
   const { query } = useRouter();
   const { data: session } = useSession();
 
-  const { data: schoolSubjects } = useListSchoolsSubjects(session);
+  const { data: schoolSubjects } = useListSchoolsSubjects(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const handleSelectSchoolSubject = (schoolSubject: SchoolSubject) => {
     if (selectedSchoolSubject?.id === schoolSubject.id) {

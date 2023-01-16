@@ -36,7 +36,8 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
 
   const { data: schoolDetail, refetch } = useGetSchoolDetail(
     school.id,
-    session
+    session,
+    session?.configs.school_year_id
   );
 
   const canChangeSchoolDirectory = useMemo(

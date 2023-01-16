@@ -11,6 +11,7 @@ import { initializeApi, useMutation } from 'services/api';
 type AddTeacherToSchoolForm = {
   school_id: string;
   employee_id: string;
+  school_year_id: string;
 };
 
 export function useAddTeacherToSchoolMutation(

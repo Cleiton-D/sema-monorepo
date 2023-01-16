@@ -33,6 +33,7 @@ const AtaTemplate = (): JSX.Element => {
   const searchFilters = useMemo(() => {
     return {
       school_id: session?.schoolId as string,
+      school_year_id: session?.configs.school_year_id,
       ...filters
     };
   }, [session, filters]);

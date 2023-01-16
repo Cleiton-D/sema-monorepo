@@ -25,7 +25,9 @@ const SchoolSubjects = () => {
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: schoolSubjects, refetch } = useListSchoolsSubjects(session);
+  const { data: schoolSubjects, refetch } = useListSchoolsSubjects(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const modalRef = useRef<SchoolSubjectModalRef>(null);
   const handleOpenModal = () => {

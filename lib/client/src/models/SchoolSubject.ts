@@ -10,5 +10,6 @@ export type SchoolSubjectForm = {
   id?: string;
   description: string;
   additional_description: string;
+  school_year_id: string;
   index: number;
 };

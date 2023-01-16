@@ -20,7 +20,9 @@ const ClassPeriods = () => {
 
   const modalRef = useRef<ClassPeriodModalRef>(null);
 
-  const { data } = useListClassPeriods(session);
+  const { data } = useListClassPeriods(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   return (
     <Base>

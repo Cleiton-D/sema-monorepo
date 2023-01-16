@@ -38,16 +38,21 @@ const SearchClasses = ({
   const { data: schools, isLoading: isLoadingSchools } =
     useListSchools(session);
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session);
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session);
+    useListClassPeriods(session, {
+      school_year_id: session?.configs.school_year_id
+    });
 
   const { data: classrooms, isLoading: isLoadingClassrooms } =
     useListClassrooms(session, {
       school_id: school,
       grade_id: grade,
       class_period_id: classPeriod,
+      school_year_id: session?.configs.school_year_id,
       employee_id:
         session?.accessLevel?.code === 'teacher'
           ? session.user.employeeId

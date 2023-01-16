@@ -1,4 +1,5 @@
 import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSession } from 'next-auth/react';
 import { useAtomValue } from 'jotai/utils';
 import { X, PlusCircle } from '@styled-icons/feather';
@@ -10,7 +11,7 @@ import AddGradeModal, { ModalRef } from 'components/AddGradeModal';
 import { Grade } from 'models/Grade';
 import { FormHandles } from 'models/Form';
 
-import { useListGrades } from 'requests/queries/grades';
+import { gradesKeys, useListGrades } from 'requests/queries/grades';
 import { useDeleteGradeMutation } from 'requests/mutations/grades';
 
 import { schoolYearAtom } from 'store/atoms/school-year';
@@ -27,7 +28,11 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
   const addGradeModalRef = useRef<ModalRef>(null);
 
   const { data: session } = useSession();
-  const { data: grades } = useListGrades(session);
+  const queryClient = useQueryClient();
+
+  const { data: grades } = useListGrades(session, {
+    school_year_id: schoolYearAtomValue?.schoolYear.id
+  });
   const deleteGrade = useDeleteGradeMutation(session);
 
   const handleSelectGrade = (grade: Grade) => {
@@ -38,12 +43,13 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
     }
   };
 
-  const handleDeleteGrade = (event: React.MouseEvent, grade: Grade) => {
+  const handleDeleteGrade = async (event: React.MouseEvent, grade: Grade) => {
     event.stopPropagation();
 
     const confirm = window.confirm(`Deseja apagar ${grade.description}?`);
     if (confirm) {
-      deleteGrade.mutate(grade);
+      await deleteGrade.mutateAsync(grade);
+      queryClient.invalidateQueries(...gradesKeys.all);
     }
   };
 
@@ -99,7 +105,10 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
         active={!!selectedGrade}
         onClick={() => setSelectedGrade(undefined)}
       />
-      <AddGradeModal ref={addGradeModalRef} />
+      <AddGradeModal
+        ref={addGradeModalRef}
+        schoolYearId={schoolYearAtomValue?.schoolYear.id}
+      />
     </>
   );
 };

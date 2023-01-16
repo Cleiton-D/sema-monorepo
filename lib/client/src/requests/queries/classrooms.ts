@@ -13,7 +13,7 @@ export const classroomsKeys = {
   lists: () => [...classroomsKeys.all, 'list'] as const,
   list: (filters: string) => [...classroomsKeys.lists(), { filters }] as const,
   shows: () => [...classroomsKeys.all, 'show'] as const,
-  show: (filters: string) => [...classroomsKeys.lists(), { filters }] as const
+  show: (filters: string) => [...classroomsKeys.shows(), { filters }] as const
 };
 
 export const addClassroomQueryMutation = (
@@ -39,6 +39,7 @@ export type ListClassroomsFilters = {
   employee_id?: string;
   with_in_multigrades?: boolean | number;
   with_multigrades?: boolean | number;
+  school_year_id?: string;
   page?: number;
   size?: number;
 };

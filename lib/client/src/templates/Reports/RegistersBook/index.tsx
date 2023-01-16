@@ -28,7 +28,10 @@ const RegistersBookTemplate = (): JSX.Element => {
   };
 
   const { data: session } = useSession();
-  const { data: classrooms } = useListClassrooms(session, filters);
+  const { data: classrooms } = useListClassrooms(session, {
+    ...filters,
+    school_year_id: session?.configs.school_year_id
+  });
 
   return (
     <Base>

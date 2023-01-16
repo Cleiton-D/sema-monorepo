@@ -41,7 +41,8 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
   const { data: session } = useSession();
 
   const { data: schoolTeachers, isLoading } = useListSchoolTeachers(session, {
-    school_id: schoolId
+    school_id: schoolId,
+    school_year_id: session?.configs.school_year_id
   });
 
   const addTeacherToSchoolSubject =

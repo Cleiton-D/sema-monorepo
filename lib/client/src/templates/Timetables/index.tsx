@@ -44,9 +44,10 @@ const Timetables = () => {
       school_id: schoolId,
       with_in_multigrades: false,
       with_multigrades: true,
+      school_year_id: session?.configs.school_year_id,
       ...filters
     };
-  }, [filters, schoolId]);
+  }, [filters, schoolId, session]);
 
   const { data: classrooms } = useListClassrooms(session, classroomsFilters);
 

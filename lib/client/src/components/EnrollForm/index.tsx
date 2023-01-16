@@ -47,14 +47,19 @@ const EnrollForm: React.ForwardRefRenderFunction<
   const [state, setState] = useAtom(jotaiState);
 
   const { data: session } = useSession();
-  const { data: grades } = useListGrades(session);
+  const { data: grades } = useListGrades(session, {
+    school_year_id: session?.configs.school_year_id
+  });
   const { data: classrooms, isLoading } = useListClassrooms(session, {
     school_id: school.id,
     grade_id: selectedGrade,
-    class_period_id: selectedClassPeriod
+    class_period_id: selectedClassPeriod,
+    school_year_id: session?.configs.school_year_id
   });
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session);
+    useListClassPeriods(session, {
+      school_year_id: session?.configs.school_year_id
+    });
 
   const gradesOptions = useMemo(() => {
     if (!grades) return [];

@@ -58,7 +58,8 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
     });
 
   const { data: schoolTeachers } = useListSchoolTeachers(session, {
-    school_id: classroom?.school_id
+    school_id: classroom?.school_id,
+    school_year_id: session?.configs.school_year_id
   });
 
   const deleteClassroomTeacherSchoolSubject =
