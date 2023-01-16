@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
+import privateRoute from '@shared/decorators/privateRoute';
+
 import CreateSchoolYearService from '@modules/education_core/services/CreateSchoolYearService';
 import ShowSchoolYearService from '@modules/education_core/services/ShowSchoolYearService';
 import UpdateSchoolYearService from '@modules/education_core/services/UpdateSchoolYearService';
+import FinishSchoolYearService from '@modules/education_core/services/FinishSchoolYearService';
 
 class SchoolYearsController {
   public async show(request: Request, response: Response): Promise<Response> {
@@ -41,6 +44,17 @@ class SchoolYearsController {
       date_start,
       date_end,
     });
+
+    return response.json(schoolYear);
+  }
+
+  @privateRoute()
+  public async finish(request: Request, response: Response): Promise<Response> {
+    const { school_year_id } = request.params;
+
+    const finishSchoolYear = container.resolve(FinishSchoolYearService);
+
+    const schoolYear = await finishSchoolYear.execute({ school_year_id });
 
     return response.json(schoolYear);
   }
