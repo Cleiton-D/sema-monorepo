@@ -108,7 +108,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: 'Deploy'
-        uses: 'deliverybot/helm@master'
+        uses: 'deliverybot/helm@v1'
         with:
           chart: ci/app
           release: app
