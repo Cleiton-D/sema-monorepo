@@ -1,13 +1,13 @@
 api:
   env:
-    API_URL: http://api.cleitonkiper.com.br
-    API_DOMAIN: api.cleitonkiper.com.br
+    API_URL: https://api.diarioescolar.net.br
+    API_DOMAIN: api.diarioescolar.net.br
 
 client:
   env:
-    API_URL: http://api.cleitonkiper.com.br
-    APP_URL: http://diario.cleitonkiper.com.br
-    APP_DOMAIN: diario.cleitonkiper.com.br
-    SERVER_HOSTNAME: api.cleitonkiper.com.br
+    API_URL: https://api.diarioescolar.net.br
+    APP_URL: https://diarioescolar.net.br
+    APP_DOMAIN: diarioescolar.net.br
+    SERVER_HOSTNAME: api.diarioescolar.net.br
   apiServiceName: app-api
   reportServiceName: app-report-engine

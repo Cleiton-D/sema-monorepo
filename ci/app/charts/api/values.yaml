@@ -36,16 +36,16 @@ ingress:
   enabled: true
   className: ""
   annotations:
-    # traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
   hosts:
     - host: api.diarioescolar.net.br
       paths:
         - path: /
           pathType: Prefix
-  # tls:
-  #   - hosts:
-  #       - api.cleitonkiper.com.br
-  #     secretName: api.cleitonkiper.com.br-tls
+  tls:
+    - hosts:
+        - api.diarioescolar.net.br
+      secretName: api.diarioescolar.net.br-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

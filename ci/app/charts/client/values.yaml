@@ -37,16 +37,16 @@ ingress:
   enabled: true
   className: ""
   annotations:
-    # traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
   hosts:
     - host: diarioescolar.net.br
       paths:
         - path: /
           pathType: Prefix
-  # tls:
-  #   - hosts:
-  #     - diario.cleitonkiper.com.br
-  #     secretName: diario.cleitonkiper.com.br-tls
+  tls:
+    - hosts:
+      - diarioescolar.net.br
+      secretName: diarioescolar.net.br-tls
 
 
 
