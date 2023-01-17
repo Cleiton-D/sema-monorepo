@@ -39,7 +39,7 @@ ingress:
   annotations:
     # traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
   hosts:
-    - host: diario.cleitonkiper.com.br
+    - host: diarioescolar.net.br
       paths:
         - path: /
           pathType: Prefix
