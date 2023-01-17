@@ -101,6 +101,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-api, build-client, build-report-engine]
 
+    env:
+      BUILD_ID: ${{ needs.create-build-id.outputs.build_id }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -110,6 +113,10 @@ jobs:
           chart: ci/app
           release: app
           namespace: prod
+          values: |
+            api:
+              image:
+                tag: "api-${{ github.sha }}-$BUILD_ID"
         env: 
           KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
       
