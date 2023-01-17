@@ -1,12 +1,12 @@
 api:
   env:
-    API_URL: https://api.diarioescolar.net.br
+    API_URL: http://api.diarioescolar.net.br
     API_DOMAIN: api.diarioescolar.net.br
 
 client:
   env:
-    API_URL: https://api.diarioescolar.net.br
-    APP_URL: https://diarioescolar.net.br
+    API_URL: http://api.diarioescolar.net.br
+    APP_URL: http://diarioescolar.net.br
     APP_DOMAIN: diarioescolar.net.br
     SERVER_HOSTNAME: api.diarioescolar.net.br
   apiServiceName: app-api
