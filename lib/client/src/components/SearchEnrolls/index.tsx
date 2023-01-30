@@ -90,7 +90,7 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
     return [
       {
         value: 'ACTIVE',
-        label: 'Ativo'
+        label: 'Cursando'
       },
       {
         value: 'INACTIVE',

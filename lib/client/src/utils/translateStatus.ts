@@ -5,7 +5,7 @@ export const translateStatus = (
   status: Status | EnrollStatus | string
 ): string => {
   const obj: Record<string, string> = {
-    ACTIVE: 'Ativo',
+    ACTIVE: 'Cursando',
     INACTIVE: 'Inativo',
     PENDING: 'Pendente',
     TRANSFERRED: 'Transferido',
