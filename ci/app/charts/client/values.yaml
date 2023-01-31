@@ -1,9 +1,9 @@
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: cleiton45/sema
   pullPolicy: IfNotPresent
-  tag: "client-b7db34771668a56c35dfe74ce0af2c0fa5df2cc1-1673972955"
+  tag: "client-befe408d114021c9f04d84164710d6c2dc3cdf58-1675183783"
 
 imagePullSecrets:
   - name: regcred
