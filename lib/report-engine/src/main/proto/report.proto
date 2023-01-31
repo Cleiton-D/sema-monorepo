@@ -9,7 +9,11 @@ import "google/protobuf/timestamp.proto";
 package report;
 
 service ClassDiary {
-  rpc Generate (ClassDiaryGenerateRequest) returns (ClassDiaryGenerateResponse) {}
+  rpc Generate (ClassDiaryGenerateRequest) returns (FileResponse) {}
+}
+
+service FinalResultService {
+  rpc Generate (FinalResultGenerateRequest) returns (FileResponse) {}
 }
 
 message MinifiedAttendance {
@@ -78,6 +82,16 @@ message ClassDiaryGenerateRequest {
   string classPeriod = 8;
 }
 
-message ClassDiaryGenerateResponse {
+message FileResponse {
   bytes fileChunk = 1;
+}
+
+message FinalResultGenerateRequest {
+  repeated FinalResult finalResult = 1;
+
+  string schoolName = 2;
+  string referenceYear = 3;
+  string grade = 4;
+  string classroom = 5;
+  string classPeriod = 6;
 }

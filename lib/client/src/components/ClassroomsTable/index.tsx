@@ -17,12 +17,14 @@ type ClassroomsTableProps = {
     name: string;
     createHref: (classroom: Classroom) => LinkProps['href'];
   };
+  actions?: (classroom: Classroom) => JSX.Element;
 };
 
 export const ClassroomsTable = ({
   classrooms,
   subTable,
-  link
+  link,
+  actions
 }: ClassroomsTableProps) => {
   const { data: session } = useSession();
 
@@ -57,6 +59,16 @@ export const ClassroomsTable = ({
               <S.TableLink>{link.name}</S.TableLink>
             </Link>
           )}
+        />
+      )}
+
+      {!!actions && (
+        <TableColumn
+          label="Ações"
+          tableKey=""
+          contentAlign="center"
+          actionColumn
+          render={actions}
         />
       )}
     </Table>

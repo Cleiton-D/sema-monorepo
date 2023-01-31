@@ -2,4 +2,4 @@ docker run -v /Users/cleitondione/Documents/Trabalho/Sistema\ Escolar\ M.A./sema
 
 grpc_tools_node_protoc --js_out=import_style=commonjs,binary:../grpc/generated/ --grpc_out=grpc_js:../grpc/generated ./report.proto
 
-protoc --plugin=protoc-gen-ts=/usr/local/share/.config/yarn/global/node_modules/grpc_tools_node_protoc_ts/bin/protoc-gen-ts --ts_out=grpc_js:../grpc/generated ./report.proto
+protoc --plugin=protoc-gen-ts=/Users/cleitonkiper/.config/yarn/global/node_modules/grpc_tools_node_protoc_ts/bin/protoc-gen-ts --ts_out=grpc_js:../grpc/generated ./report.proto

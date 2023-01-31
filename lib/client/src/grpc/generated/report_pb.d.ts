@@ -286,24 +286,61 @@ export namespace ClassDiaryGenerateRequest {
     }
 }
 
-export class ClassDiaryGenerateResponse extends jspb.Message { 
+export class FileResponse extends jspb.Message { 
     getFilechunk(): Uint8Array | string;
     getFilechunk_asU8(): Uint8Array;
     getFilechunk_asB64(): string;
-    setFilechunk(value: Uint8Array | string): ClassDiaryGenerateResponse;
+    setFilechunk(value: Uint8Array | string): FileResponse;
 
     serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): ClassDiaryGenerateResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: ClassDiaryGenerateResponse): ClassDiaryGenerateResponse.AsObject;
+    toObject(includeInstance?: boolean): FileResponse.AsObject;
+    static toObject(includeInstance: boolean, msg: FileResponse): FileResponse.AsObject;
     static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
     static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: ClassDiaryGenerateResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): ClassDiaryGenerateResponse;
-    static deserializeBinaryFromReader(message: ClassDiaryGenerateResponse, reader: jspb.BinaryReader): ClassDiaryGenerateResponse;
+    static serializeBinaryToWriter(message: FileResponse, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): FileResponse;
+    static deserializeBinaryFromReader(message: FileResponse, reader: jspb.BinaryReader): FileResponse;
 }
 
-export namespace ClassDiaryGenerateResponse {
+export namespace FileResponse {
     export type AsObject = {
         filechunk: Uint8Array | string,
+    }
+}
+
+export class FinalResultGenerateRequest extends jspb.Message { 
+    clearFinalresultList(): void;
+    getFinalresultList(): Array<FinalResult>;
+    setFinalresultList(value: Array<FinalResult>): FinalResultGenerateRequest;
+    addFinalresult(value?: FinalResult, index?: number): FinalResult;
+    getSchoolname(): string;
+    setSchoolname(value: string): FinalResultGenerateRequest;
+    getReferenceyear(): string;
+    setReferenceyear(value: string): FinalResultGenerateRequest;
+    getGrade(): string;
+    setGrade(value: string): FinalResultGenerateRequest;
+    getClassroom(): string;
+    setClassroom(value: string): FinalResultGenerateRequest;
+    getClassperiod(): string;
+    setClassperiod(value: string): FinalResultGenerateRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): FinalResultGenerateRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: FinalResultGenerateRequest): FinalResultGenerateRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: FinalResultGenerateRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): FinalResultGenerateRequest;
+    static deserializeBinaryFromReader(message: FinalResultGenerateRequest, reader: jspb.BinaryReader): FinalResultGenerateRequest;
+}
+
+export namespace FinalResultGenerateRequest {
+    export type AsObject = {
+        finalresultList: Array<FinalResult.AsObject>,
+        schoolname: string,
+        referenceyear: string,
+        grade: string,
+        classroom: string,
+        classperiod: string,
     }
 }

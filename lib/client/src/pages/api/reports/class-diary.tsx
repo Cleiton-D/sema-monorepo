@@ -23,7 +23,7 @@ import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 
 import {
   ClassDiaryGenerateRequest,
-  ClassDiaryGenerateResponse
+  FileResponse
 } from 'grpc/generated/report_pb';
 
 import { ClassDiaryClient } from 'grpc/generated/report_grpc_pb';
@@ -170,7 +170,7 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
   requestData.setEnrollsList(enrolls);
   requestData.setFinalresultList(finalResult);
 
-  const promise = new Promise<ClassDiaryGenerateResponse>((resolve, reject) => {
+  const promise = new Promise<FileResponse>((resolve, reject) => {
     client.generate(requestData, (error, result) => {
       if (error) reject(error);
       resolve(result);
