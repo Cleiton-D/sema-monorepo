@@ -114,7 +114,7 @@ jobs:
       - name: 'Deploy'
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm upgrade --install app ci/app --wait --values=values.yaml -n prod
+          exec: helm upgrade --install app ci/app --values=values.yaml -n prod
           kubeconfig: '${{ secrets.KUBECONFIG }}'
 
       # - name: 'Deploy'
