@@ -11,3 +11,7 @@ client:
     SERVER_HOSTNAME: api.diarioescolar.net.br
   apiServiceName: app-api
   reportServiceName: app-report-engine
+
+report-engine:
+  image:
+    tag: "report-engine-befe408d114021c9f04d84164710d6c2dc3cdf58-1675183783"
