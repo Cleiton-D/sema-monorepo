@@ -110,7 +110,8 @@ jobs:
       - name: 'Deploy'
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm upgrade --install app ci/app --set client.image.tag=client-${{ github.sha }}-${{ env.BUILD_ID }} --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} --set api.image.tag=api-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
+#           exec: helm upgrade --install app ci/app --set client.image.tag=client-${{ github.sha }}-${{ env.BUILD_ID }} --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} --set api.image.tag=api-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
+          exec: helm upgrade --install app ci/app --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
           kubeconfig: '${{ secrets.KUBECONFIG }}'
 
       # - name: 'Deploy'
