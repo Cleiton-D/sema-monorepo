@@ -109,7 +109,7 @@ jobs:
 
       - name: Prep helm chart
         run: |
-          echo '{client.image.tag: client-${{ github.sha }}-${{ env.BUILD_ID }}, api.image.tag: api-${{ github.sha }}-${{ env.BUILD_ID }}, report-engine.image.tag: report-engine-${{ github.sha }}-${{ env.BUILD_ID }}}' > values.yaml
+          echo '{client.image.tag: client-${{ github.sha }}-${{ env.BUILD_ID }}, report-engine.image.tag: report-engine-${{ github.sha }}-${{ env.BUILD_ID }}}', api.image.tag: api-${{ github.sha }}-${{ env.BUILD_ID }} > values.yaml
 
       - name: 'Deploy'
         uses: WyriHaximus/github-action-helm3@v2
