@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: cleiton45/sema
   pullPolicy: IfNotPresent
-  tag: "client-befe408d114021c9f04d84164710d6c2dc3cdf58-1675183783"
+  tag: "client-d046ca7aaef24f694c9ebc71e183c299dd3c3194-1675268554"
 
 imagePullSecrets:
   - name: regcred
@@ -37,16 +37,16 @@ ingress:
   enabled: true
   className: ""
   annotations:
-    # traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
   hosts:
     - host: diarioescolar.net.br
       paths:
         - path: /
           pathType: Prefix
-  # tls:
-  #   - hosts:
-  #     - diarioescolar.net.br
-  #     secretName: diarioescolar.net.br-tls
+  tls:
+    - hosts:
+      - diarioescolar.net.br
+      secretName: diarioescolar.net.br-tls
 
 
 

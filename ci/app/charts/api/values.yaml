@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: cleiton45/sema
   pullPolicy: IfNotPresent
-  tag: "api-b7db34771668a56c35dfe74ce0af2c0fa5df2cc1-1673972955"
+  tag: "api-d046ca7aaef24f694c9ebc71e183c299dd3c3194-1675268554"
 
 imagePullSecrets:
   - name: regcred
@@ -36,16 +36,16 @@ ingress:
   enabled: true
   className: ""
   annotations:
-    # traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect@kubernetescrd
   hosts:
     - host: api.diarioescolar.net.br
       paths:
         - path: /
           pathType: Prefix
-  # tls:
-  #   - hosts:
-  #       - api.diarioescolar.net.br
-  #     secretName: api.diarioescolar.net.br-tls
+  tls:
+    - hosts:
+        - api.diarioescolar.net.br
+      secretName: api.diarioescolar.net.br-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

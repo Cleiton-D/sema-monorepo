@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: cleiton45/sema
   pullPolicy: IfNotPresent
-  tag: "report-engine-befe408d114021c9f04d84164710d6c2dc3cdf58-1675183783"
+  tag: "report-engine-d046ca7aaef24f694c9ebc71e183c299dd3c3194-1675268554"
 
 imagePullSecrets:
   - name: regcred
