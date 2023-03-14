@@ -26,6 +26,7 @@ export const useFinishSchoolYear = () => {
           password
         })
         .catch((err) => {
+          console.log(err);
           toast.error('Não foi possível realizar a autenticação');
           return err;
         });
@@ -40,11 +41,12 @@ export const useFinishSchoolYear = () => {
           undefined,
           {
             headers: {
-              authorization: response.token
+              authorization: `Bearer ${response.token}`
             }
           }
         )
-        .then((res) => res.data);
+        .then((res) => res.data)
+        .catch(() => toast.error('Ocorreu um erro ao encerrar o ano letivo.'));
     },
     [api, session]
   );

@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import UnregisteredTextInput from 'components/UnregisteredTextInput';
 
 import * as S from './styles';
+import useOnClickOutside from 'hooks/use-onclick-outside';
 
 export type Option = {
   label: string;
@@ -206,6 +207,10 @@ const UnregisteredSelect: React.ForwardRefRenderFunction<
 
   useImperativeHandle(ref, () => ({ setValue }));
 
+  useOnClickOutside(wrapperRef, () => {
+    setOpen(false);
+  });
+
   return (
     <S.Wrapper className={className} ref={wrapperRef}>
       <UnregisteredTextInput
@@ -214,7 +219,6 @@ const UnregisteredSelect: React.ForwardRefRenderFunction<
         unformRegister={false}
         readOnly
         onFocus={handleOpen}
-        onBlur={() => setOpen(false)}
         value={optionSelected?.label || ''}
         icon={<S.ArrowIcon isOpen={open} />}
         error={error}

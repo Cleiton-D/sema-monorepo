@@ -44,7 +44,6 @@ const Select = ({
   const { defaultValue, fieldName, registerField, error } = useField(name);
 
   const setValue = useCallback((value: any) => {
-    console.log(value);
     selectedOptionValue.current = value;
     unregisteredSelectRef.current?.setValue(value);
   }, []);
@@ -63,6 +62,7 @@ const Select = ({
   }, [selectedOption, defaultValue]);
 
   const handleChange = (value: any) => {
+    console.log(value);
     selectedOptionValue.current = value;
     onChange && onChange(value);
   };
