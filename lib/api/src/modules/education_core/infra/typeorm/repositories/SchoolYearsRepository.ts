@@ -132,11 +132,13 @@ class SchoolYearsRepository implements ISchoolYearsRepository {
     reference_year,
     date_start,
     date_end,
+    status,
   }: CreateSchoolYearDTO): Promise<SchoolYear> {
     const schoolYear = this.ormRepository.create({
       reference_year,
       date_start,
       date_end,
+      status,
     });
 
     await this.ormRepository.save(schoolYear);

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { parseISO } from 'date-fns';
+import { parseISO, startOfDay, endOfDay } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
@@ -34,8 +34,10 @@ class CreateSchoolYearService {
       throw new AppError('Already exist an school year for this year');
     }
 
-    const date_start = parseISO(dateStartStr);
-    const date_end = parseISO(dateEndStr);
+    const date_start = startOfDay(parseISO(dateStartStr));
+    const date_end = endOfDay(parseISO(dateEndStr));
+
+    const startOfToday = startOfDay(new Date());
 
     const existInPeriod = await this.schoolYearsRepository.findByPeriod({
       date_start,
@@ -50,6 +52,8 @@ class CreateSchoolYearService {
       reference_year,
       date_start,
       date_end,
+      status:
+        startOfToday.getTime() >= date_start.getTime() ? 'ACTIVE' : 'PENDING',
     });
 
     if (!previousSchoolYear) return schoolYear;
