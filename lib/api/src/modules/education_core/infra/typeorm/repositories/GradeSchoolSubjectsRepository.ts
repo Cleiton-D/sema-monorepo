@@ -4,6 +4,7 @@ import {
   IsNull,
   SelectQueryBuilder,
   ObjectLiteral,
+  In,
 } from 'typeorm';
 
 import { dataSource } from '@config/data_source';
@@ -40,8 +41,20 @@ class GradeSchoolSubjectsRepository implements IGradeSchoolSubjectsRepository {
     const andWhere: AndWhere[] = [];
 
     if (id) where.id = id;
-    if (grade_id) where.grade_id = grade_id;
-    if (school_subject_id) where.school_subject_id = school_subject_id;
+    if (grade_id) {
+      if (Array.isArray(grade_id)) {
+        where.grade_id = In(grade_id);
+      } else {
+        where.grade_id = grade_id;
+      }
+    }
+    if (school_subject_id) {
+      if (Array.isArray(school_subject_id)) {
+        where.school_subject_id = In(school_subject_id);
+      } else {
+        where.school_subject_id = school_subject_id;
+      }
+    }
     if (workload) where.workload = workload;
     if (!include_multidisciplinary && !is_multidisciplinary) {
       andWhere.push({

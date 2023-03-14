@@ -4,8 +4,8 @@ import GradeSchoolSubject from '../infra/typeorm/entities/GradeSchoolSubject';
 import IGradeSchoolSubjectsRepository from '../repositories/IGradeSchoolSubjectsRepository';
 
 export type ListGradeSchoolSubjectsRequest = {
-  grade_id?: string | 'all';
-  school_subject_id?: string;
+  grade_id?: string | string[] | 'all';
+  school_subject_id?: string | string[];
   is_multidisciplinary?: boolean;
   include_multidisciplinary?: boolean;
 };
