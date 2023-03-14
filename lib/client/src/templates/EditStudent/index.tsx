@@ -8,7 +8,7 @@ import Base from 'templates/Base';
 import Heading from 'components/Heading';
 import FormsGroup from 'components/FormsGroup';
 import StudentForm from 'components/StudentForm';
-import StudentDocumentsForm from 'components/StudentDocumentsForm ';
+import StudentDocumentsForm from 'components/StudentDocumentsForm';
 import ContactsForm from 'components/ContactsForm';
 
 import useAtomCallback from 'hooks/use-atom-callback';

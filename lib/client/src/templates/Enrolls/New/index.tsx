@@ -8,7 +8,7 @@ import Heading from 'components/Heading';
 
 import OldStudentForm from 'components/OldStudentForm';
 import StudentForm from 'components/StudentForm';
-import StudentDocumentsForm from 'components/StudentDocumentsForm ';
+import StudentDocumentsForm from 'components/StudentDocumentsForm';
 import ContactsForm from 'components/ContactsForm';
 import EnrollForm from 'components/EnrollForm';
 import FormsGroup from 'components/FormsGroup';
