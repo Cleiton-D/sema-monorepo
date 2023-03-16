@@ -4,3 +4,4 @@ metadata:
   name: diarioonline-api-configmap
 data:
   API_URL: {{ .Values.env.API_URL }}
+  STORAGE_PATH: /data

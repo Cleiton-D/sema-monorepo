@@ -44,6 +44,11 @@ spec:
                 configMapKeyRef:
                   name: diarioonline-api-configmap
                   key: API_URL
+            - name: STORAGE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: diarioonline-api-configmap
+                  key: STORAGE_PATH
             - name: POSTGRES_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -81,7 +86,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /data/api
+            - mountPath: /data
               name: api-data
       volumes:
         - name: api-data

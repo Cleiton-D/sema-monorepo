@@ -25,11 +25,10 @@ class CreateSystemBackgroundService {
   public async execute({
     filename,
   }: CreateSystemBackgroundRequest): Promise<SystemBackground> {
-    const currentDefinedBackgrounds = await this.systemBackgroundsRepository.findAll(
-      {
+    const currentDefinedBackgrounds =
+      await this.systemBackgroundsRepository.findAll({
         current_defined: true,
-      },
-    );
+      });
 
     const file = await this.storageProvider.saveFile(filename);
     const filepath = path.join(uploadConfig.uploadsPath, file);
