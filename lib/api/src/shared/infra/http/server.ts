@@ -25,12 +25,17 @@ import multigradesRouter from '@modules/schools/infra/http/routes/multigrades.ro
 import calendarEventsRouter from '@modules/education_core/infra/http/routes/calendar_events.routes';
 
 import AppError from '@shared/errors/AppError';
+import healthyDatasource from '../typeorm/healthy';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/healthy', (_, res) => res.json({ api: 'ok' }));
+app.get('/healthy', async (_, res) => {
+  await healthyDatasource();
+
+  return res.json({ api: 'ok', datasource: 'ok' });
+});
 app.use('/contacts', contactsRoutes);
 app.use('/adresses', adressesRoutes);
 app.use('/employees', employeesRoutes);

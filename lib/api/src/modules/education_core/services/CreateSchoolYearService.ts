@@ -30,6 +30,7 @@ class CreateSchoolYearService {
   }: CreateSchoolYearRequest): Promise<SchoolYear> {
     const existWithReferenceYear =
       await this.schoolYearsRepository.findByReferenceYear(reference_year);
+
     if (existWithReferenceYear) {
       throw new AppError('Already exist an school year for this year');
     }
