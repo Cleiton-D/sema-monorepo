@@ -80,6 +80,13 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /data/api
+              name: api-data
+      volumes:
+        - name: api-data
+          persistentVolumeClaim: 
+            claimName: api-data-claim
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
