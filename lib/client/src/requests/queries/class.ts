@@ -42,6 +42,7 @@ export type ListClassesFilters = {
   school_id?: string;
   class_date?: string;
   class_period_id?: string;
+  school_year_id?: string;
   grade_id?: string;
   status?: string;
   taught_content?: string;

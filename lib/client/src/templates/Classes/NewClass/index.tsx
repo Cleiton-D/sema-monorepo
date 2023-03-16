@@ -68,7 +68,6 @@ const NewClass = () => {
       classroom_id: selectedClassroom,
       school_id: session?.schoolId,
       school_year_id: session?.configs.school_year_id
-      // grade_id: grade
     });
 
   const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms(

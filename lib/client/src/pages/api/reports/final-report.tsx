@@ -79,9 +79,13 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
 
   const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
     classroom.school?.name
-  }.pdf`;
+  }.xlsx`;
 
-  response.setHeader('Content-Type', 'application/pdf');
+  //response.setHeader('Content-Type', 'application/pdf');
+  response.setHeader(
+    'Content-Type',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  );
   response.setHeader('Content-Disposition', `inline; filename=${filename}`);
 
   return response.send(byteArray);
