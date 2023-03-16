@@ -86,7 +86,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - mountPath: /data
+            - mountPath: /data/api
               name: api-data
       volumes:
         - name: api-data
