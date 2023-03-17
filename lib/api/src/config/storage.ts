@@ -3,10 +3,10 @@ import path from 'path';
 import crypto from 'crypto';
 import multer, { StorageEngine } from 'multer';
 
-const storagePath = path.resolve(__dirname, '..', '..', 'storage');
+// const storagePath = path.resolve(__dirname, '..', '..', 'storage');
 
-// const storagePath =
-// process.env.STORAGE_PATH || path.resolve(__dirname, '..', '..', 'storage');
+const storagePath =
+  process.env.STORAGE_PATH || path.resolve(__dirname, '..', '..', 'storage');
 
 const uploadsPath = path.join(storagePath, 'upload');
 const tempFolder = path.join(storagePath, 'temp');
