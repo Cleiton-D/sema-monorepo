@@ -20,7 +20,7 @@ podAnnotations: {}
 podSecurityContext: {}
 
 securityContext:
-  runAsUser: 1001
+  runAsUser: nodejs
   # capabilities:
   #   drop:
   #   - ALL
