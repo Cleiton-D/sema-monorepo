@@ -46,7 +46,7 @@ const CalendarTemplate = () => {
         {Array.from({ length: 12 }).map((_, month) => (
           <CalendarMonth
             month={month}
-            year={2022}
+            year={schoolYear?.reference_year ? +schoolYear.reference_year : 2022}
             key={String(month)}
             calendarEvents={mappedCalendarEvents}
           />
