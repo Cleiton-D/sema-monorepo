@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 
 import * as S from './styles';
+import SchoolYearSelector from 'components/SchoolYearSelector';
 
 type UserDropdownProps = {
   username: string;
@@ -42,6 +43,9 @@ const UserDropdown = ({ username, image }: UserDropdownProps) => {
         <S.Content isOpen={show}>
           <ul>
             <S.ListItem>Meu perfil</S.ListItem>
+            <S.ListItem>
+              <SchoolYearSelector />
+            </S.ListItem>
             <S.ListItem onClick={handleSignout}>Sair</S.ListItem>
           </ul>
         </S.Content>

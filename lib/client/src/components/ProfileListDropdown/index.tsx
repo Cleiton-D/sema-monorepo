@@ -35,6 +35,7 @@ const ProfileListDropdown = () => {
   const handleClickItem = async (profileId: string) => {
     await signIn('refresh', {
       profileId,
+      schoolYearId: session?.configs.school_year_id,
       token: session?.jwt,
       redirect: false
     });

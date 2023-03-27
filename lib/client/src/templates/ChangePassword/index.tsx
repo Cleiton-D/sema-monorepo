@@ -55,6 +55,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
       const result = await signIn('refresh', {
         profileId: session?.profileId,
         token: session?.jwt,
+        schoolYearId: session?.configs.school_year_id,
         redirect: false,
         callbackUrl
       });

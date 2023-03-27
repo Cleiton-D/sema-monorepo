@@ -47,13 +47,13 @@ const refreshProvider = Refresh<Record<string, CredentialInput>>({
   async authorize(params) {
     if (!params) return null;
 
-    const { profileId, token } = params;
+    const { profileId, schoolYearId, token } = params;
 
     const api = initializeApi();
     try {
       const response = await api.put(
         '/sessions',
-        { profile_id: profileId },
+        { profile_id: profileId, school_year_id: schoolYearId },
         {
           headers: { authorization: token ? `Bearer ${token}` : '' }
         }
@@ -74,6 +74,7 @@ const refreshProvider = Refresh<Record<string, CredentialInput>>({
           employeeId: employee?.id,
           profileId: data.profile.id,
           accessLevel: data.profile.access_level,
+          schoolYearId: data.school_year_id,
           schoolId: school?.id,
           branchId: branch?.id,
           branchType: branch?.type
@@ -118,6 +119,7 @@ const signInProvider = Credentials<Record<string, CredentialInput>>({
           employeeId: employee?.id,
           profileId: data.profile?.id,
           accessLevel: data.profile?.access_level,
+          schoolYearId: data.school_year_id,
           schoolId: school ? school.id : undefined,
           branchId: branch ? branch.id : undefined,
           branchType: branch ? branch.type : undefined
@@ -168,7 +170,7 @@ const createOptions = (
 
         try {
           const { data: schoolYear } = await api.get<SchoolYear>(
-            '/education/admin/school-years/current',
+            `/education/admin/school-years/${token.schoolYearId || 'current'}`,
             {
               headers: { authorization: token.jwt ? `Bearer ${token.jwt}` : '' }
             }
@@ -218,6 +220,7 @@ const createOptions = (
           token.employeeId = user.employeeId;
           token.branchId = user.branchId;
           token.branchType = user.branchType;
+          token.schoolYearId = user.schoolYearId;
         }
 
         if (!token.sessionId) {

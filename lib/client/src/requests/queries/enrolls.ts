@@ -12,6 +12,7 @@ export type EnrollFilters = {
   school_id?: string;
   grade_id?: string;
   class_period_id?: string;
+  school_year_id?: string;
   page?: number;
   size?: number;
   status?: EnrollStatus;

@@ -12,6 +12,7 @@ import {
 import { schoolYearMapper } from 'utils/mappers/schoolYearMapper';
 
 import { listSchoolTermPeriods } from './school-term-periods';
+import { Status } from 'models/Status';
 
 type GetSchoolYearFilters = {
   id?: string | 'current';
@@ -80,5 +81,31 @@ export const useShowSchoolYear = (
 ) => {
   return useQuery(['show-school-year', JSON.stringify(filters)], () =>
     showSchoolYear(session, filters)
+  );
+};
+
+type ListSchoolYearsFilters = {
+  status?: Status | Status[];
+};
+export const listSchoolYears = async (
+  session?: Session | null,
+  params: ListSchoolYearsFilters = {}
+) => {
+  const api = initializeApi(session);
+
+  return api
+    .get<SchoolYear[]>(`/education/admin/school-years`, {
+      params
+    })
+    .then((response) => response.data)
+    .catch(() => []);
+};
+
+export const useListSchoolYears = (
+  session?: Session | null,
+  filters: ListSchoolYearsFilters = {}
+) => {
+  return useQuery(['list-school-years', JSON.stringify(filters)], () =>
+    listSchoolYears(session, filters)
   );
 };

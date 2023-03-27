@@ -35,6 +35,7 @@ declare module 'next-auth' {
     change_password: boolean;
     profileId: string;
     accessLevel: AccessLevel;
+    schoolYearId: string;
     schoolId: string;
     branchId: string;
     branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';
@@ -52,6 +53,7 @@ declare module 'next-auth/jwt' {
     changePassword: boolean;
     profileId: string;
     accessLevel: AccessLevel;
+    schoolYearId: string;
     schoolId: string;
     branchId: string;
     branchType: 'SCHOOL' | 'MUNICIPAL_SECRETARY';

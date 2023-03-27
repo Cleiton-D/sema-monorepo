@@ -45,10 +45,11 @@ const Enrolls = () => {
   const enrollsFilters = useMemo(() => {
     return {
       school_id: schoolId as string,
+      school_year_id: session?.configs.school_year_id,
       status: 'ACTIVE',
       ...filters
     } as EnrollFilters;
-  }, [schoolId, filters]);
+  }, [schoolId, filters, session]);
 
   const { data: enrolls } = useListEnrolls(session, enrollsFilters);
 

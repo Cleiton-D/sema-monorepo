@@ -18,6 +18,7 @@ const getData = async (session: Session | null, id?: string) => {
 
   const filters = {
     school_id: school?.id,
+    school_year_id: session?.configs.school_year_id,
     page: 1,
     size: 20
   };

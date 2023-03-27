@@ -17,7 +17,7 @@ class SessionsController {
     const user = await authenticateUser.execute({ login, password });
 
     const generateToken = container.resolve(GenerateUserTokenService);
-    const { token, profile } = await generateToken.execute({
+    const { token, profile, school_year_id } = await generateToken.execute({
       user_id: user.id,
     });
 
@@ -32,6 +32,7 @@ class SessionsController {
         token,
         accessModules,
         profile,
+        school_year_id,
       });
     }
 
@@ -39,21 +40,27 @@ class SessionsController {
       user: instanceToInstance(user),
       accessModules: [],
       token,
+      school_year_id,
     });
   }
 
   @privateRoute()
   public async update(request: Request, response: Response): Promise<Response> {
-    const { profile_id } = request.body;
+    const { profile_id, school_year_id } = request.body;
     const { id: user_id } = request.user;
 
     const showUser = container.resolve(ShowUserService);
     const user = await showUser.execute({ user_id });
 
     const generateToken = container.resolve(GenerateUserTokenService);
-    const { token, profile } = await generateToken.execute({
+    const {
+      token,
+      profile,
+      school_year_id: school_year,
+    } = await generateToken.execute({
       user_id: user.id,
       user_profile_id: profile_id,
+      school_year_id,
     });
 
     if (profile) {
@@ -67,6 +74,7 @@ class SessionsController {
         token,
         accessModules,
         profile,
+        school_year_id: school_year,
       });
     }
 
@@ -74,6 +82,7 @@ class SessionsController {
       user: instanceToInstance(user),
       accessModules: [],
       token,
+      school_year_id: school_year,
     });
   }
 

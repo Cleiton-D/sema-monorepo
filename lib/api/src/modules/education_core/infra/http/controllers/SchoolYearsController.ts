@@ -2,13 +2,26 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 import privateRoute from '@shared/decorators/privateRoute';
+import Status from '@shared/infra/typeorm/enums/Status';
 
 import CreateSchoolYearService from '@modules/education_core/services/CreateSchoolYearService';
 import ShowSchoolYearService from '@modules/education_core/services/ShowSchoolYearService';
 import UpdateSchoolYearService from '@modules/education_core/services/UpdateSchoolYearService';
 import FinishSchoolYearService from '@modules/education_core/services/FinishSchoolYearService';
+import ListSchoolYearsService from '@modules/education_core/services/ListSchoolYearsService';
 
 class SchoolYearsController {
+  public async index(request: Request, response: Response): Promise<Response> {
+    const { status } = request.query;
+
+    const listSchoolYears = container.resolve(ListSchoolYearsService);
+    const schoolYears = await listSchoolYears.execute({
+      status: status as Status,
+    });
+
+    return response.json(schoolYears);
+  }
+
   public async show(request: Request, response: Response): Promise<Response> {
     const { school_year_id } = request.params;
 

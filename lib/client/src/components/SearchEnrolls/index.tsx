@@ -99,6 +99,18 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
       {
         value: 'TRANSFERRED',
         label: 'Transferido'
+      },
+      {
+        value: 'APPROVED',
+        label: 'Aprovado'
+      },
+      {
+        value: 'DISAPPROVED',
+        label: 'Reprovado'
+      },
+      {
+        value: 'DISAPPROVED_FOR_ABSENCES',
+        label: 'Reprovado por faltas'
       }
     ];
   }, []);
