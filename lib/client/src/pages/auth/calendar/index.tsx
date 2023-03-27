@@ -19,7 +19,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await protectedRoutes(context);
 
   let dehydratedState;
-  const schoolYear = await showSchoolYear(session, { id: 'current' });
+  const schoolYear = await showSchoolYear(session, {
+    id: session?.configs.school_year_id
+  });
   const schoolYearFetcher = {
     key: 'show-school-year',
     fetcher: () => schoolYear

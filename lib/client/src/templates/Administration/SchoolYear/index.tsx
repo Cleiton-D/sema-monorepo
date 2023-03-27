@@ -35,7 +35,9 @@ const SchoolYear = () => {
   const { enableAccess } = useAccess();
 
   const { data: session } = useSession();
-  const { data: schoolYear, refetch } = useSchoolYearWithSchoolTerms(session);
+  const { data: schoolYear, refetch } = useSchoolYearWithSchoolTerms(session, {
+    id: session?.configs.school_year_id
+  });
   const updateSchoolTermPeriod = useUpdateSchoolTermPeriod();
 
   const { push } = useRouter();

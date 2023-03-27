@@ -54,7 +54,7 @@ export const useSchoolYearWithSchoolTerms = (
   session?: Session | null,
   filters: GetSchoolYearFilters = {}
 ) => {
-  return useQuery(['show-school-year-detail'], () =>
+  return useQuery(['show-school-year', 'detail', JSON.stringify(filters)], () =>
     getSchoolYearWithSchoolTerms(session, filters)
   );
 };

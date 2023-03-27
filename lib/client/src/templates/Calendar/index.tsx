@@ -16,7 +16,9 @@ import * as S from './styles';
 const CalendarTemplate = () => {
   const { data: session } = useSession();
 
-  const { data: schoolYear } = useShowSchoolYear(session, { id: 'current' });
+  const { data: schoolYear } = useShowSchoolYear(session, {
+    id: session?.configs.school_year_id
+  });
   const { data: calendarEvents } = useListCalendarEvents(
     session,
     {

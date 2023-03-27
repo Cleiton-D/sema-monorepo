@@ -25,7 +25,7 @@ const SchoolDayDatepicker = ({
   const { data: session } = useSession();
 
   const { data: schoolYear } = useShowSchoolYear(session, {
-    id: 'current'
+    id: session?.configs.school_year_id
   });
   const { data: inactivePeriods, isLoading: isLoadingSchoolTerms } =
     useListSchoolTermPeriods(session, {
