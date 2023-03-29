@@ -148,7 +148,7 @@ class ClassesRepository implements IClassesRepository {
       .leftJoin(
         'school_term_periods',
         'school_term_period',
-        'CAST(school_term_period.school_term AS varchar) = CAST(class.school_term AS varchar)',
+        'CAST(school_term_period.school_term AS varchar) = CAST(class.school_term AS varchar) AND school_term_period.school_year_id = classroom.school_year_id',
       );
 
     if (sortBy) {
