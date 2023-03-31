@@ -81,11 +81,11 @@ export default async (request: NextApiRequest, response: NextApiResponse) => {
     classroom.school?.name
   }.xlsx`;
 
-  //response.setHeader('Content-Type', 'application/pdf');
-  response.setHeader(
-    'Content-Type',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  );
+  response.setHeader('Content-Type', 'application/pdf');
+  //response.setHeader(
+   // 'Content-Type',
+   // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  //);
   response.setHeader('Content-Disposition', `inline; filename=${filename}`);
 
   return response.send(byteArray);
