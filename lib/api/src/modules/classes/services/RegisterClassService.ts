@@ -73,6 +73,7 @@ class RegisterClassService {
       class_date,
       period,
     });
+    console.log(existentClass);
     if (existentClass) {
       throw new AppError(
         'Already exist a class registered for you in this period',
