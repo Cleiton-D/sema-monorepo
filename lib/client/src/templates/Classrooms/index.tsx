@@ -168,6 +168,7 @@ const Classrooms = () => {
             render={(classroom) => (
               <S.ActionButtons>
                 <Link
+                  prefetch={false}
                   href={{
                     pathname: '/auth/exports/school-reports',
                     query: {
