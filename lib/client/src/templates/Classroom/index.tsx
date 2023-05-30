@@ -27,7 +27,7 @@ const ClassroomTemplate = () => {
   });
 
   const { data: enrollClassrooms = [] } = useListEnrollClassrooms(session, {
-    classroom_id: classroom?.id
+    classroom_id: query.classroom_id as string
   });
 
   const enrolls = useMemo(() => {
@@ -89,7 +89,9 @@ const ClassroomTemplate = () => {
             </S.LightLink>
           </Link>
         </S.SectionTitle>
-        <ClassroomStudentNominalRelation classroomId={classroom?.id} />
+        {classroom && (
+          <ClassroomStudentNominalRelation classroomId={classroom.id} />
+        )}
       </S.TableSection>
 
       <S.TableSection>
@@ -123,7 +125,7 @@ const ClassroomTemplate = () => {
           <h4>Total geral de faltas</h4>
         </S.SectionTitle>
 
-        <FinalAttendancesTable classroomId={classroom?.id} />
+        {classroom && <FinalAttendancesTable classroomId={classroom.id} />}
       </S.TableSection>
     </Base>
   );

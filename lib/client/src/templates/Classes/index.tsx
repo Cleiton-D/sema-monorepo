@@ -45,12 +45,12 @@ const ClassesTemplate = () => {
 
     return {
       school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id,
       employee_id,
       sortBy: 'created_at',
       page: 1,
       size: 20,
-      ...filters
+      ...filters,
+      school_year_id: session?.configs.school_year_id
     };
   }, [session, filters]);
 

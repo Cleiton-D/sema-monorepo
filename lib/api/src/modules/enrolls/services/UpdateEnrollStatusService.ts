@@ -26,6 +26,8 @@ class UpdateEnrollStatusService {
   ) {}
 
   private getStatus(schoolReports: SchoolReport[]): EnrollStatus {
+    if (!schoolReports.length) return 'ACTIVE';
+
     const statusSet = new Set(schoolReports.map(({ status }) => status));
 
     if (statusSet.has('DISAPPROVED_FOR_ABSENCES')) {
