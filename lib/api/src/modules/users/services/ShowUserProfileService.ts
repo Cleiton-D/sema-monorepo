@@ -10,7 +10,7 @@ type FindUserProfileRequest = {
 };
 
 @injectable()
-class FindUserService {
+class ShowUserProfileService {
   constructor(
     @inject('UserProfilesRepository')
     private userProfilesRepository: IUserProfilesRepository,
@@ -35,4 +35,4 @@ class FindUserService {
   }
 }
 
-export default FindUserService;
+export default ShowUserProfileService;

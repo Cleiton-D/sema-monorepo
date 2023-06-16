@@ -71,8 +71,13 @@ class ClassesController {
   }
 
   public async count(request: Request, response: Response): Promise<Response> {
-    const { classroom_id, employee_id, school_subject_id, school_id } =
-      request.query;
+    const {
+      classroom_id,
+      employee_id,
+      school_subject_id,
+      school_id,
+      school_year_id,
+    } = request.query;
 
     const countClasses = container.resolve(CountClassesService);
     const countResult = await countClasses.execute({
@@ -80,6 +85,7 @@ class ClassesController {
       employee_id: employee_id as string,
       school_subject_id: school_subject_id as string,
       school_id: school_id as string,
+      school_year_id: school_year_id as string,
     });
 
     return response.json(countResult);

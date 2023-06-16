@@ -7,6 +7,7 @@ type CountClassesRequest = {
   school_subject_id?: string;
   employee_id?: string;
   school_id?: string;
+  school_year_id?: string;
 };
 
 type CountClassesResponse = {
@@ -24,12 +25,14 @@ class CountClassesService {
     employee_id,
     school_subject_id,
     school_id,
+    school_year_id,
   }: CountClassesRequest): Promise<CountClassesResponse> {
     const { count } = await this.classesRepository.count({
       classroom_id,
       employee_id,
       school_subject_id,
       school_id,
+      school_year_id,
     });
 
     return { count };

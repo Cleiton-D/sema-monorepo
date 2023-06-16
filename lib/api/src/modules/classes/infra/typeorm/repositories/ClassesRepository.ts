@@ -190,6 +190,7 @@ class ClassesRepository implements IClassesRepository {
     employee_id,
     school_subject_id,
     school_id,
+    school_year_id,
   }: FindClassDTO): Promise<CountResultDTO> {
     const where: FindOptionsWhere<Class> = {};
     const andWhere: AndWhere[] = [];
@@ -201,6 +202,12 @@ class ClassesRepository implements IClassesRepository {
       andWhere.push({
         condition: 'classroom.school_id = :schoolId',
         parameters: { schoolId: school_id },
+      });
+    }
+    if (school_year_id) {
+      andWhere.push({
+        condition: 'classroom.school_year_id = :schoolYearId',
+        parameters: { schoolYearId: school_year_id },
       });
     }
 
