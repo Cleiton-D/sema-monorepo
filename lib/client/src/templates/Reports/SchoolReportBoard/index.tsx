@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -12,6 +11,7 @@ import Paginator from 'components/Paginator';
 import { Enroll } from 'models/Enroll';
 
 import { EnrollFilters, useListEnrolls } from 'requests/queries/enrolls';
+import { useProfile } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -22,7 +22,7 @@ const INITIAL_FILTERS = {
 const SchoolReportBoardTemplate = (): JSX.Element => {
   const [filters, setFilters] = useState<EnrollFilters>(INITIAL_FILTERS);
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
 
   const handleSearch = (searchData: EnrollFilters) => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
@@ -31,10 +31,10 @@ const SchoolReportBoardTemplate = (): JSX.Element => {
   const enrollsFilters = useMemo(() => {
     return {
       ...filters,
-      school_id: session?.schoolId || filters.school_id
+      school_id: profile?.school?.id || filters.school_id
     };
-  }, [session, filters]);
-  const { data: enrolls } = useListEnrolls(session, enrollsFilters);
+  }, [profile, filters]);
+  const { data: enrolls } = useListEnrolls(enrollsFilters);
 
   return (
     <Base>

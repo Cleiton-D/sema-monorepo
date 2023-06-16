@@ -7,7 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
-import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'styled-components';
 
 import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
@@ -19,6 +18,7 @@ import theme from 'styles/theme';
 import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
+import { SessionProvider } from 'context/Session';
 
 type AppProps = NextAppProps & {
   Component: NextAppProps['Component'] & {
@@ -27,9 +27,9 @@ type AppProps = NextAppProps & {
 };
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    <SessionProvider session={pageProps.session}>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <SessionProvider session={pageProps.session}>
           <AtomProvider initialState={pageProps.initialState}>
             <AtomHydrator initialState={pageProps.initialState}>
               <ThemeProvider theme={theme}>
@@ -56,9 +56,9 @@ const App = ({ Component, pageProps }: AppProps) => {
               </ThemeProvider>
             </AtomHydrator>
           </AtomProvider>
-        </Hydrate>
-      </QueryClientProvider>
-    </SessionProvider>
+        </SessionProvider>
+      </Hydrate>
+    </QueryClientProvider>
   );
 };
 

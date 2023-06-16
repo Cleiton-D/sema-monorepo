@@ -5,30 +5,32 @@ import SchoolYear from 'templates/Administration/SchoolYear';
 import { getSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 
 import prefetchQuery from 'utils/prefetch-query';
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolYearPage() {
   return <SchoolYear />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const dehydratedState = await prefetchQuery({
+      key: 'show-school-year',
+      fetcher: () =>
+        getSchoolYearWithSchoolTerms(
+          {
+            id: context.req.fullSession?.schoolYear.id
+          },
+          context.req.session
+        )
+    });
 
-  const dehydratedState = await prefetchQuery({
-    key: 'show-school-year',
-    fetcher: () =>
-      getSchoolYearWithSchoolTerms(session, {
-        id: session?.configs.school_year_id
-      })
-  });
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 SchoolYearPage.auth = {
   module: 'SCHOOL_YEAR'

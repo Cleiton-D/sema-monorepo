@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { PlusCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -15,6 +14,7 @@ import Paginator from 'components/Paginator';
 import { useAccess } from 'hooks/AccessProvider';
 
 import { EnrollFilters, useListEnrolls } from 'requests/queries/enrolls';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -29,7 +29,8 @@ const Enrolls = () => {
 
   const { query } = useRouter();
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const handleSearch = (searchData: EnrollFilters) => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
@@ -37,21 +38,21 @@ const Enrolls = () => {
 
   const schoolId = useMemo(() => {
     if (!query.school_id || query.school_id === 'me') {
-      return session?.schoolId;
+      return profile?.school?.id;
     }
     return query.school_id;
-  }, [query, session]);
+  }, [query, profile]);
 
   const enrollsFilters = useMemo(() => {
     return {
       school_id: schoolId as string,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       status: 'ACTIVE',
       ...filters
     } as EnrollFilters;
-  }, [schoolId, filters, session]);
+  }, [schoolId, filters, schoolYear]);
 
-  const { data: enrolls } = useListEnrolls(session, enrollsFilters);
+  const { data: enrolls } = useListEnrolls(enrollsFilters);
 
   const canChangeEnroll = useMemo(
     () => enableAccess({ module: 'ENROLL', rule: 'WRITE' }),

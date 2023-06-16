@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
 import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type UpdateSchoolTermPeriodForm = {
   id: string;
@@ -16,11 +15,9 @@ type UpdateSchoolTermPeriodForm = {
 };
 
 export function useUpdateSchoolTermPeriod() {
-  const { data: session } = useSession();
-
   const updateSchoolTermPeriod = useCallback(
     async (values: UpdateSchoolTermPeriodForm) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { id, ...data } = values;
 
@@ -31,7 +28,7 @@ export function useUpdateSchoolTermPeriod() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('update-school-term-periods', updateSchoolTermPeriod, {

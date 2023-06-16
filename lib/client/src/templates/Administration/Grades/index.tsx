@@ -1,6 +1,5 @@
 import { useRef, useState, useMemo } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, X } from '@styled-icons/feather';
 
 import Base, { BaseRef } from 'templates/Base';
@@ -16,6 +15,7 @@ import { Grade } from 'models/Grade';
 
 import { gradesKeys, useListGrades } from 'requests/queries/grades';
 import { useDeleteGradeMutation } from 'requests/mutations/grades';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -27,14 +27,15 @@ const Grades = () => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const queryClient = useQueryClient();
 
-  const { data: grades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: grades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
 
-  const mutation = useDeleteGradeMutation(session);
+  const mutation = useDeleteGradeMutation();
   const handleDelete = async (event: React.MouseEvent, grade: Grade) => {
     event.stopPropagation();
 
@@ -110,10 +111,7 @@ const Grades = () => {
         active={!!selectedGrade}
         onClick={() => setSelectedGrade(undefined)}
       />
-      <AddGradeModal
-        ref={modalRef}
-        schoolYearId={session?.configs.school_year_id}
-      />
+      <AddGradeModal ref={modalRef} schoolYearId={schoolYear?.id} />
     </Base>
   );
 };

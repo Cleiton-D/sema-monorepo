@@ -1,30 +1,23 @@
 import { RefObject, useCallback } from 'react';
-import { Session } from 'next-auth';
 import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 import { SchoolSubject, SchoolSubjectForm } from 'models/SchoolSubject';
 
-export function useAddSchoolSubjectMutation(
-  modalRef: RefObject<ModalRef>,
-  session?: Session | null
-) {
-  const addSchoolSubject = useCallback(
-    async (values: SchoolSubjectForm) => {
-      const api = initializeApi(session);
+export function useAddSchoolSubjectMutation(modalRef: RefObject<ModalRef>) {
+  const addSchoolSubject = useCallback(async (values: SchoolSubjectForm) => {
+    const api = createUnstableApi();
 
-      const { id, ...resquestData } = values;
+    const { id, ...resquestData } = values;
 
-      return id
-        ? api.put(`/education/admin/school-subjects/${id}`, resquestData)
-        : api.post('/education/admin/school-subjects', resquestData);
-    },
-    [session]
-  );
+    return id
+      ? api.put(`/education/admin/school-subjects/${id}`, resquestData)
+      : api.post('/education/admin/school-subjects', resquestData);
+  }, []);
 
   return useMutation('add-school-subjects', addSchoolSubject, {
     linkedQueries: {
@@ -46,15 +39,12 @@ export function useAddSchoolSubjectMutation(
   });
 }
 
-export function useDeleteSchoolSubjectMutation(session?: Session | null) {
-  const deleteSchoolSubject = useCallback(
-    async (schoolSubject: any) => {
-      const api = initializeApi(session);
+export function useDeleteSchoolSubjectMutation() {
+  const deleteSchoolSubject = useCallback(async (schoolSubject: any) => {
+    const api = createUnstableApi();
 
-      return api.delete(`/education/admin/school-subjects/${schoolSubject.id}`);
-    },
-    [session]
-  );
+    return api.delete(`/education/admin/school-subjects/${schoolSubject.id}`);
+  }, []);
 
   return useMutation('delete-school-subject', deleteSchoolSubject, {
     linkedQueries: {

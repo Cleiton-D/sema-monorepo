@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Form } from '@unform/web';
 
@@ -13,6 +12,11 @@ import { useListSchools } from 'requests/queries/schools';
 import { useListClassPeriods } from 'requests/queries/class-periods';
 import { useListGrades } from 'requests/queries/grades';
 import { useListTeachers } from 'requests/queries/teachers';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 
 import { useListSchoolSubjects } from './hooks';
 
@@ -33,46 +37,44 @@ const SearchClasses = ({
 
   const { query } = useRouter();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
 
-  const { data: schools, isLoading: isLoadingSchools } =
-    useListSchools(session);
+  const { data: schools, isLoading: isLoadingSchools } = useListSchools();
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_year_id: schoolYear?.id
     });
 
   const { data: classrooms, isLoading: isLoadingClassrooms } =
-    useListClassrooms(session, {
+    useListClassrooms({
       school_id: school,
       grade_id: grade,
       class_period_id: classPeriod,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       employee_id:
-        session?.accessLevel?.code === 'teacher'
-          ? session.user.employeeId
+        profile?.access_level?.code === 'teacher'
+          ? user?.employee?.id
           : undefined
     });
 
   const { data: schoolSubjects, isLoading: isLoadingSchoolSubjects } =
-    useListSchoolSubjects(session, {
+    useListSchoolSubjects({
       classroom_id: classroom,
       school_id: school,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       grade_id: grade
     });
 
-  const { data: teachers, isLoading: isLoadingTeachers } = useListTeachers(
-    session,
-    {
-      school_id: school
-    }
-  );
+  const { data: teachers, isLoading: isLoadingTeachers } = useListTeachers({
+    school_id: school
+  });
 
   const schoolsOptions = useMemo(() => {
     if (isLoadingSchools) return [{ label: 'Carregando...', value: '' }];
@@ -129,11 +131,11 @@ const SearchClasses = ({
   }, [teachers, isLoadingTeachers]);
 
   useEffect(() => {
-    const schoolId = query.school_id || session?.schoolId;
+    const schoolId = query.school_id || profile?.school?.id;
     if (schoolId && !Array.isArray(schoolId)) {
       setSchool(schoolId);
     }
-  }, [query, session]);
+  }, [query, profile]);
 
   return (
     <S.SearchSection>
@@ -153,7 +155,7 @@ const SearchClasses = ({
           />
           <SchoolDayDatepicker name="class_date" label="Data" />
 
-          {!session?.schoolId && (
+          {!profile?.school?.id && (
             <Select
               name="school_id"
               label="Escola"
@@ -163,7 +165,7 @@ const SearchClasses = ({
               selectedOption={school}
             />
           )}
-          {session?.accessLevel?.code !== 'teacher' && (
+          {profile?.access_level?.code !== 'teacher' && (
             <Select
               name="employee_id"
               label="Professor"

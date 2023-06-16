@@ -6,7 +6,6 @@ import {
   useState
 } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSession } from 'next-auth/react';
 
 import Modal, { ModalRef } from 'components/Modal';
 import TextInput from 'components/TextInput';
@@ -19,6 +18,7 @@ import { useAddClassroom } from 'requests/mutations/classroom';
 import { classroomsKeys } from 'requests/queries/classrooms';
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassPeriods } from 'requests/queries/class-periods';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -46,14 +46,14 @@ const ClassroomModal: React.ForwardRefRenderFunction<
 
   const modalRef = useRef<ModalRef>(null);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
   const queryClient = useQueryClient();
 
-  const { data: grades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: grades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
-  const { data: classPeriods, isLoading } = useListClassPeriods(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: classPeriods, isLoading } = useListClassPeriods({
+    school_year_id: schoolYear?.id
   });
 
   const addClassroomMutation = useAddClassroom({});
@@ -88,6 +88,7 @@ const ClassroomModal: React.ForwardRefRenderFunction<
       is_multigrade: false,
       school_id: schoolId,
       enroll_count: 0,
+      school_year_id: schoolYear?.id,
       grade: {
         description: selectedGrade?.label
       }

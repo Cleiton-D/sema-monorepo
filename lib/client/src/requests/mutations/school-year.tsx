@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 import { SchoolTerm } from 'models/SchoolTerm';
 import { SchoolYear } from 'models/SchoolYear';
@@ -24,11 +23,9 @@ type CreateSchoolYearParams = {
 };
 
 export function useCreateSchoolYearMudation() {
-  const { data: session } = useSession();
-
   const createSchoolYear = useCallback(
     async (values: CreateSchoolYearParams) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const schoolYearParams = values.school_year;
       const schoolTermParams = Object.entries(values.school_terms).map(
@@ -62,7 +59,7 @@ export function useCreateSchoolYearMudation() {
         schoolTermPeriods
       };
     },
-    [session]
+    []
   );
 
   return useMutation('create-school-year', createSchoolYear, {

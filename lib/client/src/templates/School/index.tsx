@@ -1,7 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import { Edit3, Edit, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -18,6 +17,7 @@ import { useAccess } from 'hooks/AccessProvider';
 import { School } from 'models/School';
 
 import { useGetSchoolDetail } from 'requests/queries/schools';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import { translateContactType } from 'utils/mappers/contactsMapper';
 
@@ -31,13 +31,13 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const { query } = useRouter();
 
   const { data: schoolDetail, refetch } = useGetSchoolDetail(
     school.id,
-    session,
-    session?.configs.school_year_id
+    schoolYear?.id
   );
 
   const canChangeSchoolDirectory = useMemo(

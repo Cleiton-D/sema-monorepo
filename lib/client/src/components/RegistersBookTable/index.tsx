@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
@@ -15,9 +14,7 @@ type RegistersBookTableProps = {
 const RegistersBookTable = ({
   classroom
 }: RegistersBookTableProps): JSX.Element => {
-  const { data: session } = useSession();
-
-  const { data: enrollClassrooms = [] } = useListEnrollClassrooms(session, {
+  const { data: enrollClassrooms = [] } = useListEnrollClassrooms({
     classroom_id: classroom.id,
     status: 'ACTIVE'
   });

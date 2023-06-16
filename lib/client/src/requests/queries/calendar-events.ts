@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import {
@@ -8,7 +7,7 @@ import {
   CalendarEventType
 } from 'models/CalendarEvent';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export const calendarEventsKeys = {
   all: 'calendar-events' as const,
@@ -27,10 +26,10 @@ export type ListCalendarEventsFilters = {
 };
 
 export const listCalendarEvents = (
-  session: Session | null,
-  filters: ListCalendarEventsFilters = {}
+  filters: ListCalendarEventsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<CalendarEvent[]>('/calendar-events', { params: filters })
@@ -38,7 +37,6 @@ export const listCalendarEvents = (
 };
 
 export const useListCalendarEvents = (
-  session: Session | null,
   filters: ListCalendarEventsFilters = {},
   queryOptions: QueryObserverOptions<CalendarEvent[]> = {}
 ) => {
@@ -49,7 +47,7 @@ export const useListCalendarEvents = (
 
   const result = useQuery<CalendarEvent[]>(
     key,
-    () => listCalendarEvents(session, filters),
+    () => listCalendarEvents(filters),
     queryOptions
   );
   return { ...result, key };

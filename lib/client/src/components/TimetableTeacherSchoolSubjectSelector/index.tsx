@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
 
@@ -15,6 +14,7 @@ import { validateTimetable } from 'requests/queries/timetables';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
 import { useShowGrade } from 'requests/queries/grades';
 import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 import { useAccess } from 'hooks/AccessProvider';
@@ -55,11 +55,10 @@ const TimetableTeacherSchoolSubjectSelector = ({
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: grade } = useShowGrade(session, classroom.grade_id);
+  const { data: grade } = useShowGrade(classroom.grade_id);
   const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(
-    session,
     {
       grade_id: classroom.grade_id,
       is_multidisciplinary: !!grade?.is_multidisciplinary
@@ -67,15 +66,15 @@ const TimetableTeacherSchoolSubjectSelector = ({
     { enabled: !!grade }
   );
 
-  const { data: schoolTeachers } = useListSchoolTeachers(session, {
+  const { data: schoolTeachers } = useListSchoolTeachers({
     school_id: classroom?.school_id,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   const {
     data: classroomTeacherSchoolSubjects,
     isLoading: loadingClassroomTeacherSchoolSubjects
-  } = useListClassroomTeacherSchoolSubjects(session, {
+  } = useListClassroomTeacherSchoolSubjects({
     classroom_id: classroom?.id,
     school_id: classroom?.school_id,
     school_subject_id: selectedSchoolSubject,
@@ -98,7 +97,7 @@ const TimetableTeacherSchoolSubjectSelector = ({
           }
         );
 
-        const response = await validateTimetable(session, {
+        const response = await validateTimetable({
           classroom_id: classroom.id,
           school_id: classroom.school_id,
           employee_id: teacher,
@@ -120,7 +119,7 @@ const TimetableTeacherSchoolSubjectSelector = ({
 
       return true;
     },
-    [classroom, dayOfWeek, session, timeEnd, timeStart]
+    [classroom, dayOfWeek, timeEnd, timeStart]
   );
 
   const handleChange = async (values: HandleChangeParams) => {

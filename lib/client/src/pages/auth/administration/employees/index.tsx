@@ -1,22 +1,16 @@
-import { GetServerSidePropsContext } from 'next';
-
 import Employees from 'templates/Administration/Employees';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EmployeesPage() {
   return <Employees />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
-
+export const getServerSideProps = withProtectedRoute(() => {
   return {
-    props: {
-      session
-    }
+    props: {}
   };
-}
+});
 
 EmployeesPage.auth = {
   module: 'EMPLOYEE'

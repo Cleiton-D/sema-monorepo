@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useResetAtom } from 'jotai/utils';
 
 import Base from 'templates/Base';
@@ -26,8 +25,7 @@ import { useAddSchoolMutation } from 'requests/mutations/schools';
 import * as S from './styles';
 
 const NewSchool = () => {
-  const { data: session } = useSession();
-  const mutation = useAddSchoolMutation(session);
+  const mutation = useAddSchoolMutation();
   const resetForm = useResetAtom(createSchoolData);
 
   const { push } = useRouter();

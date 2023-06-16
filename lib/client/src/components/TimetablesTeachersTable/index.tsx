@@ -1,5 +1,4 @@
 import { useMemo, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,10 +33,9 @@ const TimetablesTeachersTable = ({
   classroom
 }: TimetablesTeachersTableProps) => {
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
   const updateTimetables = useUpdateTimetables();
-  const { data: timetables } = useListTimetables(session, {
+  const { data: timetables } = useListTimetables({
     classroom_id: classroom.id,
     school_id: classroom.school_id
   });

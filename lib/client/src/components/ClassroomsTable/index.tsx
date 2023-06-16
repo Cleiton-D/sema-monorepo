@@ -1,10 +1,11 @@
 import Link, { LinkProps } from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 
 import { Classroom } from 'models/Classroom';
+
+import { useProfile } from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -26,14 +27,14 @@ export const ClassroomsTable = ({
   link,
   actions
 }: ClassroomsTableProps) => {
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
 
   return (
     <Table items={classrooms} keyExtractor={(value) => value.id}>
       <TableColumn tableKey="description" label="Turma">
         {subTable && subTable}
       </TableColumn>
-      {!session?.schoolId && (
+      {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
 

@@ -5,25 +5,18 @@ import {
   useCallback,
   forwardRef
 } from 'react';
-import { GetServerSidePropsContext } from 'next';
-import { Session } from 'next-auth';
-import { useSession } from 'next-auth/react';
 
 import Loading from 'templates/Loading';
 import NoAccessTemplate from 'templates/NoAccess';
 
-import { AccessModule } from 'models/AccessModule';
+import { useAccessModules } from 'requests/queries/session';
 
-import {
-  acessModulesKeys,
-  listAccessModules,
-  useListAccessModules
-} from 'requests/queries/access-modules';
+import { SessionAccess } from 'models/Session';
 
 import { validateHasAccess, WithAccessOptions } from 'utils/validateHasAccess';
 
 type AccessContextData = {
-  modules: AccessModule[];
+  modules: SessionAccess[];
   enableAccess: (options: WithAccessOptions) => boolean;
 };
 
@@ -34,31 +27,17 @@ type AccessProviderProps = {
   children: React.ReactNode;
 };
 const AccessProvider = ({ children, access }: AccessProviderProps) => {
-  const { data: session } = useSession();
-
-  const { data: accessModules = [], isLoading } = useListAccessModules(
-    session,
-    {
-      access_level_id: session?.accessLevel?.id
-    },
-    { refetchInterval: false, enabled: !!session?.accessLevel?.id }
-  );
-
-  const modules = useMemo(() => {
-    if (!session?.accessLevel?.id) return [];
-
-    return accessModules;
-  }, [session, accessModules]);
+  const { data: modules = [], isLoading } = useAccessModules();
 
   const hasAccess = useMemo(() => {
-    return validateHasAccess(session, modules, access);
-  }, [session, modules, access]);
+    return validateHasAccess(modules, access);
+  }, [modules, access]);
 
   const enableAccess = useCallback(
     (options: WithAccessOptions) => {
-      return validateHasAccess(session, modules, options);
+      return validateHasAccess(modules, options);
     },
-    [modules, session]
+    [modules]
   );
 
   return (
@@ -75,31 +54,6 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
 function useAccess() {
   return useContext(AccessContext);
 }
-
-const withAccess = async (
-  context: GetServerSidePropsContext,
-  session: Session | null,
-  options: WithAccessOptions
-) => {
-  const filters = {
-    access_level_id: session?.accessLevel?.id
-  };
-  const modules = await listAccessModules(session, filters);
-
-  if (!validateHasAccess(session, modules || [], options)) {
-    context.res.writeHead(302, {
-      Location: `/`
-    });
-    context.res.end();
-  }
-
-  return {
-    modules,
-    queryKey: acessModulesKeys.list(
-      JSON.stringify({ ...filters, token: session?.jwt })
-    )
-  };
-};
 
 type WithAccessProps<T> = React.PropsWithRef<T> & Partial<WithAccessOptions>;
 
@@ -139,4 +93,4 @@ function withAccessComponent<P>(
   >;
 }
 
-export { AccessProvider, useAccess, withAccess, withAccessComponent };
+export { AccessProvider, useAccess, withAccessComponent };

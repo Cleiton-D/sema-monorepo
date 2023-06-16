@@ -1,22 +1,20 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
+import SchoolTeachersCard from 'components/SchoolTeachersCard';
 
 import { SchoolWithEnrollCount } from 'models/School';
 
 import { useListSchools } from 'requests/queries/schools';
 
 import * as S from './styles';
-import SchoolTeachersCard from 'components/SchoolTeachersCard';
 
 const SchoolTeachers = () => {
   const [selectedSchool, setSelectedSchool] = useState<SchoolWithEnrollCount>();
 
-  const { data: session } = useSession();
-  const { data: schools } = useListSchools(session);
+  const { data: schools } = useListSchools();
 
   const handleSelectSchool = (school: SchoolWithEnrollCount) => {
     if (selectedSchool?.id === school.id) {

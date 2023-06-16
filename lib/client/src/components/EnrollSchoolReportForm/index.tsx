@@ -1,5 +1,4 @@
 import { forwardRef, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { useAtomValue } from 'jotai/utils';
 
@@ -9,6 +8,7 @@ import TextInput from 'components/TextInput';
 
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useListSchoolReports } from 'requests/queries/school-reports';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import { selectedStudent } from 'store/atoms/create-enroll';
 
@@ -24,19 +24,18 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
 > = ({ gradeId }, ref) => {
   const student = useAtomValue(selectedStudent);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: schoolSubjects = [] } = useListSchoolsSubjects(session, {
+  const { data: schoolSubjects = [] } = useListSchoolsSubjects({
     grade_id: gradeId,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   const { data: schoolReports = [] } = useListSchoolReports(
-    session,
     {
       enroll_as: 'last',
       student_id: student?.id,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       grade_id: gradeId
     },
     {
@@ -92,7 +91,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="1º Bimestre"
             tableKey="first"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""
@@ -110,7 +109,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="2º Bimestre"
             tableKey="second"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""
@@ -128,7 +127,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="Rec. 1º Semestre"
             tableKey="first_rec"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""
@@ -146,7 +145,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="3º Bimestre"
             tableKey="third"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""
@@ -164,7 +163,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="4º Bimestre"
             tableKey="fourth"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""
@@ -182,7 +181,7 @@ const EnrollSchoolReportForm: React.ForwardRefRenderFunction<
             label="Rec. 2º Semestre"
             tableKey="second_rec"
             actionColumn
-            render={(item: typeof subjectsWithReports[0]) => (
+            render={(item: (typeof subjectsWithReports)[0]) => (
               <S.InputContainer>
                 <TextInput
                   label=""

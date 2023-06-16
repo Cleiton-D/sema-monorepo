@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -17,6 +16,7 @@ import { useListClassrooms } from 'requests/queries/classrooms';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 const INITIAL_FILTERS = {
   page: 1,
@@ -27,23 +27,24 @@ const ClassroomTeacher = () => {
 
   const { query } = useRouter();
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const schoolId = useMemo(() => {
     if (query.school_id === 'me') {
-      return session?.schoolId;
+      return profile?.school?.id;
     }
     return query.school_id as string;
-  }, [query, session]);
+  }, [query, profile]);
 
   const classroomsFilters = useMemo(() => {
     return {
       school_id: schoolId,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       ...filters
     };
-  }, [filters, schoolId, session]);
-  const { data: classrooms } = useListClassrooms(session, classroomsFilters);
+  }, [filters, schoolId, schoolYear]);
+  const { data: classrooms } = useListClassrooms(classroomsFilters);
 
   return (
     <Base>

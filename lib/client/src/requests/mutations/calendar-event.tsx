@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import {
   CalendarEvent,
@@ -7,7 +6,7 @@ import {
   CalendarEventType
 } from 'models/CalendarEvent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 import ToastContent from 'components/ToastContent';
 
 export type CreateCalendarEventRequestData = {
@@ -20,11 +19,9 @@ export type CreateCalendarEventRequestData = {
 };
 
 export function useCreateCalendarEvent() {
-  const { data: session } = useSession();
-
   const createCalendarEvent = useCallback(
     async (values: CreateCalendarEventRequestData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { data: responseData } = await api.post<CalendarEvent>(
         '/calendar-events',
@@ -33,7 +30,7 @@ export function useCreateCalendarEvent() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('create-calendar-event', createCalendarEvent, {
@@ -46,11 +43,9 @@ export function useCreateCalendarEvent() {
 }
 
 export function useDeleteCalendarEvent() {
-  const { data: session } = useSession();
-
   const deleteCalendarEvent = useCallback(
     async (calendarEvent: CalendarEvent) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { data: responseData } = await api.delete(
         `/calendar-events/${calendarEvent.id}`
@@ -58,7 +53,7 @@ export function useDeleteCalendarEvent() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('delete-calendar-event', deleteCalendarEvent, {

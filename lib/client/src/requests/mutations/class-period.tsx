@@ -1,7 +1,6 @@
 import { RefObject, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
-import { initializeApi, useApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -15,21 +14,16 @@ import { ModalRef } from 'components/Modal';
 import ToastContent from 'components/ToastContent';
 
 export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
-  const { data: session } = useSession();
+  const mutateClassPeriod = useCallback(async (values: ClassPeriodForm) => {
+    const api = createUnstableApi();
 
-  const mutateClassPeriod = useCallback(
-    async (values: ClassPeriodForm) => {
-      const api = initializeApi(session);
+    const { data: responseData } = await api.post<ClassPeriod[]>(
+      '/education/admin/class-periods',
+      values
+    );
 
-      const { data: responseData } = await api.post<ClassPeriod[]>(
-        '/education/admin/class-periods',
-        values
-      );
-
-      return responseData;
-    },
-    [session]
-  );
+    return responseData;
+  }, []);
 
   return useMutation('create-class-period', mutateClassPeriod, {
     onMutate: () => modalRef.current?.closeModal(),
@@ -46,15 +40,14 @@ export function useMutateClassPeriod(modalRef: RefObject<ModalRef>) {
 }
 
 export function useDeleteClassPeriod() {
-  const { data: session } = useSession();
-  const api = useApi(session);
-
   const deleteClassPeriod = useCallback(
     async (classPeriod: FormattedClassPeriod) => {
       const { id } = classPeriod;
+
+      const api = createUnstableApi();
       await api.delete(`/education/admin/class-periods/${id}`);
     },
-    [api]
+    []
   );
 
   return useMutation('delete-class-period', deleteClassPeriod, {

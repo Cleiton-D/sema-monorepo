@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { ChevronLeft } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -18,8 +17,7 @@ import * as S from './styles';
 const EditClassTemplate = () => {
   const { query, back } = useRouter();
 
-  const { data: session } = useSession();
-  const { data: classEntity } = useShowClass(session, query.class_id as string);
+  const { data: classEntity } = useShowClass(query.class_id as string);
 
   const tabItems = useMemo(() => {
     return [

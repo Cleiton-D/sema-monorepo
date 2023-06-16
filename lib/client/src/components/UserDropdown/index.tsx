@@ -1,9 +1,13 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { signOut } from 'next-auth/react';
+
+import SchoolYearSelector from 'components/SchoolYearSelector';
+
+import { fetchAllSession } from 'requests/queries/session';
+import { destroySession } from 'requests/mutations/session';
 
 import * as S from './styles';
-import SchoolYearSelector from 'components/SchoolYearSelector';
 
 type UserDropdownProps = {
   username: string;
@@ -12,8 +16,13 @@ type UserDropdownProps = {
 const UserDropdown = ({ username, image }: UserDropdownProps) => {
   const [show, setShow] = useState(false);
 
+  const router = useRouter();
+
   const handleSignout = async () => {
-    await signOut();
+    await destroySession();
+    await fetchAllSession();
+
+    router.reload();
   };
 
   const toggleDropdown = () => {

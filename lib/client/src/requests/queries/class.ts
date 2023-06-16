@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { Class, FormattedClass } from 'models/Class';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 import { classMapper } from 'utils/mappers/classMapper';
 import { PaginatedHttpResponse } from 'models/app';
@@ -19,18 +18,18 @@ export const classesKeys = {
   count: (filters: string) => [...classesKeys.counts(), { filters }]
 };
 
-export const showClass = (session: Session | null, id?: string) => {
+export const showClass = (id?: string, session?: AppSession) => {
   if (!id) return undefined;
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
   return api
     .get<Class>(`/classes/${id}`)
     .then((response) => classMapper(response.data));
 };
 
-export const useShowClass = (session: Session | null, id?: string) => {
+export const useShowClass = (id?: string) => {
   const key = classesKeys.show(JSON.stringify({ id }));
-  const result = useQuery(key, () => showClass(session, id));
+  const result = useQuery(key, () => showClass(id));
 
   return { ...result, key };
 };
@@ -55,10 +54,10 @@ export type ListClassesFilters = {
   size?: number;
 };
 export const listClasses = async (
-  session: Session | null,
-  filters: ListClassesFilters = {}
+  filters: ListClassesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const response = await api
     .get<PaginatedHttpResponse<Class>>('/classes', { params: filters })
@@ -72,7 +71,6 @@ export const listClasses = async (
 };
 
 export const useListClasses = (
-  session: Session | null,
   filters: ListClassesFilters,
   queryOptions: QueryObserverOptions<
     PaginatedHttpResponse<FormattedClass> | undefined
@@ -81,7 +79,7 @@ export const useListClasses = (
   const key = classesKeys.list(JSON.stringify(filters));
   const result = useQuery<PaginatedHttpResponse<FormattedClass> | undefined>(
     key,
-    () => listClasses(session, filters),
+    () => listClasses(filters),
     queryOptions
   );
 
@@ -92,22 +90,19 @@ type CountClassesResponse = {
   count: number;
 };
 export const countClasses = async (
-  session: Session | null,
-  filters: ListClassesFilters = {}
+  filters: ListClassesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<CountClassesResponse>('/classes/count', { params: filters })
     .then((response) => response.data);
 };
 
-export const useCountClasses = (
-  session: Session | null,
-  filters: ListClassesFilters
-) => {
+export const useCountClasses = (filters: ListClassesFilters) => {
   const key = classesKeys.count(JSON.stringify(filters));
-  const result = useQuery(key, () => countClasses(session, filters));
+  const result = useQuery(key, () => countClasses(filters));
 
   return { ...result, key };
 };

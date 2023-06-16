@@ -1,5 +1,4 @@
 import { useRef, useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { PlusSquare, X } from '@styled-icons/feather';
 
 import AddEmployeeToProfileModal, {
@@ -39,8 +38,11 @@ const EmployeeSection = ({
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data: employees, isLoading, refetch } = useListEmployees(session, {
+  const {
+    data: employees,
+    isLoading,
+    refetch
+  } = useListEmployees({
     accessCode: profileCode,
     branch_id: branchId
   });

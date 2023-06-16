@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useAtom } from 'jotai';
 import { useResetAtom } from 'jotai/utils';
 
@@ -25,6 +24,7 @@ import { classroomsAtom } from 'store/atoms/create-multigrade';
 import DescriptionInput from './DescriptionInput';
 
 import * as S from './styles';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 type FormData = {
   description: string;
@@ -40,13 +40,14 @@ const NewMultigradeTemplate = ({ type }: NewMultigradeTemplateProps) => {
   const [saving, setSaving] = useState(false);
 
   const router = useRouter();
-  const { data: session } = useSession();
 
-  const { data: classPeriods, isLoading } = useListClassPeriods(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+
+  const { data: classPeriods, isLoading } = useListClassPeriods({
+    school_year_id: schoolYear?.id
   });
   const { data: currentMultigrade } = useShowMultigrade(
-    session,
     {
       multigrade_id: router.query.multigrade_id as string
     },
@@ -61,10 +62,10 @@ const NewMultigradeTemplate = ({ type }: NewMultigradeTemplateProps) => {
 
   const schoolId = useMemo(() => {
     if (router.query.school_id === 'me') {
-      return session?.schoolId;
+      return profile?.school?.id;
     }
     return router.query.school_id as string;
-  }, [router, session]);
+  }, [router, profile]);
 
   const addMultigrade = useAddMultigrade();
   const addMultigradeClassroom = useAddMultigradeClassroom();
@@ -85,7 +86,8 @@ const NewMultigradeTemplate = ({ type }: NewMultigradeTemplateProps) => {
       class_period_id,
       description,
       is_multigrade: true,
-      school_id: schoolId
+      school_id: schoolId,
+      school_year_id: schoolYear?.id
     });
 
     if (response.id) {

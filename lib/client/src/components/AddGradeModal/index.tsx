@@ -7,7 +7,6 @@ import {
   useImperativeHandle
 } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -46,7 +45,6 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef, AddGradeModalProps> = (
   const modalRef = useRef<DefaultModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const openModal = useCallback((item?: Grade) => {
@@ -59,7 +57,7 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef, AddGradeModalProps> = (
     modalRef.current?.closeModal();
   }, []);
 
-  const mutation = useAddGradeMutation(handleBack, session);
+  const mutation = useAddGradeMutation(handleBack);
   const handleSave = useCallback(
     async (values: AddGradeFormData) => {
       try {
@@ -87,7 +85,7 @@ const AddGradeModal: ForwardRefRenderFunction<ModalRef, AddGradeModalProps> = (
         }
       }
     },
-    [mutation, schoolYearId]
+    [mutation, queryClient, schoolYearId]
   );
 
   useImperativeHandle(ref, () => ({ openModal }));

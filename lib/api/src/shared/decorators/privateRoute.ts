@@ -1,7 +1,8 @@
-import { Request } from 'express';
+import { container } from 'tsyringe';
 
 import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
 import ensureModuleAccess from '@modules/authorization/infra/http/middlewares/ensureModuleAccess';
+import ShowUserProfileService from '@modules/users/services/ShowUserProfileService';
 
 type PrivateRouteProps = {
   module: string;
@@ -10,8 +11,8 @@ type PrivateRouteProps = {
 
 function privateRoute(params?: PrivateRouteProps) {
   return (
-    target: any,
-    propertyKey: string,
+    _target: any,
+    _propertyKey: string,
     propertyDescriptor: PropertyDescriptor,
   ): PropertyDescriptor => {
     const originalMethod = propertyDescriptor.value;
@@ -20,24 +21,26 @@ function privateRoute(params?: PrivateRouteProps) {
     propertyDescriptor.value = async function newMethod(...args: any) {
       const { profileId } = await ensureAuthenticated.apply(this, args);
 
+      const showUserProfile = container.resolve(ShowUserProfileService);
+      const userProfile = await showUserProfile.execute({
+        user_profile_id: profileId,
+      });
+
       if (params) {
         const { module, rule } = params;
-
-        const validateAcess = async function validateAcess(request: Request) {
-          const { userProfile } = await ensureModuleAccess({
-            module,
-            rule,
-            user_profile_id: profileId,
-          });
-
-          request.profile = {
-            id: userProfile.id,
-            branch_id: userProfile.branch_id,
-          };
-        };
-
-        await validateAcess.apply(this, args);
+        await ensureModuleAccess({
+          module,
+          rule,
+          access_level_id: userProfile.access_level_id,
+        });
       }
+
+      const [request] = args;
+      request.profile = {
+        id: userProfile.id,
+        access_level_id: userProfile.access_level_id,
+        branch_id: userProfile.branch_id,
+      };
 
       return originalMethod.apply(this, args);
     };

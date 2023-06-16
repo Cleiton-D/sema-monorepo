@@ -1,5 +1,4 @@
-import { AccessModule } from 'models/AccessModule';
-import { Session } from 'next-auth';
+import { SessionAccess } from 'models/Session';
 
 export type WithAccessOptions = {
   module: string;
@@ -7,22 +6,15 @@ export type WithAccessOptions = {
 };
 
 export const validateHasAccess = (
-  session: Session | null,
-  modules: AccessModule[],
+  modules: SessionAccess[],
   { module, rule }: WithAccessOptions
 ) => {
-  if (!session) return false;
-
-  const findedModule = modules.find(
-    ({ app_module }) => app_module.description === module
-  );
+  const findedModule = modules.find(({ app_module }) => app_module === module);
   if (!findedModule) return false;
 
-  if (rule) {
-    if (rule === 'READ') return findedModule.read;
-    if (rule === 'WRITE') return findedModule.write;
-    return false;
-  }
+  if (!rule) return true;
 
-  return findedModule.read || findedModule.write;
+  if (findedModule.access_level === 'WRITE') return true;
+
+  return findedModule.access_level === rule;
 };

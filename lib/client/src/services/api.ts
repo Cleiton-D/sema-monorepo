@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
-import { signOut } from 'next-auth/react';
+//import { Session } from 'next-auth';
+//import { signOut } from 'next-auth/react';
 import axios, { AxiosError } from 'axios';
 import {
   MutationFunction,
@@ -10,16 +10,11 @@ import {
 } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
-// import { serverSignOut } from 'utils/serverSignOut';
 
-const isChrome =
-  typeof navigator !== 'undefined' &&
-  /Chrome/.test(navigator.userAgent) &&
-  /Google Inc/.test(navigator.vendor);
+import { isServer } from 'utils/isServer';
+import { SESSION_KEYS } from 'requests/queries/session';
 
-const isServer = typeof window === 'undefined' || (isChrome && !window.chrome);
-
-const createApi = (session?: Session | null) => {
+const createApi = (session?: any) => {
   const jwt = session?.jwt;
 
   const api = axios.create({
@@ -60,10 +55,10 @@ const createApi = (session?: Session | null) => {
           /invalid jwt token/i
         );
         if (isUnauthorized) {
-          signOut({
-            callbackUrl: '/sign-in',
-            redirect: true
-          });
+          //signOut({
+          //  callbackUrl: '/sign-in',
+          //  redirect: true
+          //});
 
           return undefined;
         }
@@ -76,11 +71,11 @@ const createApi = (session?: Session | null) => {
   return api;
 };
 
-export function initializeApi(session?: Session | null) {
+export function initializeApi(session: never) {
   return createApi(session);
 }
 
-export function useApi(session?: Session | null) {
+export function useApi(session: never) {
   const store = useMemo(() => createApi(session), [session]);
   return store;
 }
@@ -200,11 +195,35 @@ export const queryClient = new QueryClient({
   }
 });
 
+const unstable__api = createApi();
+
+if (!isServer) {
+  unstable__api.interceptors.request.use((config) => {
+    const session = queryClient.getQueryData<{ token?: string }>([
+      SESSION_KEYS.all
+    ]);
+
+    const token = session?.token ? `Bearer ${session.token}` : '';
+    config.headers.authorization = token;
+
+    return config;
+  });
+}
+
+export const createUnstableApi = (session?: AppSession) => {
+  const authorization = session?.token ? `Bearer ${session.token}` : '';
+  unstable__api.defaults.headers.authorization = authorization;
+
+  return unstable__api;
+};
+
 type ApiError = {
   message: string;
   status: 'error';
 };
 
-export const isApiError = (error: unknown): error is AxiosError<ApiError> => {
+const isApiError = (error: unknown): error is AxiosError<ApiError> => {
   return axios.isAxiosError(error);
 };
+
+export { unstable__api, isApiError };

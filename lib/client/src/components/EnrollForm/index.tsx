@@ -6,7 +6,6 @@ import {
   useImperativeHandle,
   forwardRef
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { FormHandles as UnformHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -22,6 +21,7 @@ import { School } from 'models/School';
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { useListClassPeriods } from 'requests/queries/class-periods';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -46,19 +46,20 @@ const EnrollForm: React.ForwardRefRenderFunction<
 
   const [state, setState] = useAtom(jotaiState);
 
-  const { data: session } = useSession();
-  const { data: grades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+
+  const { data: grades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
-  const { data: classrooms, isLoading } = useListClassrooms(session, {
+  const { data: classrooms, isLoading } = useListClassrooms({
     school_id: school.id,
     grade_id: selectedGrade,
     class_period_id: selectedClassPeriod,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_year_id: schoolYear?.id
     });
 
   const gradesOptions = useMemo(() => {

@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -10,6 +9,7 @@ import TeacherSchoolSubjectCard from 'components/TeacherSchoolSubjectCard';
 import { SchoolSubject } from 'models/SchoolSubject';
 
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -18,10 +18,12 @@ const TeacherSchoolSubjects = () => {
     useState<SchoolSubject>();
 
   const { query } = useRouter();
-  const { data: session } = useSession();
 
-  const { data: schoolSubjects } = useListSchoolsSubjects(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+
+  const { data: schoolSubjects } = useListSchoolsSubjects({
+    school_year_id: schoolYear?.id
   });
 
   const handleSelectSchoolSubject = (schoolSubject: SchoolSubject) => {
@@ -34,10 +36,10 @@ const TeacherSchoolSubjects = () => {
 
   const schoolId = useMemo(() => {
     if (query.school_id === 'me') {
-      return session?.schoolId as string;
+      return profile?.school?.id as string;
     }
     return query.school_id as string;
-  }, [query, session]);
+  }, [query, profile]);
 
   return (
     <Base>

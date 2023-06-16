@@ -5,27 +5,26 @@ import Schools from 'templates/Administration/Schools';
 import { listSchools } from 'requests/queries/schools';
 import prefetchQuery from 'utils/prefetch-query';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolsPage() {
   return <Schools />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const dehydratedState = await prefetchQuery({
+      key: 'get-schools',
+      fetcher: () => listSchools(context.req.session)
+    });
 
-  const dehydratedState = await prefetchQuery({
-    key: 'get-schools',
-    fetcher: () => listSchools(session)
-  });
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 SchoolsPage.auth = {
   module: 'SCHOOL'

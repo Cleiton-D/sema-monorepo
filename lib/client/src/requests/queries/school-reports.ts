@@ -1,8 +1,8 @@
-import { SchoolReport } from 'models/SchoolReport';
-import { Session } from 'next-auth';
 import { useQuery, UseQueryOptions } from 'react-query';
 
-import { initializeApi } from 'services/api';
+import { SchoolReport } from 'models/SchoolReport';
+
+import { createUnstableApi } from 'services/api';
 
 type ListSchoolReportsFilters = {
   enroll_id?: string;
@@ -15,8 +15,8 @@ type ListSchoolReportsFilters = {
 };
 
 export const listSchoolReports = async (
-  session: Session | null,
-  filters: ListSchoolReportsFilters
+  filters: ListSchoolReportsFilters,
+  session?: AppSession
 ) => {
   const validFilter = Object.values(filters).some(
     (value) => value !== undefined
@@ -24,7 +24,7 @@ export const listSchoolReports = async (
 
   if (!validFilter) return [];
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const response = await api
     .get<SchoolReport[]>('/enrolls/reports', { params: filters })
@@ -34,7 +34,6 @@ export const listSchoolReports = async (
 };
 
 export const useListSchoolReports = (
-  session: Session | null,
   filters: ListSchoolReportsFilters,
   queryOptions: UseQueryOptions<SchoolReport[]> = {}
 ) => {
@@ -42,7 +41,7 @@ export const useListSchoolReports = (
 
   const result = useQuery<SchoolReport[]>(
     key,
-    () => listSchoolReports(session, filters),
+    () => listSchoolReports(filters),
     queryOptions
   );
 

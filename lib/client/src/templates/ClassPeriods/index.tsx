@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { PlusCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -12,16 +11,17 @@ import CreateClassPeriodModal, {
 } from 'components/CreateClassPeriodModal';
 
 import { useListClassPeriods } from 'requests/queries/class-periods';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
 const ClassPeriods = () => {
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const modalRef = useRef<ClassPeriodModalRef>(null);
 
-  const { data } = useListClassPeriods(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data } = useListClassPeriods({
+    school_year_id: schoolYear?.id
   });
 
   return (

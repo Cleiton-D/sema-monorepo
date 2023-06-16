@@ -1,22 +1,12 @@
-import { GetServerSidePropsContext } from 'next';
-
 import ClassesTemplate from 'templates/Classes';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassesPage() {
   return <ClassesTemplate />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
-
-  return {
-    props: {
-      session
-    }
-  };
-}
+export const getServerSideProps = withProtectedRoute();
 
 ClassesPage.auth = {
   module: 'CLASS'

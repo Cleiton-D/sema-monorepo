@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { Multigrade } from 'models/Multigrade';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export const multigradesKeys = {
   all: 'multigrades' as const,
@@ -20,21 +19,18 @@ export type ListMultigradesFilters = {
 
 export const listMultigrades = (
   filters: ListMultigradesFilters,
-  session: Session | null
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Multigrade[]>(`/multigrades`, { params: filters })
     .then((response) => response.data);
 };
 
-export const useListMultigrades = (
-  session: Session | null,
-  filters: ListMultigradesFilters = {}
-) => {
+export const useListMultigrades = (filters: ListMultigradesFilters = {}) => {
   return useQuery(multigradesKeys.list(JSON.stringify(filters)), () =>
-    listMultigrades(filters, session)
+    listMultigrades(filters)
   );
 };
 
@@ -44,12 +40,12 @@ export type ShowMultigradeFilters = {
 
 export const showMultigrade = async (
   filters: ShowMultigradeFilters,
-  session: Session | null
+  session?: AppSession
 ) => {
   const { multigrade_id } = filters;
   if (!multigrade_id) return undefined;
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
   const response = await api
     .get<Multigrade>(`/multigrades/${multigrade_id}`)
     .then((response) => response.data);
@@ -58,13 +54,12 @@ export const showMultigrade = async (
 };
 
 export const useShowMultigrade = (
-  session: Session | null,
   filters: ShowMultigradeFilters = {},
   queryOptions: QueryObserverOptions<Multigrade | undefined> = {}
 ) => {
   return useQuery<Multigrade | undefined>(
     multigradesKeys.show(JSON.stringify(filters)),
-    () => showMultigrade(filters, session),
+    () => showMultigrade(filters),
     queryOptions
   );
 };

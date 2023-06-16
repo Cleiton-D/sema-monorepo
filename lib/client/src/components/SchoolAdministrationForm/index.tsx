@@ -1,5 +1,4 @@
 import { forwardRef, useCallback, useMemo, useImperativeHandle } from 'react';
-import { useSession } from 'next-auth/react';
 import { PrimitiveAtom, useAtom } from 'jotai';
 
 import Select from 'components/Select';
@@ -24,8 +23,7 @@ const SchoolAdministrationForm: React.ForwardRefRenderFunction<
 > = ({ jotaiState, basicJotaiState }, ref) => {
   const [state, setState] = useAtom(basicJotaiState);
 
-  const { data: session } = useSession();
-  const { data: employees, isLoading } = useListEmployees(session);
+  const { data: employees, isLoading } = useListEmployees();
 
   const employeesOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];

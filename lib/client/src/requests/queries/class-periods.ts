@@ -1,10 +1,9 @@
-import { Session } from 'next-auth';
+import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 import { ClassPeriod, FormattedClassPeriod } from 'models/ClassPeriod';
 import { classPeriodsMapper } from 'utils/mappers/classPeriodMapper';
-import { useMemo } from 'react';
 
 export const classPeriodsKeys = {
   all: 'class_periods' as const,
@@ -18,24 +17,21 @@ type ClassPeriodsFilters = {
 };
 
 export const listClassPeriods = (
-  session?: Session | null,
-  filters: ClassPeriodsFilters = {}
+  filters: ClassPeriodsFilters = {},
+  session?: AppSession
 ): Promise<FormattedClassPeriod[]> => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<ClassPeriod[]>('/education/admin/class-periods', { params: filters })
     .then((response) => response.data.map(classPeriodsMapper));
 };
 
-export const useListClassPeriods = (
-  session?: Session | null,
-  filters: ClassPeriodsFilters = {}
-) => {
+export const useListClassPeriods = (filters: ClassPeriodsFilters = {}) => {
   const key = useMemo(
     () => classPeriodsKeys.list(JSON.stringify(filters)),
     [filters]
   );
 
-  return useQuery(key, () => listClassPeriods(session, filters));
+  return useQuery(key, () => listClassPeriods(filters));
 };

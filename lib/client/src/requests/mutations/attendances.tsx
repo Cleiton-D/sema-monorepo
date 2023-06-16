@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
 import { Attendance } from 'models/Attendance';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type RegisterAttendancesFormData = {
   class_id: string;
@@ -16,11 +15,9 @@ type RegisterAttendancesFormData = {
 };
 
 export function useRegisterAttendances() {
-  const { data: session } = useSession();
-
   const registerAttendances = useCallback(
     async (values: RegisterAttendancesFormData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { data: responseData } = await api.put<Attendance[]>(
         `/attendances`,
@@ -29,7 +26,7 @@ export function useRegisterAttendances() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('register-attendances', registerAttendances, {
@@ -47,23 +44,18 @@ type JustifyAbsenceFormData = {
 };
 
 export function useJustifyAbsence() {
-  const { data: session } = useSession();
+  const justifyAbsence = useCallback(async (values: JustifyAbsenceFormData) => {
+    const api = createUnstableApi();
 
-  const justifyAbsence = useCallback(
-    async (values: JustifyAbsenceFormData) => {
-      const api = initializeApi(session);
+    const { attendance_id, ...params } = values;
 
-      const { attendance_id, ...params } = values;
+    const { data: responseData } = await api.patch<Attendance>(
+      `/attendances/${attendance_id}/justify`,
+      params
+    );
 
-      const { data: responseData } = await api.patch<Attendance>(
-        `/attendances/${attendance_id}/justify`,
-        params
-      );
-
-      return responseData;
-    },
-    [session]
-  );
+    return responseData;
+  }, []);
 
   return useMutation('justify-absence', justifyAbsence, {
     renderLoading: function render() {
@@ -80,11 +72,9 @@ type RemoveAbsenceJustificationData = {
 };
 
 export function useRemoveAbsenceJustification() {
-  const { data: session } = useSession();
-
   const removeAbsenceJustification = useCallback(
     async (values: RemoveAbsenceJustificationData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { attendance_id } = values;
 
@@ -94,7 +84,7 @@ export function useRemoveAbsenceJustification() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation(

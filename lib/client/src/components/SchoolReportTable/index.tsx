@@ -1,4 +1,3 @@
-import { useSession } from 'next-auth/react';
 import { useMemo } from 'react';
 
 import Table from 'components/Table';
@@ -10,6 +9,7 @@ import { useListSchoolReports } from 'requests/queries/school-reports';
 import { useCountAttendances } from 'requests/queries/attendances';
 import { useGetEnrollDetails } from 'requests/queries/enrolls';
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import { schoolReportsSubjectsMapper } from 'utils/mappers/schoolReportsMapper';
 import { masks } from 'utils/masks';
@@ -25,14 +25,14 @@ const SchoolReportTable = ({
   enrollId,
   isMininal = false
 }: SchoolReportTableProps) => {
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: enroll } = useGetEnrollDetails(enrollId, session);
-  const { data: schoolReports = [] } = useListSchoolReports(session, {
+  const { data: enroll } = useGetEnrollDetails(enrollId);
+  const { data: schoolReports = [] } = useListSchoolReports({
     enroll_id: enrollId
   });
 
-  const { data: attendances } = useCountAttendances(session, {
+  const { data: attendances } = useCountAttendances({
     class_id: 'all',
     enroll_id: enrollId,
     split_by_school_term: true,
@@ -40,11 +40,10 @@ const SchoolReportTable = ({
   });
 
   const { data: schoolSubjects = [] } = useListSchoolsSubjects(
-    session,
     {
       grade_id: enroll?.grade_id,
       include_multidisciplinary: true,
-      school_year_id: session?.configs.school_year_id
+      school_year_id: schoolYear?.id
     },
     { enabled: !!enroll?.grade_id }
   );

@@ -2,7 +2,6 @@ import { useRef, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useQueryClient } from 'react-query';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, X, Edit, FileText } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -30,6 +29,7 @@ import { useDeleteClassroom } from 'requests/mutations/classroom';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 const INITIAL_FILTERS = {
   page: 1,
@@ -44,25 +44,27 @@ const Classrooms = () => {
   const { enableAccess } = useAccess();
 
   const { query } = useRouter();
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
+
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const schoolId = useMemo(() => {
     if (query.school_id === 'me') {
-      return session?.schoolId;
+      return profile?.school?.id;
     }
     return query.school_id as string;
-  }, [query, session]);
+  }, [query, profile]);
 
   const classroomsFilters = useMemo(() => {
     return {
       school_id: schoolId,
-      school_year_id: session?.configs.school_year_id,
+      school_year_id: schoolYear?.id,
       ...filters
     };
-  }, [filters, schoolId, session]);
+  }, [filters, schoolId, schoolYear]);
 
-  const { data: classrooms } = useListClassrooms(session, classroomsFilters);
+  const { data: classrooms } = useListClassrooms(classroomsFilters);
 
   const deleteClassroomMutation = useDeleteClassroom({});
 
@@ -119,7 +121,7 @@ const Classrooms = () => {
             {(classroom) => <ClassroomEnrollsTable classroom={classroom} />}
           </TableColumn>
 
-          {!session?.schoolId && (
+          {!profile?.school?.id && (
             <TableColumn label="Escola" tableKey="school.name" />
           )}
 

@@ -1,6 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -16,6 +15,11 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -29,25 +33,27 @@ const ClassReportsTemplate = () => {
   const [filters, setFilters] =
     useState<ListClassroomsFilters>(INITIAL_FILTERS);
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const handleSearch = useCallback((searchData: ListClassroomsFilters) => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
   }, []);
 
   const classroomsFilters = useMemo(() => {
-    const isTeacher = session?.accessLevel?.code === 'teacher';
-    const employee_id = isTeacher ? session?.user.employeeId : undefined;
+    const isTeacher = profile?.access_level?.code === 'teacher';
+    const employee_id = isTeacher ? user?.employee?.id : undefined;
 
     return {
-      school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id,
+      school_id: profile?.school?.id,
+      school_year_id: schoolYear?.id,
       employee_id,
       ...filters
     };
-  }, [session, filters]);
+  }, [filters, profile, user, schoolYear]);
 
-  const { data: classrooms } = useListClassrooms(session, classroomsFilters);
+  const { data: classrooms } = useListClassrooms(classroomsFilters);
 
   return (
     <Base>

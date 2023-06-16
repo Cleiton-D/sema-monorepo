@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
 import { useQuery, QueryObserverOptions } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Classroom } from 'models/Classroom';
 import { PaginatedHttpResponse } from 'models/app';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export const classroomsKeys = {
   all: 'classrooms' as const,
@@ -45,10 +44,10 @@ export type ListClassroomsFilters = {
 };
 
 export const listClassrooms = (
-  session: Session | null,
-  filters: ListClassroomsFilters = {}
+  filters: ListClassroomsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { ...params } = filters;
   if (typeof filters.with_in_multigrades !== 'undefined') {
@@ -64,7 +63,6 @@ export const listClassrooms = (
 };
 
 export const useListClassrooms = (
-  session: Session | null,
   filters: ListClassroomsFilters = {},
   queryOptions: QueryObserverOptions<PaginatedHttpResponse<Classroom>> = {}
 ) => {
@@ -75,7 +73,7 @@ export const useListClassrooms = (
 
   const result = useQuery<PaginatedHttpResponse<Classroom>>(
     key,
-    () => listClassrooms(session, filters),
+    () => listClassrooms(filters),
     queryOptions
   );
 
@@ -91,10 +89,10 @@ type ShowClassroomFilters = {
   id: string;
 };
 export const showClassroom = (
-  session: Session | null,
-  filters: ShowClassroomFilters
+  filters: ShowClassroomFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
   const { id } = filters;
 
   return api
@@ -103,7 +101,6 @@ export const showClassroom = (
 };
 
 export const useShowClassroom = (
-  session: Session | null,
   filters: ShowClassroomFilters,
   queryOptions: QueryObserverOptions<Classroom> = {}
 ) => {
@@ -114,7 +111,7 @@ export const useShowClassroom = (
 
   const result = useQuery<Classroom>(
     key,
-    () => showClassroom(session, filters),
+    () => showClassroom(filters),
     queryOptions
   );
   return { ...result, key };
@@ -124,10 +121,10 @@ type CountClassroomsResponse = {
   count: number;
 };
 export const countClassrooms = (
-  session: Session | null,
-  params: ListClassroomsFilters = {}
+  params: ListClassroomsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<CountClassroomsResponse>(`/classrooms/count`, { params })
@@ -135,12 +132,9 @@ export const countClassrooms = (
     .catch(() => undefined);
 };
 
-export const useCountClassrooms = (
-  session: Session | null,
-  filters: ListClassroomsFilters = {}
-) => {
+export const useCountClassrooms = (filters: ListClassroomsFilters = {}) => {
   const key = `count-classrooms-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => countClassrooms(session, filters));
+  const result = useQuery(key, () => countClassrooms(filters));
 
   return { ...result, key };
 };

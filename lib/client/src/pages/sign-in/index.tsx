@@ -4,14 +4,14 @@ import SignIn, { SignInProps } from 'templates/SignIn';
 
 import { SystemBackground } from 'models/SystemBackground';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export default function SignInPage(props: SignInProps) {
   return <SignIn {...props} />;
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const api = initializeApi();
+  const api = createUnstableApi();
 
   try {
     const { data: background } = await api.get<SystemBackground>(

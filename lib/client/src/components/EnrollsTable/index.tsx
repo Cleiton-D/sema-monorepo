@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import differenceInYears from 'date-fns/differenceInYears';
 import { Repeat, Edit } from '@styled-icons/feather';
 
@@ -13,6 +12,8 @@ import MoveEnrollModal, {
 } from 'components/MoveEnrollModal';
 
 import { Enroll } from 'models/Enroll';
+
+import { useProfile } from 'requests/queries/session';
 
 import { translateStatus } from 'utils/translateStatus';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
@@ -31,7 +32,8 @@ const EnrollsTable = ({
   enrolls
 }: EnrollsTableProps): JSX.Element => {
   const router = useRouter();
-  const { data: session } = useSession();
+
+  const { data: profile } = useProfile();
 
   const moveEnrollModalRef = useRef<MoveEnrollModalRef>(null);
 
@@ -63,7 +65,7 @@ const EnrollsTable = ({
         <TableColumn label="NIS" tableKey="student.nis" />
         <TableColumn label="Código único" tableKey="student.unique_code" />
 
-        {!session?.schoolId && (
+        {!profile?.school?.id && (
           <TableColumn label="Escola" tableKey="school.name" />
         )}
 

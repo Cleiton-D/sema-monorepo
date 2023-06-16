@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { Employee } from 'models/Employee';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type CountEmployeesResponse = {
   count: number;
@@ -15,18 +14,18 @@ type ListEmployeesFilters = {
 };
 
 export const listEmployees = (
-  session: Session | null,
-  filters: ListEmployeesFilters = {}
+  filters: ListEmployeesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Employee[]>('/employees', { params: filters })
     .then((response) => response.data);
 };
 
-export const employeesCount = (session: Session | null) => {
-  const api = initializeApi(session);
+export const employeesCount = (session?: AppSession) => {
+  const api = createUnstableApi(session);
 
   return api
     .get<CountEmployeesResponse>('/employees/count')
@@ -34,19 +33,16 @@ export const employeesCount = (session: Session | null) => {
     .catch(() => undefined);
 };
 
-export const useListEmployees = (
-  session: Session | null,
-  filters: ListEmployeesFilters = {}
-) => {
+export const useListEmployees = (filters: ListEmployeesFilters = {}) => {
   const key = `list-employees-${JSON.stringify(filters)}`;
 
-  const result = useQuery(key, () => listEmployees(session, filters));
+  const result = useQuery(key, () => listEmployees(filters));
   return { ...result, key };
 };
 
-export const useEmployeesCount = (session: Session | null) => {
+export const useEmployeesCount = () => {
   const key = `count-employees`;
-  const result = useQuery(key, () => employeesCount(session));
+  const result = useQuery(key, () => employeesCount());
 
   return { ...result, key };
 };
@@ -58,25 +54,22 @@ type ShowEmployeeFilters = {
 };
 
 export const showEmployee = (
-  session: Session | null,
-  filters: ShowEmployeeFilters
+  filters: ShowEmployeeFilters,
+  session?: AppSession
 ) => {
   const { employee_id, ...params } = filters;
   if (!employee_id && Object.keys(params).length === 0) return undefined;
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
   return api
     .get<Employee>(`/employees/${employee_id || 'show'}`, { params })
     .then((response) => response.data)
     .catch(() => null);
 };
 
-export const useShowEmployee = (
-  session: Session | null,
-  filters: ShowEmployeeFilters
-) => {
+export const useShowEmployee = (filters: ShowEmployeeFilters) => {
   const key = `show-employee-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => showEmployee(session, filters));
+  const result = useQuery(key, () => showEmployee(filters));
 
   return { ...result, key };
 };

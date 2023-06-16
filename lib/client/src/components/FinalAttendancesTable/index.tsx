@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 
 import { useCountAttendances } from 'requests/queries/attendances';
 import { useListEnrolls } from 'requests/queries/enrolls';
+import { useProfile, useUser } from 'requests/queries/session';
 
 import { AttendanceCount } from 'models/Attendance';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
@@ -19,35 +19,35 @@ const FinalAttendancesTable = ({
   classroomId,
   isMinimal = false
 }: FinalAttendancesTableProps): JSX.Element => {
-  const { data: session } = useSession();
-
-  const { data: enrolls } = useListEnrolls(session, {
+  const { data: enrolls } = useListEnrolls({
     classroom_id: classroomId
   });
 
+  const { data: user } = useUser();
+  const { data: profile } = useProfile();
+
   const { data: classroomTeacherSchoolSubjects } =
     useListClassroomTeacherSchoolSubjects(
-      session,
       {
-        employee_id: session?.user.employeeId,
+        employee_id: user?.employee?.id,
         classroom_id: classroomId,
         is_multidisciplinary: null
       },
-      { enabled: session?.accessLevel?.code === 'teacher' }
+      { enabled: profile?.access_level?.code === 'teacher' }
     );
 
   const attendancesFilter = useMemo(() => {
     const defaultFilter = { classroom_id: classroomId };
-    if (session?.accessLevel?.code !== 'teacher') defaultFilter;
+    if (profile?.access_level?.code !== 'teacher') defaultFilter;
 
     const schoolSubjects = classroomTeacherSchoolSubjects?.map(
       ({ school_subject_id }) => school_subject_id
     );
 
     return { ...defaultFilter, school_subject_id: schoolSubjects };
-  }, [classroomId, classroomTeacherSchoolSubjects, session]);
+  }, [classroomId, classroomTeacherSchoolSubjects, profile]);
 
-  const { data: attendances } = useCountAttendances(session, attendancesFilter);
+  const { data: attendances } = useCountAttendances(attendancesFilter);
 
   const mappedAttendances = useMemo(() => {
     if (!enrolls) return [];

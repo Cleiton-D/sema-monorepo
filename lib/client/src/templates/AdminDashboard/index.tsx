@@ -1,34 +1,28 @@
-import { useSession } from 'next-auth/react';
-
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
 import DatabaseDumpCard from 'components/DatabaseDumpCard';
 
-import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useCountSchools } from 'requests/queries/schools';
 import { useGradesCount } from 'requests/queries/grades';
 import { useEmployeesCount } from 'requests/queries/employee';
 import { useCountSchoolSubjects } from 'requests/queries/school-subjects';
 import { useCountUsers } from 'requests/queries/users';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
 const AdminDashboard = () => {
-  const { data: session } = useSession();
-
-  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
-    id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: schoolsCount } = useCountSchools();
+  const { data: gradesCount } = useGradesCount({
+    school_year_id: schoolYear?.id
   });
-  const { data: schoolsCount } = useCountSchools(session);
-  const { data: gradesCount } = useGradesCount(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: employeesCount } = useEmployeesCount();
+  const { data: schoolSubjectsCount } = useCountSchoolSubjects({
+    school_year_id: schoolYear?.id
   });
-  const { data: employeesCount } = useEmployeesCount(session);
-  const { data: schoolSubjectsCount } = useCountSchoolSubjects(session, {
-    school_year_id: session?.configs.school_year_id
-  });
-  const { data: usersCount } = useCountUsers(session);
+  const { data: usersCount } = useCountUsers();
 
   return (
     <Base>
@@ -56,7 +50,6 @@ const AdminDashboard = () => {
         >
           {usersCount?.count}
         </Card>
-
         <Card
           description="Servidores"
           link="/auth/administration/employees"

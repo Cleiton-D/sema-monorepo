@@ -1,5 +1,4 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 
 import Button from 'components/Button';
@@ -13,6 +12,7 @@ import { useAccess } from 'hooks/AccessProvider';
 import { SchoolTeacher } from 'models/SchoolTeacher';
 
 import { useListSchoolTeachers } from 'requests/queries/school-teachers';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useDeleteSchoolTeacher } from 'requests/mutations/school-teacher';
 
 import * as S from './styles';
@@ -26,14 +26,14 @@ const SchoolTeachersCard = ({ schoolId }: SchoolTeachersCardProps) => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
   const {
     data: schoolTeachers,
     isLoading,
     refetch
-  } = useListSchoolTeachers(session, {
+  } = useListSchoolTeachers({
     school_id: schoolId,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
   const deleteSchoolTeacher = useDeleteSchoolTeacher();
 

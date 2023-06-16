@@ -6,7 +6,6 @@ import {
   forwardRef,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -18,6 +17,7 @@ import { useListSchoolTeachers } from 'requests/queries/school-teachers';
 import { useAddTeacherToSchoolSubjectMutation } from 'requests/mutations/teacher-school-subjects';
 
 import * as S from './styles';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 export type AddTeacherToSchoolSubjectModalRef = {
   openModal: () => void;
@@ -38,11 +38,11 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: schoolTeachers, isLoading } = useListSchoolTeachers(session, {
+  const { data: schoolTeachers, isLoading } = useListSchoolTeachers({
     school_id: schoolId,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   const addTeacherToSchoolSubject =
@@ -59,7 +59,7 @@ const AddTeacherToSchoolSubjectModal: React.ForwardRefRenderFunction<
   }, [schoolTeachers, isLoading]);
 
   const handleSave = useCallback(
-    async ({ employee_id }) => {
+    async ({ employee_id }: any) => {
       setSaving(true);
 
       formRef.current?.setErrors({});

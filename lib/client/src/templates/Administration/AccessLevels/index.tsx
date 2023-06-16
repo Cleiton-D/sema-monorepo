@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { X, PlusCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -48,12 +47,10 @@ const AccessLevels = () => {
   const accessModuleModalRef = useRef<CreateAccessModuleRef>(null);
   const addAccessLevelModal = useRef<AccessLevelModalRef>(null);
 
-  const { data: session } = useSession();
-
-  const { data: accessLevels, refetch } = useListAccessLevels(session);
+  const { data: accessLevels, refetch } = useListAccessLevels();
 
   const mutateAccessModules = useMutateAccessModules();
-  const mutation = useDeleteAccessLevelMutation(session);
+  const mutation = useDeleteAccessLevelMutation();
 
   const handleDelete = async (
     event: React.MouseEvent,

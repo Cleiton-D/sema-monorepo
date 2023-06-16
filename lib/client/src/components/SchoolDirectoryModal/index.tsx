@@ -5,7 +5,6 @@ import {
   useMemo,
   useState
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -52,8 +51,7 @@ const SchoolDirectoryModal: React.ForwardRefRenderFunction<
     modalRef.current?.closeModal();
   };
 
-  const { data: session } = useSession();
-  const { data: employees, isLoading } = useListEmployees(session);
+  const { data: employees, isLoading } = useListEmployees();
   const updateSchool = useUpdateSchool(school, handleBack);
 
   const handleSubmit = async (values: SchoolDirectoryFormData) => {

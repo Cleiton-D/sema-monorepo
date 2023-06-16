@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { useSession, signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -12,12 +11,12 @@ import TextInput from 'components/TextInput';
 
 import { SystemBackground } from 'models/SystemBackground';
 
-import { useApi } from 'services/api';
-
 import { changePasswordSchema } from './rules/schema';
 
 import * as S from './styles';
 import { isUrl } from 'utils/isUrl';
+import { useSession, useUser } from 'requests/queries/session';
+import { unstable__api } from 'services/api';
 
 type ChangePasswordFormData = {
   newPassword: string;
@@ -31,8 +30,7 @@ export type ChangePasswordProps = {
 const ChangePassword = ({ background }: ChangePasswordProps) => {
   const [loading, setLoading] = useState(false);
 
-  const { data: session } = useSession();
-  const api = useApi(session);
+  const { data: user } = useUser();
 
   const formRef = useRef<FormHandles>(null);
   const { push, query } = useRouter();
@@ -44,37 +42,15 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
 
       await changePasswordSchema.validate(values, { abortEarly: false });
 
-      await api.put(`/users/${session?.id}/password`, {
+      await unstable__api.put(`/users/${user?.id}/password`, {
         password: values.newPassword
       });
 
-      const callbackUrl = isUrl((query?.callbackUrl as string) || '')
-        ? query?.callbackUrl
-        : `${window.location.origin}${query?.callbackUrl || '/auth'}`;
-
-      const result = await signIn('refresh', {
-        profileId: session?.profileId,
-        token: session?.jwt,
-        schoolYearId: session?.configs.school_year_id,
-        redirect: false,
-        callbackUrl
+      toast.success('Senha criada com sucesso.', {
+        position: toast.POSITION.TOP_RIGHT
       });
 
-      if (result?.error) {
-        toast.error('Usuário ou senha inválidos!', {
-          position: toast.POSITION.TOP_RIGHT
-        });
-      }
-
-      await getSession({});
-
-      if (result?.url) {
-        toast.success('Senha criada com sucesso.', {
-          position: toast.POSITION.TOP_RIGHT
-        });
-
-        return push(`${query?.callbackUrl || '/auth'}`);
-      }
+      return push(`${query?.callbackUrl || '/auth'}`);
     } catch (err) {
       if (err instanceof ValidationError) {
         const validationErrors: Record<string, string> = {};
@@ -119,14 +95,14 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
               objectFit="cover"
               quality={80}
               sizes="80px"
-              alt={session?.user.name || undefined}
+              alt={user?.username || undefined}
             />
           </S.UserImageContainer>
-          <span>{session?.user.name}</span>
+          <span>{user?.username}</span>
         </S.UserContent>
 
         <span>
-          Olá {session?.user.name}, para acessar o portal você precisa criar uma
+          Olá {user?.username}, para acessar o portal você precisa criar uma
           nova senha!
         </span>
 

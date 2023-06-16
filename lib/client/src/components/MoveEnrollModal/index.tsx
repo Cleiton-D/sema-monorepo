@@ -23,7 +23,6 @@ import { enrollsKeys } from 'requests/queries/enrolls';
 import { useRelocateEnroll, useUpdateEnroll } from 'requests/mutations/enroll';
 
 import * as S from './styles';
-import { now } from 'next-auth/client/_utils';
 
 export type MoveEnrollModalRef = {
   openModal: (enroll: Enroll) => void;

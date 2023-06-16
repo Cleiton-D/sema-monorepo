@@ -5,7 +5,6 @@ import {
   useState,
   useMemo
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -26,6 +25,7 @@ import { getGradeSchoolSubjectSchema } from './rules/schema';
 
 import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
 import { useShowGrade } from 'requests/queries/grades';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -54,14 +54,14 @@ const GradeSchoolSubjectModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: schoolSubjects, isLoading } = useListSchoolsSubjects(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolSubjects, isLoading } = useListSchoolsSubjects({
+    school_year_id: schoolYear?.id
   });
 
-  const { data: grade } = useShowGrade(session, gradeId);
-  const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(session, {
+  const { data: grade } = useShowGrade(gradeId);
+  const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects({
     grade_id: gradeId,
     include_multidisciplinary: true
   });

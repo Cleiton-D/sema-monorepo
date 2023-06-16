@@ -1,20 +1,19 @@
 import { GetServerSidePropsContext } from 'next';
-import { Session } from 'next-auth';
 
 import Classrooms from 'templates/Classrooms';
 
 import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
-import protectedRoutes from 'utils/protected-routes';
 import prefetchQuery from 'utils/prefetch-query';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassroomsPage() {
   return <Classrooms />;
 }
 
-const getData = async (session: Session | null, id: string) => {
-  const school = await getSchool(session, { id });
+const getData = async (id: string, session?: AppSession) => {
+  const school = await getSchool({ id }, session);
 
   const filters = {
     school_id: school.id,
@@ -25,7 +24,7 @@ const getData = async (session: Session | null, id: string) => {
   return prefetchQuery([
     {
       key: classroomsKeys.list(JSON.stringify(filters)),
-      fetcher: () => listClassrooms(session, filters)
+      fetcher: () => listClassrooms(filters, session)
     },
     {
       key: schoolKeys.show(JSON.stringify({ id: id })),
@@ -34,37 +33,39 @@ const getData = async (session: Session | null, id: string) => {
   ]);
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { school_id } = context.params!;
+    if (school_id === 'me') {
+      if (context.req.fullSession?.profile.school?.id) {
+        const dehydratedState = await getData(
+          context.req.fullSession.profile.school.id,
+          context.req.session
+        );
+        return {
+          props: {
+            dehydratedState
+          }
+        };
+      }
 
-  const { school_id } = context.params!;
-  if (school_id === 'me') {
-    if (session?.schoolId) {
-      const dehydratedState = await getData(session, session?.schoolId);
       return {
-        props: {
-          session,
-          dehydratedState
-        }
+        props: {} as any
       };
     }
 
+    const dehydratedState = await getData(
+      school_id as string,
+      context.req.session
+    );
+
     return {
       props: {
-        session
+        dehydratedState
       }
     };
   }
-
-  const dehydratedState = await getData(session, school_id as string);
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+);
 
 ClassroomsPage.auth = {
   module: 'CLASSROOM'

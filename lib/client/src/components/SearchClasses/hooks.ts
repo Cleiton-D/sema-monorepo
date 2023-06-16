@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { SchoolSubject } from 'models/SchoolSubject';
@@ -8,6 +7,9 @@ import { listClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-t
 import { listSchoolSubjects } from 'requests/queries/school-subjects';
 
 type ListClassSchoolSubjectsFilters = {
+  accessLevel?: string;
+  userEmployeeId?: string;
+  isTeacher?: boolean;
   classroom_id?: string;
   school_id?: string;
   employee_id?: string;
@@ -17,11 +19,10 @@ type ListClassSchoolSubjectsFilters = {
 };
 
 const findByTeacherSchoolSubjects = async (
-  session: Session | null,
   filters: ListClassSchoolSubjectsFilters
 ) => {
   const classroomTeacherSchoolSubjects =
-    await listClassroomTeacherSchoolSubjects(session, {
+    await listClassroomTeacherSchoolSubjects({
       classroom_id: filters.classroom_id,
       employee_id: filters.employee_id,
       school_id: filters.school_id,
@@ -44,11 +45,8 @@ const findByTeacherSchoolSubjects = async (
 };
 
 const listSchoolSubjectsToClass = async (
-  session: Session | null,
   filters: ListClassSchoolSubjectsFilters
 ) => {
-  const isTeacher = session?.accessLevel?.code === 'teacher';
-
   let isMultidisciplinary = undefined;
   if (
     filters.is_multidisciplinary !== null &&
@@ -57,8 +55,8 @@ const listSchoolSubjectsToClass = async (
     isMultidisciplinary = Boolean(filters.is_multidisciplinary);
   }
 
-  if (!isTeacher || !filters.employee_id) {
-    return listSchoolSubjects(session, {
+  if (!filters.isTeacher || !filters.employee_id) {
+    return listSchoolSubjects({
       grade_id: filters.grade_id,
       school_year_id: filters.school_year_id,
       include_multidisciplinary: true,
@@ -66,9 +64,9 @@ const listSchoolSubjectsToClass = async (
     });
   }
 
-  return findByTeacherSchoolSubjects(session, {
+  return findByTeacherSchoolSubjects({
     classroom_id: filters.classroom_id,
-    employee_id: session.user.employeeId,
+    employee_id: filters.userEmployeeId,
     school_id: filters.school_id,
     grade_id: filters.grade_id,
     school_year_id: filters.school_year_id,
@@ -77,22 +75,19 @@ const listSchoolSubjectsToClass = async (
 };
 
 export const useListSchoolSubjects = (
-  session: Session | null,
   filters: ListClassSchoolSubjectsFilters
 ) => {
   const key = useMemo(() => {
     const filtersStr = JSON.stringify({
-      lvl: session?.accessLevel?.code,
-      userEmployee: session?.user.employeeId,
+      lvl: filters.accessLevel,
+      userEmployee: filters.userEmployeeId,
       ...filters
     });
 
     return `list-class-school-subjects-${filtersStr}`;
-  }, [session, filters]);
+  }, [filters]);
 
-  const result = useQuery(key, () =>
-    listSchoolSubjectsToClass(session, filters)
-  );
+  const result = useQuery(key, () => listSchoolSubjectsToClass(filters));
 
   return { ...result, key };
 };

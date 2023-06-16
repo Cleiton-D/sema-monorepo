@@ -1,46 +1,55 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { signIn, useSession } from 'next-auth/react';
 
 import { useListUserProfiles } from 'requests/queries/user-profile';
 
 import * as S from './styles';
+import {
+  fetchAllSession,
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
+import { refreshSession } from 'requests/mutations/session';
 
 const ProfileListDropdown = () => {
   const [open, setOpen] = useState(false);
 
   const { push } = useRouter();
-  const { data: session } = useSession();
-  const { data: userProfiles } = useListUserProfiles(session, {
-    user_id: session?.id
+
+  const { data: user } = useUser();
+  const { data: currentProfile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
+
+  const { data: userProfiles } = useListUserProfiles({
+    user_id: user?.id
   });
 
   const selectedProfile = useMemo(() => {
     const selected = userProfiles?.find(
-      (profile) => profile.id === session?.profileId
+      (profile) => profile.id === currentProfile?.id
     );
     return selected;
-  }, [userProfiles, session]);
+  }, [userProfiles, currentProfile]);
 
   const profilesWithoutSelected = useMemo(() => {
-    if (!session?.profileId) return [];
+    if (!currentProfile?.id) return [];
 
-    return userProfiles?.filter((profile) => profile.id !== session.profileId);
-  }, [userProfiles, session]);
+    return userProfiles?.filter((profile) => profile.id !== currentProfile?.id);
+  }, [userProfiles, currentProfile]);
 
   const toggleDropdown = () => {
     setOpen((current) => !current);
   };
 
   const handleClickItem = async (profileId: string) => {
-    await signIn('refresh', {
+    await refreshSession({
       profileId,
-      schoolYearId: session?.configs.school_year_id,
-      token: session?.jwt,
-      redirect: false
+      schoolYearId: schoolYear?.id
     });
-    push('/auth');
+    await fetchAllSession();
 
+    push('/auth');
     setOpen(false);
   };
 
