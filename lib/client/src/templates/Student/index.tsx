@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { Edit, Printer } from '@styled-icons/feather';
 import format from 'date-fns/format';
 
@@ -27,12 +26,8 @@ const StudentPageTemplate = () => {
   const { enableAccess } = useAccess();
 
   const { query } = useRouter();
-  const { data: session } = useSession();
 
-  const { data: enroll } = useGetEnrollDetails(
-    query.enroll_id as string,
-    session
-  );
+  const { data: enroll } = useGetEnrollDetails(query.enroll_id as string);
 
   const canEditEnroll = useMemo(
     () => enableAccess({ module: 'ENROLL', rule: 'WRITE' }),

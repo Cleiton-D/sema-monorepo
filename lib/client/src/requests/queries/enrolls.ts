@@ -1,11 +1,10 @@
-import { Session } from 'next-auth';
+import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 
 import { PaginatedHttpResponse } from 'models/app';
 import { Enroll, EnrollStatus } from 'models/Enroll';
 
-import { initializeApi } from 'services/api';
-import { useMemo } from 'react';
+import { createUnstableApi } from 'services/api';
 
 export type EnrollFilters = {
   classroom_id?: string;
@@ -33,25 +32,22 @@ export const enrollsKeys = {
 };
 
 export const listEnrolls = (
-  session?: Session | null,
-  filters: EnrollFilters = {}
+  filters: EnrollFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<PaginatedHttpResponse<Enroll>>('/enrolls', { params: filters })
     .then((response) => response.data);
 };
 
-export const getEnrollDetails = (
-  enroll_id?: string,
-  session?: Session | null
-) => {
+export const getEnrollDetails = (enroll_id?: string, session?: AppSession) => {
   if (!enroll_id) {
     return undefined;
   }
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const enroll = api
     .get<Enroll>(`/enrolls/${enroll_id}`)
@@ -61,49 +57,40 @@ export const getEnrollDetails = (
 };
 
 export const enrollCount = (
-  session?: Session | null,
-  filters: EnrollFilters = {}
+  filters: EnrollFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
   return api
     .get<CountEnrollsResponse>('/enrolls/count', { params: filters })
     .then((response) => response.data)
     .catch(() => undefined);
 };
 
-export const useListEnrolls = (
-  session?: Session | null,
-  filters: EnrollFilters = {}
-) => {
+export const useListEnrolls = (filters: EnrollFilters = {}) => {
   const key = useMemo(
     () => enrollsKeys.list(JSON.stringify(filters)),
     [filters]
   );
 
-  const result = useQuery(key, () => listEnrolls(session, filters));
+  const result = useQuery(key, () => listEnrolls(filters));
   return { ...result, key };
 };
 
-export const useGetEnrollDetails = (
-  enroll_id?: string,
-  session?: Session | null
-) => {
+export const useGetEnrollDetails = (enroll_id?: string) => {
   const key = useMemo(() => enrollsKeys.show(enroll_id), [enroll_id]);
 
-  const result = useQuery(key, () => getEnrollDetails(enroll_id, session));
+  const result = useQuery(key, () => getEnrollDetails(enroll_id));
 
   return { ...result, key };
 };
 
-export const useEnrollCount = (
-  session?: Session | null,
-  filters: EnrollFilters = {}
-) => {
+export const useEnrollCount = (filters: EnrollFilters = {}) => {
   const key = useMemo(
     () => enrollsKeys.count(JSON.stringify(filters)),
     [filters]
   );
-  const result = useQuery(key, () => enrollCount(session, filters));
+  const result = useQuery(key, () => enrollCount(filters));
 
   return { ...result, key };
 };

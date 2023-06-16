@@ -1,5 +1,4 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import debounce from 'lodash.debounce';
 
 import Table from 'components/Table';
@@ -42,8 +41,7 @@ const AccessModuleTable = ({
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data: accessModules, refetch } = useListAccessModules(session, {
+  const { data: accessModules, refetch } = useListAccessModules({
     access_level_id: accessLevel.id
   });
 

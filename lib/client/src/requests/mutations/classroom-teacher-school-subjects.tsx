@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
@@ -7,7 +6,7 @@ import { ModalRef } from 'components/Modal';
 import { Classroom } from 'models/Classroom';
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type LinkClassroomTeacherSchoolSubjectForm = {
   classroom: Classroom;
@@ -21,11 +20,9 @@ type LinkClassroomTeacherSchoolSubjectForm = {
 export function useLinkClassroomTeacherSchoolSubject(
   modalRef?: React.RefObject<ModalRef>
 ) {
-  const { data: session } = useSession();
-
   const linkClassroomTeacherSchoolSubject = useCallback(
     async (values: LinkClassroomTeacherSchoolSubjectForm) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { classroom, ...requestData } = values;
 
@@ -40,7 +37,7 @@ export function useLinkClassroomTeacherSchoolSubject(
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation(
@@ -62,19 +59,17 @@ type DeleteClassroomTeacherSchoolSubjectProps = {
 };
 
 export function useDeleteClassroomTeacherSchoolSubject() {
-  const { data: session } = useSession();
-
   const deleteClassroomTeacherSchoolSubject = useCallback(
     async ({
       classroomTeacherSchoolSubject
     }: DeleteClassroomTeacherSchoolSubjectProps) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       await api.delete(
         `/classroom-teacher-school-subjects/${classroomTeacherSchoolSubject.id}`
       );
     },
-    [session]
+    []
   );
 
   return useMutation(

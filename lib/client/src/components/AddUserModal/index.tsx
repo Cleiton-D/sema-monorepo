@@ -5,7 +5,6 @@ import {
   useRef
 } from 'react';
 import mergeRef from 'react-merge-refs';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -28,8 +27,7 @@ type AddUserFormData = {
 
 const AddUserModal: ForwardRefRenderFunction<ModalRef> = (_, ref) => {
   const modalRef = useRef<ModalRef>(null);
-  const { data: session } = useSession();
-  const mutation = useAddUserMutation(modalRef, session);
+  const mutation = useAddUserMutation(modalRef);
 
   const formRef = useRef<FormHandles>(null);
 

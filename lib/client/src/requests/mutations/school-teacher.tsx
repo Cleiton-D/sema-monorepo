@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
 
 import { SchoolTeacher } from 'models/SchoolTeacher';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type AddTeacherToSchoolForm = {
   school_id: string;
@@ -17,11 +16,9 @@ type AddTeacherToSchoolForm = {
 export function useAddTeacherToSchoolMutation(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const { data: session } = useSession();
-
   const addTeacherToSchool = useCallback(
     async (values: AddTeacherToSchoolForm) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { school_id, ...data } = values;
 
@@ -32,7 +29,7 @@ export function useAddTeacherToSchoolMutation(
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('add-teacher-to-school', addTeacherToSchool, {
@@ -46,18 +43,16 @@ export function useAddTeacherToSchoolMutation(
 }
 
 export function useDeleteSchoolTeacher() {
-  const { data: session } = useSession();
-
   const deleteSchoolTeacher = useCallback(
     async (schoolTeacher: SchoolTeacher) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { id, school_id } = schoolTeacher;
 
       const response = await api.delete(`/schools/${school_id}/teachers/${id}`);
       return response;
     },
-    [session]
+    []
   );
 
   return useMutation('delete-school-teacher', deleteSchoolTeacher, {

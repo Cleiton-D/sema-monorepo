@@ -1,32 +1,28 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { Employee } from 'models/Employee';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type ListTeachersFilter = {
   school_id?: string;
 };
 
 export const listTeachers = async (
-  session?: Session | null,
-  filters: ListTeachersFilter = {}
+  filters: ListTeachersFilter = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Employee[]>('/teachers', { params: filters })
     .then((response) => response.data);
 };
 
-export const useListTeachers = (
-  session?: Session | null,
-  filters: ListTeachersFilter = {}
-) => {
+export const useListTeachers = (filters: ListTeachersFilter = {}) => {
   const key = `list-teachers-${JSON.stringify(filters)}`;
 
-  const result = useQuery(key, () => listTeachers(session, filters));
+  const result = useQuery(key, () => listTeachers(filters));
 
   return { ...result, key };
 };

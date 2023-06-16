@@ -1,5 +1,4 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 
 import Button from 'components/Button';
@@ -30,12 +29,11 @@ const TeacherSchoolSubjectCard = ({
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
   const {
     data: teacherSchoolSubjects,
     isLoading,
     refetch
-  } = useListTeacherSchoolSubjects(session, {
+  } = useListTeacherSchoolSubjects({
     school_id: schoolId,
     school_subject_id: schoolSubjectId
   });

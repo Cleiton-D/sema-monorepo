@@ -1,4 +1,3 @@
-import { Session } from 'next-auth';
 import { QueryOptions, useQuery } from 'react-query';
 
 import { CompleteSchool, School, SchoolWithEnrollCount } from 'models/School';
@@ -6,7 +5,7 @@ import { EnrollCountResponse } from 'models/Enroll';
 import { ClassroomsCountResponse } from 'models/Classroom';
 import { Multigrade } from 'models/Multigrade';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type GetSchoolFilters = {
   id?: string;
@@ -28,8 +27,8 @@ export const schoolKeys = {
   count: (filters: string) => [...schoolKeys.counts(), { filters }] as const
 };
 
-export const listSchools = (session?: Session | null) => {
-  const api = initializeApi(session);
+export const listSchools = (session?: AppSession) => {
+  const api = createUnstableApi(session);
 
   return api
     .get<SchoolWithEnrollCount[]>('/schools')
@@ -37,10 +36,10 @@ export const listSchools = (session?: Session | null) => {
 };
 
 export const getSchool = (
-  session?: Session | null,
-  filters: GetSchoolFilters = {}
+  filters: GetSchoolFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { id } = filters;
 
@@ -51,12 +50,12 @@ export const getSchool = (
 
 export const getSchoolDetail = async (
   id: string,
-  session?: Session | null,
-  school_year_id?: string
+  school_year_id?: string,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
-  const school = await getSchool(session, { id });
+  const school = await getSchool({ id }, session);
 
   const [enrollsCountResponse, classroomsCountResponse, multigradesResponse] =
     await Promise.all([
@@ -83,8 +82,8 @@ export const getSchoolDetail = async (
   };
 };
 
-export const countSchools = async (session?: Session | null) => {
-  const api = initializeApi(session);
+export const countSchools = async (session?: AppSession) => {
+  const api = createUnstableApi(session);
 
   return api
     .get<CountSchoolsResponse>('/schools/count')
@@ -93,38 +92,28 @@ export const countSchools = async (session?: Session | null) => {
 };
 
 export const useListSchools = (
-  session?: Session | null,
   queryOptions: QueryOptions<SchoolWithEnrollCount[]> = {}
 ) => {
   return useQuery<SchoolWithEnrollCount[]>(
     schoolKeys.list(JSON.stringify({})),
-    () => listSchools(session),
+    () => listSchools(),
     queryOptions
   );
 };
 
-export const useGetSchool = (
-  session?: Session | null,
-  filters: GetSchoolFilters = {}
-) => {
+export const useGetSchool = (filters: GetSchoolFilters = {}) => {
   return useQuery<School>(schoolKeys.show(JSON.stringify(filters)), () =>
-    getSchool(session, filters)
+    getSchool(filters)
   );
 };
 
-export const useGetSchoolDetail = (
-  id: string,
-  session?: Session | null,
-  school_year_id?: string
-) => {
+export const useGetSchoolDetail = (id: string, school_year_id?: string) => {
   return useQuery<CompleteSchool>(
     schoolKeys.detail(JSON.stringify({ id, school_year_id })),
-    () => getSchoolDetail(id, session, school_year_id)
+    () => getSchoolDetail(id, school_year_id)
   );
 };
 
-export const useCountSchools = (session?: Session | null) => {
-  return useQuery(schoolKeys.count(JSON.stringify({})), () =>
-    countSchools(session)
-  );
+export const useCountSchools = () => {
+  return useQuery(schoolKeys.count(JSON.stringify({})), () => countSchools());
 };

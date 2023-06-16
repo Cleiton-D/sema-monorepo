@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { SchoolSubject } from 'models/SchoolSubject';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type ListSchoolSubjectsFilters = {
   grade_id?: string | 'all';
@@ -13,10 +12,10 @@ type ListSchoolSubjectsFilters = {
 };
 
 export const listSchoolSubjects = (
-  session?: Session | null,
-  filters: ListSchoolSubjectsFilters = {}
+  filters: ListSchoolSubjectsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { include_multidisciplinary, is_multidisciplinary, ...restParams } =
     filters;
@@ -38,7 +37,6 @@ export const listSchoolSubjects = (
 };
 
 export const useListSchoolsSubjects = (
-  session?: Session | null,
   filters: ListSchoolSubjectsFilters = {},
   queryOptions: QueryObserverOptions<SchoolSubject[]> = {}
 ) => {
@@ -46,25 +44,25 @@ export const useListSchoolsSubjects = (
 
   const result = useQuery<SchoolSubject[]>(
     key,
-    () => listSchoolSubjects(session, filters),
+    () => listSchoolSubjects(filters),
     queryOptions
   );
 
   return { ...result, key };
 };
 
-export const showSchoolSubject = (session: Session | null, id: string) => {
-  const api = initializeApi(session);
+export const showSchoolSubject = (id: string, session?: AppSession) => {
+  const api = createUnstableApi(session);
 
   return api
     .get<SchoolSubject>(`/education/admin/school-subjects/${id}`)
     .then((response) => response.data);
 };
 
-export const useShowSchoolSubject = (session: Session | null, id: string) => {
+export const useShowSchoolSubject = (id: string) => {
   const key = `show-school-subject-${id}`;
 
-  const result = useQuery(key, () => showSchoolSubject(session, id));
+  const result = useQuery(key, () => showSchoolSubject(id));
   return { ...result, key };
 };
 
@@ -72,10 +70,10 @@ type CountSchoolSubjectsResponse = {
   count: number;
 };
 export const countSchoolSubjects = (
-  session: Session | null,
-  filters: CountSchoolSubjectsFilters = {}
+  filters: CountSchoolSubjectsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<CountSchoolSubjectsResponse>(
@@ -91,11 +89,10 @@ type CountSchoolSubjectsFilters = {
 };
 
 export const useCountSchoolSubjects = (
-  session: Session | null,
   filters: CountSchoolSubjectsFilters = {}
 ) => {
   const key = `count-school-subjects-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => countSchoolSubjects(session, filters));
+  const result = useQuery(key, () => countSchoolSubjects(filters));
 
   return { ...result, key };
 };

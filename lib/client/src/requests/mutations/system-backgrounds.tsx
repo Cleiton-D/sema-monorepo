@@ -1,11 +1,10 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
 import { SystemBackground } from 'models/SystemBackground';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type SetCurrentSystemBackgroundRequestData = {
   system_background_id: string;
@@ -13,11 +12,9 @@ type SetCurrentSystemBackgroundRequestData = {
 };
 
 export function useChangeCurrentSystemBackgroundMutation() {
-  const { data: session } = useSession();
-
   const changeCurrentSystemBackground = useCallback(
     async (values: SetCurrentSystemBackgroundRequestData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background`;
       const { data: responseData } = await api.patch<SystemBackground>(
@@ -27,7 +24,7 @@ export function useChangeCurrentSystemBackgroundMutation() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation(
@@ -47,11 +44,9 @@ type CreateCurrentSystemBackgroundRequestData = {
   image: File;
 };
 export function useCreateCurrentSystemBackgroundMutation() {
-  const { data: session } = useSession();
-
   const createCurrentSystemBackground = useCallback(
     async (values: CreateCurrentSystemBackgroundRequestData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
@@ -67,7 +62,7 @@ export function useCreateCurrentSystemBackgroundMutation() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation(
@@ -84,17 +79,12 @@ export function useCreateCurrentSystemBackgroundMutation() {
 }
 
 export function useDeleteSystemBackgroundMutation() {
-  const { data: session } = useSession();
+  const deleteSystemBackground = useCallback(({ id }: SystemBackground) => {
+    const api = createUnstableApi();
 
-  const deleteSystemBackground = useCallback(
-    ({ id }: SystemBackground) => {
-      const api = initializeApi(session);
-
-      const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background/${id}`;
-      return api.delete(url);
-    },
-    [session]
-  );
+    const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/background/${id}`;
+    return api.delete(url);
+  }, []);
 
   return useMutation('delete-system-background', deleteSystemBackground, {
     renderLoading: function render() {

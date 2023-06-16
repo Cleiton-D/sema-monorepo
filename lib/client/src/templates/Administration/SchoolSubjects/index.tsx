@@ -1,5 +1,4 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, Edit, X } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -20,13 +19,14 @@ import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useDeleteSchoolSubjectMutation } from 'requests/mutations/school-subjects';
 
 import * as S from './styles';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 const SchoolSubjects = () => {
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data: schoolSubjects, refetch } = useListSchoolsSubjects(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: schoolSubjects, refetch } = useListSchoolsSubjects({
+    school_year_id: schoolYear?.id
   });
 
   const modalRef = useRef<SchoolSubjectModalRef>(null);
@@ -34,7 +34,7 @@ const SchoolSubjects = () => {
     modalRef.current?.openModal();
   };
 
-  const mutation = useDeleteSchoolSubjectMutation(session);
+  const mutation = useDeleteSchoolSubjectMutation();
   const handleDelete = async (schoolSubject: SchoolSubject) => {
     const confirmation = window.confirm(
       `Deseja excluir a disciplina ${schoolSubject.description}?`

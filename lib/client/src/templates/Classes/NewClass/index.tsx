@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -17,6 +16,11 @@ import { useListTimetables } from 'requests/queries/timetables';
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { useListClassPeriods } from 'requests/queries/class-periods';
 import { useShowSchoolTermPeriod } from 'requests/queries/school-term-periods';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 import { useCreateClass } from 'requests/mutations/classes';
 
 import { useListSchoolSubjects } from 'components/SearchClasses/hooks';
@@ -55,40 +59,43 @@ const NewClass = () => {
   const [selectedClassroom, setSelectedClassroom] = useState<string>();
 
   const { push } = useRouter();
-  const { data: session } = useSession();
 
-  const { data: timetables } = useListTimetables(session, {
-    school_id: session?.schoolId,
-    employee_id: session?.user.employeeId,
+  const { data: user } = useUser();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
+
+  const { data: timetables } = useListTimetables({
+    school_id: profile?.school?.id,
+    employee_id: user?.employee?.id,
     day_of_week: dayOfWeek
   });
 
   const { data: schoolSubjects, isLoading: isLoadingSchoolSubjects } =
-    useListSchoolSubjects(session, {
+    useListSchoolSubjects({
       classroom_id: selectedClassroom,
-      school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id
+      school_id: profile?.school?.id,
+      school_year_id: schoolYear?.id,
+      userEmployeeId: user?.employee?.id,
+      accessLevel: profile?.access_level?.code,
+      isTeacher: profile?.access_level?.code === 'teacher'
     });
 
-  const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms(
-    session,
-    {
-      school_id: session?.schoolId,
-      employee_id: session?.user.employeeId,
-      school_year_id: session?.configs.school_year_id,
-      with_in_multigrades: false,
-      with_multigrades: true
-    }
-  );
+  const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms({
+    school_id: profile?.school?.id,
+    employee_id: user?.employee?.id,
+    school_year_id: schoolYear?.id,
+    with_in_multigrades: false,
+    with_multigrades: true
+  });
 
   const { data: classPeriods, isLoading: loadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_id: profile?.school?.id,
+      school_year_id: schoolYear?.id
     });
 
-  const { data: schoolTermPeriod } = useShowSchoolTermPeriod(session, {
-    school_year_id: session?.configs.school_year_id,
+  const { data: schoolTermPeriod } = useShowSchoolTermPeriod({
+    school_year_id: schoolYear?.id,
     contain_date: selectedDay,
     status: 'ACTIVE'
   });

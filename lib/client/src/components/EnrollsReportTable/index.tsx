@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
 
 import { Enroll } from 'models/Enroll';
+
+import { useProfile } from 'requests/queries/session';
 
 import { translateStatus } from 'utils/translateStatus';
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
@@ -20,7 +21,7 @@ const EnrollsReportTable = ({
   enrolls,
   subTable
 }: EnrollsReportTableProps): JSX.Element => {
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
 
   return (
     <Table<Enroll> items={enrolls || []} keyExtractor={(value) => value.id}>
@@ -30,7 +31,7 @@ const EnrollsReportTable = ({
 
       <TableColumn label="NIS" tableKey="student.nis" />
 
-      {!session?.schoolId && (
+      {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
 

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import { getSession, signIn } from 'next-auth/react';
 import { ValidationError } from 'yup';
 import { FormHandles } from '@unform/core';
 import { toast } from 'react-toastify';
@@ -11,12 +10,16 @@ import Button from 'components/Button';
 
 import { SystemBackground } from 'models/SystemBackground';
 
+import { fetchAllSession } from 'requests/queries/session';
+import { createSession } from 'requests/mutations/session';
+
+import { isUrl } from 'utils/isUrl';
+
 import { signInSchema } from './rules/schema';
 
 import Image from 'next/image';
 
 import * as S from './styles';
-import { isUrl } from 'utils/isUrl';
 
 export type SigninFormData = {
   email: string;
@@ -43,30 +46,24 @@ const SignIn = ({ background }: SignInProps) => {
         abortEarly: false
       });
 
-      const callbackUrl = isUrl((query?.callbackUrl as string) || '')
-        ? query?.callbackUrl
-        : `${window.location.origin}${query?.callbackUrl || '/auth'}`;
-      const result = await signIn('credentials', {
-        ...values,
-        redirect: false,
-        callbackUrl
-      });
+      const queryCallbackUrl = (query?.callbackUrl as string) || '';
 
-      if (result?.error) {
-        toast.error('Usuário ou senha inválidos!', {
-          position: toast.POSITION.TOP_RIGHT
-        });
+      const callbackUrl = isUrl(queryCallbackUrl)
+        ? queryCallbackUrl
+        : `${window.location.origin}${queryCallbackUrl || '/auth'}`;
+
+      await createSession({ ...values });
+      const [user] = await fetchAllSession();
+
+      if (!user) {
+        throw new Error('user not found');
       }
 
-      const session = await getSession({});
-
-      if (session?.user.changePassword) {
+      if (user.change_password) {
         return push(`/auth/change-password?callbackUrl=${callbackUrl}`);
       }
 
-      if (result?.url) {
-        return push(result.url);
-      }
+      return push(callbackUrl);
     } catch (err) {
       if (err instanceof ValidationError) {
         const validationError: Record<string, string> = {};

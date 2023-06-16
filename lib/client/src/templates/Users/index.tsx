@@ -1,5 +1,4 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, PlusSquare, X, Unlock } from '@styled-icons/feather';
 import { useQuery } from 'react-query';
 
@@ -33,12 +32,11 @@ const Users = () => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data } = useQuery<FormattedUser[]>('get-users', () =>
-    listUsers(session)
+  const { data: users } = useQuery<FormattedUser[]>('get-users', () =>
+    listUsers()
   );
-  const mutation = useDeleteUserMutation(session);
-  const resetPass = useResetPassword(session);
+  const mutation = useDeleteUserMutation();
+  const resetPass = useResetPassword();
 
   const handleOpenModal = () => {
     modalRef.current?.openModal();
@@ -91,7 +89,7 @@ const Users = () => {
         </S.SectionTitle>
 
         <Table<FormattedUser>
-          items={data || []}
+          items={users || []}
           keyExtractor={(value) => value.id}
         >
           <TableColumn label="Nome" tableKey="username">

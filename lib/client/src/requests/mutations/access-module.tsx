@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
@@ -7,7 +6,7 @@ import ToastContent from 'components/ToastContent';
 import { AccessModule } from 'models/AccessModule';
 import { AccessLevel } from 'models/AccessLevel';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type MutateAcessModulesFormData = Array<{
   access_level_id: string;
@@ -54,8 +53,6 @@ const queryMutateAccessModule = (
 };
 
 export function useMutateAccessModules(accessLevel?: AccessLevel) {
-  const { data: session } = useSession();
-
   const queryFilter = useMemo(
     () => ({ access_level_id: accessLevel?.id }),
     [accessLevel]
@@ -63,7 +60,7 @@ export function useMutateAccessModules(accessLevel?: AccessLevel) {
 
   const mutateAcessModules = useCallback(
     async (values: MutateAcessModulesFormData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const requestData = values.map(
         ({ access_level_id, module_id, read, write }) => ({
@@ -81,7 +78,7 @@ export function useMutateAccessModules(accessLevel?: AccessLevel) {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('mutate-access-modules', mutateAcessModules, {
@@ -98,16 +95,11 @@ export function useMutateAccessModules(accessLevel?: AccessLevel) {
 }
 
 export function useDeleteAccessModule() {
-  const { data: session } = useSession();
+  const deleteAcessModule = useCallback(async (accessModule: AccessModule) => {
+    const api = createUnstableApi();
 
-  const deleteAcessModule = useCallback(
-    async (accessModule: AccessModule) => {
-      const api = initializeApi(session);
-
-      await api.delete(`/app/access-modules/${accessModule.id}`);
-    },
-    [session]
-  );
+    await api.delete(`/app/access-modules/${accessModule.id}`);
+  }, []);
 
   return useMutation('delete-access-module', deleteAcessModule, {
     renderLoading: function render() {

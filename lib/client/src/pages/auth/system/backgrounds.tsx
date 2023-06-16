@@ -1,21 +1,11 @@
-import { GetServerSidePropsContext } from 'next';
-
 import BackgroundsTemplate from 'templates/Backgrounds';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function Backgrounds() {
   return <BackgroundsTemplate />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
-
-  return {
-    props: {
-      session
-    }
-  };
-}
+export const getServerSideProps = withProtectedRoute();
 
 export default Backgrounds;

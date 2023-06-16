@@ -6,6 +6,7 @@ import Modal, { ModalRef } from 'components/Modal';
 import Button from 'components/Button';
 import TextInput from 'components/TextInput';
 
+import { useUser } from 'requests/queries/session';
 import { useFinishSchoolYear } from 'requests/mutations/finish-school-year';
 
 import * as S from './styles';
@@ -24,6 +25,8 @@ const FinishSchoolYearConfirmationModal: React.ForwardRefRenderFunction<
 > = ({ schoolYear }, ref) => {
   const modalRef = useRef<ModalRef>(null);
 
+  const { data: user } = useUser();
+
   const finishSchoolYear = useFinishSchoolYear();
 
   const openModal = () => {
@@ -39,6 +42,7 @@ const FinishSchoolYearConfirmationModal: React.ForwardRefRenderFunction<
     finishSchoolYear
       .mutateAsync({
         schoolYearId: schoolYear.id,
+        login: user?.login,
         password: values.passwd
       })
       .then(() => document.location.reload());

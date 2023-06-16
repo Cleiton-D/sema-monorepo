@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,12 +9,8 @@ import { withAccessComponent } from 'hooks/AccessProvider';
 
 import { getDatabaseDump } from 'requests/queries/database';
 
-import { downloadFile } from 'utils/downloadFile';
-
 const DatabaseDumpCard = () => {
   const [loading, setLoading] = useState(false);
-
-  const { data: session } = useSession();
 
   const handleGetDump = async () => {
     if (loading) return;
@@ -36,7 +31,7 @@ const DatabaseDumpCard = () => {
         }
       );
 
-      await getDatabaseDump(session);
+      await getDatabaseDump();
 
       toast.dismiss(toastKey);
     } catch (err) {

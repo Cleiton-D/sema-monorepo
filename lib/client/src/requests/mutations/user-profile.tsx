@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type CreateUserProfileForm = {
   user_id: string;
@@ -21,17 +20,15 @@ type DeleteUserProfileData = {
 };
 
 export function useCreateUserProfile() {
-  const { data: session } = useSession();
-
   const createUserProfile = useCallback(
     async (values: CreateUserProfileForm) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { data: responseData } = await api.post(`/user-profiles`, values);
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('create-user-profile', createUserProfile, {
@@ -49,11 +46,9 @@ type DeleteUserProfileOptions = {
 export function useDeleteUserProfile({
   showToasts = true
 }: DeleteUserProfileOptions = {}) {
-  const { data: session } = useSession();
-
   const deleteUserProfile = useCallback(
     async (values: DeleteUserProfileData) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { id, ...data } = values;
       if (id) return api.delete(`/user-profiles/${id}`);
@@ -62,7 +57,7 @@ export function useDeleteUserProfile({
         data
       });
     },
-    [session]
+    []
   );
 
   return useMutation('create-user-profile', deleteUserProfile, {

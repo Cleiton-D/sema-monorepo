@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 import { useUpdateAtom, RESET } from 'jotai/utils';
 
@@ -20,8 +19,6 @@ const OldStudentForm = () => {
 
   const setStudentData = useUpdateAtom(createEnrollData);
   const setSelectedStudent = useUpdateAtom(selectedStudent);
-
-  const { data: session } = useSession();
 
   const handleOldStudent = (value: boolean) => {
     setOldStudent(value);
@@ -52,7 +49,7 @@ const OldStudentForm = () => {
         return;
       }
 
-      const student = await getStudent(session, studentId);
+      const student = await getStudent(studentId);
 
       const { contacts = [], birth_date, ...newStudent } = student;
 
@@ -78,7 +75,7 @@ const OldStudentForm = () => {
 
       setSelectedStudent(student);
     },
-    [session, setStudentData, setSelectedStudent]
+    [setStudentData, setSelectedStudent]
   );
 
   return (
@@ -97,7 +94,7 @@ const OldStudentForm = () => {
             <AutocompleteField
               label="Pesquisar aluno"
               name="name"
-              queryFn={(filters) => listStudents(session, filters)}
+              queryFn={listStudents}
               labelPath="name"
               searchBy={['name', 'cpf', 'rg']}
               valuePath="id"

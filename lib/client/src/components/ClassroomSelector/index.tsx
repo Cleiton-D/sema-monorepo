@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Select, { Option } from 'components/Select';
 
@@ -24,12 +23,7 @@ const ClassroomSelector = ({
   searchParams,
   exceptId
 }: ClassroomSelectorProps) => {
-  const { data: session } = useSession();
-
-  const { data: classrooms, isLoading } = useListClassrooms(
-    session,
-    searchParams
-  );
+  const { data: classrooms, isLoading } = useListClassrooms(searchParams);
 
   const classroomsOptions = useMemo(() => {
     if (isLoading) return [{ label: 'Carregando...', value: '' }];

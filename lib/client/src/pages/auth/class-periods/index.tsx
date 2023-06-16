@@ -1,33 +1,34 @@
 import { GetServerSidePropsContext } from 'next';
 
-import protectedRoutes from 'utils/protected-routes';
-
 import ClassPeriods from 'templates/ClassPeriods';
 import prefetchQuery from 'utils/prefetch-query';
 import { listClassPeriods } from 'requests/queries/class-periods';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassPeriodsPage() {
   return <ClassPeriods />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const dehydratedState = await prefetchQuery({
+      key: 'get-class-periods',
+      fetcher: () =>
+        listClassPeriods(
+          {
+            school_year_id: context.req.fullSession?.schoolYear.id
+          },
+          context.req.session
+        )
+    });
 
-  const dehydratedState = await prefetchQuery({
-    key: 'get-class-periods',
-    fetcher: () =>
-      listClassPeriods(session, {
-        school_year_id: session?.configs.school_year_id
-      })
-  });
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 ClassPeriodsPage.auth = {
   module: 'MUNICIPAL_SECRETARY'

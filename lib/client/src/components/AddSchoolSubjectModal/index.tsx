@@ -6,7 +6,6 @@ import {
   useState,
   useImperativeHandle
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
 
@@ -22,6 +21,7 @@ import { addSchoolSubjectSchema } from './rules/schema';
 
 import * as S from './styles';
 import Checkbox from 'components/Checkbox';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 export type SchoolSubjectModalRef = {
   openModal: (schoolSubject?: SchoolSubject) => void;
@@ -43,9 +43,10 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
   const [isMultidisciplinary, setIsMultidisciplinary] = useState(false);
   const [schoolSubject, setSchoolSubject] = useState<SchoolSubject>();
 
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const modalRef = useRef<ModalRef>(null);
-  const { data: session } = useSession();
-  const mutation = useAddSchoolSubjectMutation(modalRef, session);
+  const mutation = useAddSchoolSubjectMutation(modalRef);
 
   const formRef = useRef<FormHandles>(null);
 
@@ -59,7 +60,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
         await mutation.mutateAsync({
           id: schoolSubject?.id,
           is_multidisciplinary: isMultidisciplinary,
-          school_year_id: session?.configs.school_year_id,
+          school_year_id: schoolYear?.id,
           ...values
         });
         refetchFn && refetchFn();
@@ -77,7 +78,7 @@ const AddSchoolSubjectModal: ForwardRefRenderFunction<
         }
       }
     },
-    [mutation, schoolSubject, isMultidisciplinary, refetchFn, session]
+    [mutation, schoolSubject, isMultidisciplinary, refetchFn, schoolYear]
   );
 
   const handleBack = useCallback(() => {

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
@@ -8,6 +7,7 @@ import TableColumn from 'components/TableColumn';
 import { Classroom } from 'models/Classroom';
 
 import { useListMultigradeClassrooms } from 'requests/queries/multigrade-classrooms';
+import { useProfile } from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -20,14 +20,11 @@ type ClassroomsTableProps = {
 export const MultigradeClassroomsTable = ({
   multigradeId
 }: ClassroomsTableProps) => {
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
 
-  const { data: multigradeClassrooms = [] } = useListMultigradeClassrooms(
-    session,
-    {
-      multigrade_id: multigradeId
-    }
-  );
+  const { data: multigradeClassrooms = [] } = useListMultigradeClassrooms({
+    multigrade_id: multigradeId
+  });
 
   const classrooms = useMemo(
     () => multigradeClassrooms.map(({ classroom }) => classroom),
@@ -37,7 +34,7 @@ export const MultigradeClassroomsTable = ({
   return (
     <Table items={classrooms} keyExtractor={(value) => value.id} minimal>
       <TableColumn tableKey="description" label="Turma" />
-      {!session?.schoolId && (
+      {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
 

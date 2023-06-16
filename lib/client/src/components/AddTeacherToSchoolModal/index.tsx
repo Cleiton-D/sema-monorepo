@@ -6,7 +6,6 @@ import {
   forwardRef,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 
@@ -15,6 +14,7 @@ import Modal, { ModalRef } from 'components/Modal';
 import Select from 'components/Select';
 
 import { useListEmployees } from 'requests/queries/employee';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useAddTeacherToSchoolMutation } from 'requests/mutations/school-teacher';
 
 import * as S from './styles';
@@ -34,11 +34,12 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
 > = ({ schoolId, refetchFn }, ref) => {
   const [saving, setSaving] = useState(false);
 
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
-  const { data: employees, isLoading } = useListEmployees(session);
+  const { data: employees, isLoading } = useListEmployees();
 
   const addTeacherToSchool = useAddTeacherToSchoolMutation(modalRef);
 
@@ -53,7 +54,7 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
   }, [employees, isLoading]);
 
   const handleSave = useCallback(
-    async ({ employee_id }) => {
+    async ({ employee_id }: any) => {
       setSaving(true);
 
       formRef.current?.setErrors({});
@@ -72,13 +73,13 @@ const AddTeacherToSchoolModal: React.ForwardRefRenderFunction<
       await addTeacherToSchool.mutateAsync({
         employee_id,
         school_id: schoolId,
-        school_year_id: session?.configs.school_year_id
+        school_year_id: schoolYear?.id
       });
       refetchFn();
 
       setSaving(false);
     },
-    [addTeacherToSchool, session, schoolId, refetchFn]
+    [addTeacherToSchool, schoolYear, schoolId, refetchFn]
   );
 
   const handleBack = () => {

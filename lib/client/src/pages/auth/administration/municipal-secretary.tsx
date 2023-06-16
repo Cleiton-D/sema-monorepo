@@ -5,65 +5,76 @@ import MunicipalSecretary from 'templates/Administration/MunicipalSecretary';
 import { showBranch } from 'requests/queries/branch';
 
 import prefetchQuery from 'utils/prefetch-query';
-import protectedRoutes from 'utils/protected-routes';
 import { listEmployees, showEmployee } from 'requests/queries/employee';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function MunicipalSecretaryPage() {
   return <MunicipalSecretary />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const branch = await showBranch(
+      { type: 'MUNICIPAL_SECRETARY' },
+      context.req.session
+    );
 
-  const branch = await showBranch(session, { type: 'MUNICIPAL_SECRETARY' });
-
-  const dehydratedState = await prefetchQuery([
-    {
-      key: `show-branch-${JSON.stringify({ type: 'MUNICIPAL_SECRETARY' })}`,
-      fetcher: () => branch
-    },
-    {
-      key: `show-employee-${JSON.stringify({
-        branch_id: branch?.id,
-        accessCode: 'municipal-secretary'
-      })}`,
-      fetcher: () =>
-        showEmployee(session, {
+    const dehydratedState = await prefetchQuery([
+      {
+        key: `show-branch-${JSON.stringify({ type: 'MUNICIPAL_SECRETARY' })}`,
+        fetcher: () => branch
+      },
+      {
+        key: `show-employee-${JSON.stringify({
           branch_id: branch?.id,
           accessCode: 'municipal-secretary'
-        })
-    },
-    {
-      key: `list-employees-${JSON.stringify({
-        accessCode: 'pedagogical-coordination',
-        branch_id: branch?.id
-      })}`,
-      fetcher: () =>
-        listEmployees(session, {
+        })}`,
+        fetcher: () =>
+          showEmployee(
+            {
+              branch_id: branch?.id,
+              accessCode: 'municipal-secretary'
+            },
+            context.req.session
+          )
+      },
+      {
+        key: `list-employees-${JSON.stringify({
           accessCode: 'pedagogical-coordination',
           branch_id: branch?.id
-        })
-    },
-    {
-      key: `list-employees-${JSON.stringify({
-        accessCode: 'bookkeeping',
-        branch_id: branch?.id
-      })}`,
-      fetcher: () =>
-        listEmployees(session, {
+        })}`,
+        fetcher: () =>
+          listEmployees(
+            {
+              accessCode: 'pedagogical-coordination',
+              branch_id: branch?.id
+            },
+            context.req.session
+          )
+      },
+      {
+        key: `list-employees-${JSON.stringify({
           accessCode: 'bookkeeping',
           branch_id: branch?.id
-        })
-    }
-  ]);
+        })}`,
+        fetcher: () =>
+          listEmployees(
+            {
+              accessCode: 'bookkeeping',
+              branch_id: branch?.id
+            },
+            context.req.session
+          )
+      }
+    ]);
 
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 MunicipalSecretaryPage.auth = {
   module: 'MUNICIPAL_SECRETARY'

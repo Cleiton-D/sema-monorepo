@@ -1,10 +1,9 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { DayOfWeek } from 'models/DafOfWeek';
 import { Timetable } from 'models/Timetable';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type ListTimetablesRequest = {
   employee_id?: string;
@@ -17,10 +16,10 @@ type ListTimetablesRequest = {
 };
 
 export const listTimetables = (
-  session: Session | null,
-  params: ListTimetablesRequest
+  params: ListTimetablesRequest,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Timetable[]>(`/timetables`, {
@@ -29,12 +28,9 @@ export const listTimetables = (
     .then((response) => response.data);
 };
 
-export const useListTimetables = (
-  session: Session | null,
-  filters: ListTimetablesRequest
-) => {
+export const useListTimetables = (filters: ListTimetablesRequest) => {
   const key = ['timetables', 'list', JSON.stringify(filters)];
-  const result = useQuery(key, () => listTimetables(session, filters));
+  const result = useQuery(key, () => listTimetables(filters));
 
   return { ...result, key };
 };
@@ -54,10 +50,10 @@ type ValidateTimetableResponse = {
 };
 
 export const validateTimetable = (
-  session: Session | null,
-  params: ValidateTimetableRequest
+  params: ValidateTimetableRequest,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<ValidateTimetableResponse>(`/timetables/validate`, {

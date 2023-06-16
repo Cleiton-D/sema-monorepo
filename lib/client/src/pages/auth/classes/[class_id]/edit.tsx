@@ -13,54 +13,58 @@ import {
 } from 'requests/queries/enroll-classrooms';
 
 import prefetchQuery from 'utils/prefetch-query';
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EditClassPage() {
   return <EditClassTemplate />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { class_id } = context.params!;
 
-  const { class_id } = context.params!;
+    const classEntity = await showClass(
+      class_id as string,
+      context.req.session
+    );
 
-  const classEntity = await showClass(session, class_id as string);
+    const attendancesFilter: ListAttendancesByClassesFilters = {
+      classroom_id: classEntity?.classroom_id,
+      school_subject_id: classEntity?.school_subject_id,
+      limit: 6,
+      sortBy: 'date_start',
+      order: 'DESC',
+      before: classEntity?.id
+    };
 
-  const attendancesFilter: ListAttendancesByClassesFilters = {
-    classroom_id: classEntity?.classroom_id,
-    school_subject_id: classEntity?.school_subject_id,
-    limit: 6,
-    sortBy: 'date_start',
-    order: 'DESC',
-    before: classEntity?.id
-  };
+    const listEnrollsFilter = {
+      classroom_id: classEntity?.classroom_id
+    };
 
-  const listEnrollsFilter = {
-    classroom_id: classEntity?.classroom_id
-  };
+    const dehydratedState = await prefetchQuery([
+      {
+        key: classesKeys.show(JSON.stringify({ id: class_id })),
+        fetcher: () => classEntity
+      },
+      {
+        key: `list-attendances-by-classes-${JSON.stringify(attendancesFilter)}`,
+        fetcher: () =>
+          listAttendancesByClasses(attendancesFilter, context.req.session)
+      },
+      {
+        key: enrollClassroomsKeys.list(JSON.stringify(listEnrollsFilter)),
+        fetcher: () =>
+          listEnrollClassrooms(listEnrollsFilter, context.req.session)
+      }
+    ]);
 
-  const dehydratedState = await prefetchQuery([
-    {
-      key: classesKeys.show(JSON.stringify({ id: class_id })),
-      fetcher: () => classEntity
-    },
-    {
-      key: `list-attendances-by-classes-${JSON.stringify(attendancesFilter)}`,
-      fetcher: () => listAttendancesByClasses(session, attendancesFilter)
-    },
-    {
-      key: enrollClassroomsKeys.list(JSON.stringify(listEnrollsFilter)),
-      fetcher: () => listEnrollClassrooms(session, listEnrollsFilter)
-    }
-  ]);
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 EditClassPage.auth = {
   module: 'CLASS',

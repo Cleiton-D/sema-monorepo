@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import format from 'date-fns/format';
 
 import Table from 'components/Table';
@@ -31,9 +30,7 @@ const AttendancesReportTable = ({
   classroom,
   schoolTermPeriod
 }: AttendancesReportTableProps) => {
-  const { data: session } = useSession();
-
-  const { data: enrollClassrooms } = useListEnrollClassrooms(session, {
+  const { data: enrollClassrooms } = useListEnrollClassrooms({
     classroom_id: classroom.id
   });
 
@@ -57,7 +54,6 @@ const AttendancesReportTable = ({
   }, [classroom, schoolTermPeriod?.school_term, schoolSubjectId]);
 
   const { data: { classes, attendances } = {} } = useListAttendancesByClasses(
-    session,
     listAttendancesFilters,
     { enabled: enabledListAttendances }
   );

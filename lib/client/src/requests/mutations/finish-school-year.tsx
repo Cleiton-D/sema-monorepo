@@ -1,28 +1,26 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
 import { SchoolYear } from 'models/SchoolYear';
 
 import ToastContent from 'components/ToastContent';
 
-import { useApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 type FinishSchoolYearParams = {
   schoolYearId: string;
+  login: string;
   password: string;
 };
 
 export const useFinishSchoolYear = () => {
-  const { data: session } = useSession();
-
-  const api = useApi(session);
-
   const finishSchoolYear = useCallback(
-    async ({ password, schoolYearId }: FinishSchoolYearParams) => {
+    async ({ login, password, schoolYearId }: FinishSchoolYearParams) => {
+      const api = createUnstableApi();
+
       const { data: response } = await api
         .post(`/sessions`, {
-          login: session?.user.email,
+          login,
           password
         })
         .catch((err) => {
@@ -48,7 +46,7 @@ export const useFinishSchoolYear = () => {
         .then((res) => res.data)
         .catch(() => toast.error('Ocorreu um erro ao encerrar o ano letivo.'));
     },
-    [api, session]
+    []
   );
 
   return useMutation('finish-school-year', finishSchoolYear, {

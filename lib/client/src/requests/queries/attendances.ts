@@ -1,4 +1,3 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import {
@@ -8,7 +7,7 @@ import {
 } from 'models/Attendance';
 import { SchoolTerm } from 'models/SchoolTerm';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type ListAttendancesFilters = {
   class_id?: string | string[];
@@ -18,10 +17,10 @@ type ListAttendancesFilters = {
 };
 
 export const listAttendances = (
-  session: Session | null,
-  params: ListAttendancesFilters = {}
+  params: ListAttendancesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { attendance } = params;
   if (typeof attendance !== 'undefined' && attendance !== null) {
@@ -51,10 +50,10 @@ export type ListAttendancesByClassesFilters = {
 };
 
 export const listAttendancesByClasses = (
-  session: Session | null,
-  params: ListAttendancesByClassesFilters = {}
+  params: ListAttendancesByClassesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<ListAttendancesByClassResponseDTO>(`/attendances/by-classes`, {
@@ -64,14 +63,13 @@ export const listAttendancesByClasses = (
 };
 
 export const useListAttendances = (
-  session: Session | null,
   filters: ListAttendancesFilters = {},
   queryOptions?: QueryObserverOptions<Attendance[]>
 ) => {
   const key = `list-attendances-${JSON.stringify(filters)}`;
   const result = useQuery<Attendance[]>(
     key,
-    () => listAttendances(session, filters),
+    () => listAttendances(filters),
     queryOptions
   );
 
@@ -79,14 +77,13 @@ export const useListAttendances = (
 };
 
 export const useListAttendancesByClasses = (
-  session: Session | null,
   filters: ListAttendancesByClassesFilters = {},
   queryOptions?: QueryObserverOptions<ListAttendancesByClassResponseDTO>
 ) => {
   const key = `list-attendances-by-classes-${JSON.stringify(filters)}`;
   const result = useQuery<ListAttendancesByClassResponseDTO>(
     key,
-    () => listAttendancesByClasses(session, filters),
+    () => listAttendancesByClasses(filters),
     queryOptions
   );
 
@@ -104,10 +101,10 @@ type CountAttendancesFilters = {
 };
 
 export const countAttendances = (
-  session: Session | null,
-  filters: CountAttendancesFilters = {}
+  filters: CountAttendancesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const {
     attendance,
@@ -132,12 +129,9 @@ export const countAttendances = (
     .then((response) => response.data);
 };
 
-export const useCountAttendances = (
-  session: Session | null,
-  filters: CountAttendancesFilters = {}
-) => {
+export const useCountAttendances = (filters: CountAttendancesFilters = {}) => {
   const key = `count-attendances-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => countAttendances(session, filters));
+  const result = useQuery(key, () => countAttendances(filters));
 
   return { ...result, key };
 };

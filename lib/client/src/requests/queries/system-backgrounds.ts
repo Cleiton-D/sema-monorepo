@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { SystemBackground } from 'models/SystemBackground';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export const systemBackgroundKeys = {
   all: 'system-backgrounds' as const,
@@ -13,8 +12,8 @@ export const systemBackgroundKeys = {
   show: (filters: string) => [...systemBackgroundKeys.shows(), { filters }]
 };
 
-export const listSystemBackgrounds = (session: Session | null) => {
-  const api = initializeApi(session);
+export const listSystemBackgrounds = (session?: AppSession) => {
+  const api = createUnstableApi(session);
 
   return api
     .get<SystemBackground[]>(`/admin/background`)
@@ -22,7 +21,7 @@ export const listSystemBackgrounds = (session: Session | null) => {
     .catch(() => []);
 };
 
-export const useListSystemBackgrounds = (session: Session | null) => {
+export const useListSystemBackgrounds = () => {
   const key = systemBackgroundKeys.list(``);
-  return useQuery(key, () => listSystemBackgrounds(session));
+  return useQuery(key, () => listSystemBackgrounds());
 };

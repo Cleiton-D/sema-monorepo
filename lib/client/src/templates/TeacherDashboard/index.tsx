@@ -1,24 +1,27 @@
-import { useSession } from 'next-auth/react';
 import { CardChecklist } from '@styled-icons/bootstrap';
 
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
 
-import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useCountClasses } from 'requests/queries/class';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 
 import * as S from './styles';
 
 const TeacherDashboard = () => {
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: user } = useUser();
+  const { data: profile } = useProfile();
 
-  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
-    id: session?.configs.school_year_id
-  });
-  const { data: classesCount } = useCountClasses(session, {
-    employee_id: session?.user.employeeId,
-    school_id: session?.schoolId
+  const { data: classesCount } = useCountClasses({
+    employee_id: user?.employee?.id,
+    school_id: profile?.school?.id,
+    school_year_id: schoolYear?.id
   });
 
   return (

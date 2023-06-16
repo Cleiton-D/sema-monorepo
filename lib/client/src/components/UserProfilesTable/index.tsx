@@ -1,4 +1,3 @@
-import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 
 import Table from 'components/Table';
@@ -15,8 +14,7 @@ type UserProfilesTableProps = {
   userId: string;
 };
 const UserProfilesTable = ({ userId }: UserProfilesTableProps) => {
-  const { data: session } = useSession();
-  const { data: userProfiles, refetch } = useListUserProfiles(session, {
+  const { data: userProfiles, refetch } = useListUserProfiles({
     user_id: userId
   });
 

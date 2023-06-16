@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { SchoolTermPeriod, TermPeriodStatus } from 'models/SchoolTermPeriod';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 import { schoolTermPeriodMapper } from 'utils/mappers/schoolTermPeriodMapper';
 
@@ -13,10 +12,10 @@ type ListSchoolTermPeriodsFilters = {
 };
 
 export const listSchoolTermPeriods = (
-  session?: Session | null,
-  filters: ListSchoolTermPeriodsFilters = {}
+  filters: ListSchoolTermPeriodsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<SchoolTermPeriod[]>('/education/admin/school-term-periods', {
@@ -26,11 +25,10 @@ export const listSchoolTermPeriods = (
 };
 
 export const useListSchoolTermPeriods = (
-  session: Session | null,
   filters: ListSchoolTermPeriodsFilters = {}
 ) => {
   const key = `list-school-term-periods-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => listSchoolTermPeriods(session, filters));
+  const result = useQuery(key, () => listSchoolTermPeriods(filters));
 
   return { ...result, key };
 };
@@ -42,10 +40,10 @@ type ShowSchoolTermPeriodFilters = {
   status?: TermPeriodStatus;
 };
 export const showSchoolTermPeriod = (
-  session?: Session | null,
-  filters: ShowSchoolTermPeriodFilters = {}
+  filters: ShowSchoolTermPeriodFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<SchoolTermPeriod>('/education/admin/school-term-periods/show', {
@@ -55,11 +53,10 @@ export const showSchoolTermPeriod = (
 };
 
 export const useShowSchoolTermPeriod = (
-  session: Session | null,
   filters: ShowSchoolTermPeriodFilters = {}
 ) => {
   const key = `show-school-term-period-${JSON.stringify(filters)}`;
-  const result = useQuery(key, () => showSchoolTermPeriod(session, filters));
+  const result = useQuery(key, () => showSchoolTermPeriod(filters));
 
   return { ...result, key };
 };

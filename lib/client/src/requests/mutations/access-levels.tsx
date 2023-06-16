@@ -1,24 +1,17 @@
 import { RefObject, useCallback } from 'react';
-import { Session } from 'next-auth';
 import { v4 as uuidv4 } from 'uuid';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 import { AccessLevel } from 'models/AccessLevel';
 
-export function useAddAccessLevelMutation(
-  modalRef: RefObject<ModalRef>,
-  session?: Session | null
-) {
-  const addAccessLevel = useCallback(
-    async (values: any) => {
-      const api = initializeApi(session);
-      return api.post('/app/access-levels', values);
-    },
-    [session]
-  );
+export function useAddAccessLevelMutation(modalRef: RefObject<ModalRef>) {
+  const addAccessLevel = useCallback(async (values: any) => {
+    const api = createUnstableApi();
+    return api.post('/app/access-levels', values);
+  }, []);
 
   return useMutation('add-access-levels', addAccessLevel, {
     linkedQueries: {
@@ -42,14 +35,11 @@ export function useAddAccessLevelMutation(
   });
 }
 
-export function useDeleteAccessLevelMutation(session?: Session | null) {
-  const deleteAccessLevel = useCallback(
-    async (accessLevel: AccessLevel) => {
-      const api = initializeApi(session);
-      return api.delete(`/app/access-levels/${accessLevel.id}`);
-    },
-    [session]
-  );
+export function useDeleteAccessLevelMutation() {
+  const deleteAccessLevel = useCallback(async (accessLevel: AccessLevel) => {
+    const api = createUnstableApi();
+    return api.delete(`/app/access-levels/${accessLevel.id}`);
+  }, []);
 
   return useMutation('delete-access-levels', deleteAccessLevel, {
     linkedQueries: {

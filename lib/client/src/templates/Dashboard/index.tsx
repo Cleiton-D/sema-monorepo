@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/react';
+import { useProfile } from 'requests/queries/session';
 
 import AdminDashboard from 'templates/AdminDashboard';
 import MunicipalSecretaryDashboard from 'templates/MunicipalSecretaryDashboard';
@@ -6,15 +6,15 @@ import SchoolAdministrationDashboard from 'templates/SchoolAdministrationDashboa
 import TeacherDashboard from 'templates/TeacherDashboard';
 
 const Dashboard = () => {
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
 
-  if (session?.branch.type === 'MUNICIPAL_SECRETARY') {
+  if (profile?.branch?.type === 'MUNICIPAL_SECRETARY') {
     return <MunicipalSecretaryDashboard />;
   }
-  if (session?.accessLevel?.code === 'teacher') {
+  if (profile?.access_level?.code === 'teacher') {
     return <TeacherDashboard />;
   }
-  if (session?.accessLevel?.code === 'administrator') {
+  if (profile?.access_level?.code === 'administrator') {
     return <AdminDashboard />;
   }
 

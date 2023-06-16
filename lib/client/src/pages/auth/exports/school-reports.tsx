@@ -1,6 +1,5 @@
 import { EnrollClassroom } from 'models/EnrollClassroom';
 import { GetServerSidePropsContext } from 'next';
-import { Session } from 'next-auth';
 
 import SchoolReportsReport, {
   SchoolReportsReportProps
@@ -10,7 +9,7 @@ import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 import { listSchoolReports } from 'requests/queries/school-reports';
 import { listSchoolSubjects } from 'requests/queries/school-subjects';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 export default function SchoolReports(props: SchoolReportsReportProps) {
   // if (typeof window !== 'undefined') {
@@ -21,28 +20,37 @@ export default function SchoolReports(props: SchoolReportsReportProps) {
 }
 
 const createEnrollClassroom = async (
-  session: Session,
+  context: GetServerSidePropsContext,
   enrollClassroom: EnrollClassroom
 ) => {
   const { enroll } = enrollClassroom;
 
-  const schoolSubjects = await listSchoolSubjects(session, {
-    grade_id: enroll.grade_id,
-    include_multidisciplinary: true,
-    school_year_id: session.configs.school_year_id
-  });
+  const schoolSubjects = await listSchoolSubjects(
+    {
+      grade_id: enroll.grade_id,
+      include_multidisciplinary: true,
+      school_year_id: context.req.fullSession?.schoolYear.id
+    },
+    context.req.session
+  );
 
-  const schoolReports = await listSchoolReports(session, {
-    enroll_as: 'last',
-    enroll_id: enroll.id
-  });
+  const schoolReports = await listSchoolReports(
+    {
+      enroll_as: 'last',
+      enroll_id: enroll.id
+    },
+    context.req.session
+  );
 
-  const attendances = await countAttendances(session, {
-    class_id: 'all',
-    enroll_id: enroll.id,
-    split_by_school_term: true,
-    split_by_school_subject: true
-  });
+  const attendances = await countAttendances(
+    {
+      class_id: 'all',
+      enroll_id: enroll.id,
+      split_by_school_term: true,
+      split_by_school_subject: true
+    },
+    context.req.session
+  );
 
   return {
     enrollClassroom,
@@ -52,28 +60,29 @@ const createEnrollClassroom = async (
   };
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { classroom_id, enroll_id } = context.query;
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { classroom_id, enroll_id } = context.query;
 
-  const session = await protectedRoutes(context);
-  if (!session) return;
+    const enrollClassrooms = await listEnrollClassrooms(
+      {
+        classroom_id: classroom_id as string,
+        enroll_id: enroll_id as string
+        // status: 'ACTIVE'
+      },
+      context.req.session
+    );
 
-  const enrollClassrooms = await listEnrollClassrooms(session, {
-    classroom_id: classroom_id as string,
-    enroll_id: enroll_id as string
-    // status: 'ACTIVE'
-  });
+    const enrolls = await Promise.all(
+      enrollClassrooms.map((enrollClassroom) =>
+        createEnrollClassroom(context, enrollClassroom)
+      )
+    );
 
-  const enrolls = await Promise.all(
-    enrollClassrooms.map((enrollClassroom) =>
-      createEnrollClassroom(session, enrollClassroom)
-    )
-  );
-
-  return {
-    props: {
-      session,
-      enrolls
-    }
-  };
-}
+    return {
+      props: {
+        enrolls
+      }
+    };
+  }
+);

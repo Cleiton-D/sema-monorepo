@@ -1,21 +1,16 @@
 import { useCallback } from 'react';
-import { Session } from 'next-auth';
-import { useSession } from 'next-auth/react';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 import ToastContent from 'components/ToastContent';
 
 import { School } from 'models/School';
 
-export function useAddSchoolMutation(session?: Session | null) {
-  const addSchool = useCallback(
-    async (values: any) => {
-      const api = initializeApi(session);
-      return api.post('/schools', values);
-    },
-    [session]
-  );
+export function useAddSchoolMutation() {
+  const addSchool = useCallback(async (values: any) => {
+    const api = createUnstableApi();
+    return api.post('/schools', values);
+  }, []);
 
   return useMutation('add-school', addSchool, {
     renderLoading: function render(newSchool) {
@@ -54,16 +49,14 @@ type UpdateSchoolResquest = {
 };
 
 export function useUpdateSchool(school: School, onMutate?: () => void) {
-  const { data: session } = useSession();
-
   const updateSchool = useCallback(
     async (values: UpdateSchoolResquest) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
       return api
         .put<School>(`/schools/${school.id}`, values)
         .then((response) => response.data);
     },
-    [session, school]
+    [school]
   );
 
   return useMutation('update-school', updateSchool, {

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -13,6 +12,7 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -27,10 +27,10 @@ const RegistersBookTemplate = (): JSX.Element => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
   };
 
-  const { data: session } = useSession();
-  const { data: classrooms } = useListClassrooms(session, {
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: classrooms } = useListClassrooms({
     ...filters,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   return (

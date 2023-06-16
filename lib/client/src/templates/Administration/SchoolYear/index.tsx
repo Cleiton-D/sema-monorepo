@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, Edit3, Power, XCircle } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -23,6 +22,7 @@ import { FormattedSchoolYear } from 'models/SchoolYear';
 import { useAccess } from 'hooks/AccessProvider';
 
 import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useUpdateSchoolTermPeriod } from 'requests/mutations/school-term-periods';
 
 import * as S from './styles';
@@ -34,9 +34,9 @@ const SchoolYear = () => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data: schoolYear, refetch } = useSchoolYearWithSchoolTerms(session, {
-    id: session?.configs.school_year_id
+  const { data: sessionSchoolYear } = useSessionSchoolYear();
+  const { data: schoolYear, refetch } = useSchoolYearWithSchoolTerms({
+    id: sessionSchoolYear?.id
   });
   const updateSchoolTermPeriod = useUpdateSchoolTermPeriod();
 

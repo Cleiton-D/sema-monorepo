@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type ListClassroomTeacherSchoolSubjectsFilters = {
   classroom_id?: string;
@@ -21,10 +20,10 @@ export const classroomTeacherSchoolSubjectsKeys = {
 };
 
 export const listClassroomTeacherSchoolSubjects = (
-  session: Session | null,
-  filters: ListClassroomTeacherSchoolSubjectsFilters
+  filters: ListClassroomTeacherSchoolSubjectsFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<ClassroomTeacherSchoolSubject[]>(
@@ -35,7 +34,6 @@ export const listClassroomTeacherSchoolSubjects = (
 };
 
 export const useListClassroomTeacherSchoolSubjects = (
-  session: Session | null,
   {
     is_multidisciplinary = 0,
     ...rest
@@ -47,7 +45,7 @@ export const useListClassroomTeacherSchoolSubjects = (
 
   const result = useQuery<ClassroomTeacherSchoolSubject[]>(
     key,
-    () => listClassroomTeacherSchoolSubjects(session, filters),
+    () => listClassroomTeacherSchoolSubjects(filters),
     queryOptions
   );
 
@@ -59,10 +57,10 @@ type ShowClassroomTeacherSchoolSubjectsFilters = {
 };
 
 export const showClassroomTeacherSchoolSubject = (
-  session: Session | null,
-  { id }: ShowClassroomTeacherSchoolSubjectsFilters
+  { id }: ShowClassroomTeacherSchoolSubjectsFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<ClassroomTeacherSchoolSubject>(

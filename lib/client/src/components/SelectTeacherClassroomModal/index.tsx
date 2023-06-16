@@ -5,7 +5,6 @@ import {
   forwardRef,
   useMemo
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 
@@ -16,6 +15,7 @@ import Button from 'components/Button';
 import { Classroom } from 'models/Classroom';
 
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
+import { useProfile, useUser } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -51,12 +51,14 @@ const SelectTeacherClassroomModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
+
   const { data: classroomTeacherSchoolSubjects, isLoading } =
-    useListClassroomTeacherSchoolSubjects(session, {
+    useListClassroomTeacherSchoolSubjects({
       classroom_id: 'all',
-      school_id: session?.schoolId,
-      employee_id: session?.user.employeeId
+      school_id: profile?.school?.id,
+      employee_id: user?.employee?.id
     });
 
   const classroomOptions = useMemo(() => {

@@ -1,24 +1,36 @@
 import type { ChangeEvent } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 import { useListSchoolYears } from 'requests/queries/school-year';
+import {
+  fetchAllSession,
+  useProfile,
+  useSessionSchoolYear
+} from 'requests/queries/session';
+import { refreshSession } from 'requests/mutations/session';
 
 import * as S from './styles';
 
 const SchoolYearSelector = (): JSX.Element => {
-  const { data: session } = useSession();
-  const { data: schoolYears } = useListSchoolYears(session);
+  const { push } = useRouter();
+
+  const { data: currentSchoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+
+  const { data: schoolYears } = useListSchoolYears();
 
   const handleChangeSchoolYear = async (
     event: ChangeEvent<HTMLSelectElement>
   ) => {
     const schoolyearId = event.target.value;
 
-    await signIn('refresh', {
+    await refreshSession({
       schoolYearId: schoolyearId,
-      token: session?.jwt,
-      callbackUrl: `${window.location.origin}/auth`
+      profileId: profile?.id
     });
+    await fetchAllSession();
+
+    push('/auth');
   };
 
   return (
@@ -29,7 +41,7 @@ const SchoolYearSelector = (): JSX.Element => {
           <option
             key={schoolYear.id}
             value={schoolYear.id}
-            selected={session?.configs.school_year_id === schoolYear.id}
+            selected={currentSchoolYear?.id === schoolYear.id}
           >
             {schoolYear.reference_year}
           </option>

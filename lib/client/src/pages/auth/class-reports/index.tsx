@@ -4,36 +4,35 @@ import ClassReportsTemplate from 'templates/ClassReports';
 
 import { listClassrooms, classroomsKeys } from 'requests/queries/classrooms';
 
-import protectedRoutes from 'utils/protected-routes';
 import prefetchQuery from 'utils/prefetch-query';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassesReportsPage() {
   return <ClassReportsTemplate />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const filters = {
+      school_id: context.req.fullSession?.profile.school?.id,
+      employee_id: context.req.fullSession?.user.employee?.id,
+      page: 1,
+      size: 20
+    };
 
-  const filters = {
-    school_id: session?.schoolId,
-    employee_id: session?.user.employeeId,
-    page: 1,
-    size: 20
-  };
+    const dehydratedState = await prefetchQuery([
+      {
+        key: classroomsKeys.list(JSON.stringify(filters)),
+        fetcher: () => listClassrooms(filters, context.req.session)
+      }
+    ]);
 
-  const dehydratedState = await prefetchQuery([
-    {
-      key: classroomsKeys.list(JSON.stringify(filters)),
-      fetcher: () => listClassrooms(session, filters)
-    }
-  ]);
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 export default ClassesReportsPage;

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useUpdateAtom, RESET } from 'jotai/utils';
 import format from 'date-fns/format';
 
@@ -30,9 +29,8 @@ import * as S from './styles';
 
 const SaveEmployee = () => {
   const route = useRouter();
-  const { data: session } = useSession();
 
-  const { data: employee } = useShowEmployee(session, {
+  const { data: employee } = useShowEmployee({
     employee_id: route.query.employee_id as string
   });
 

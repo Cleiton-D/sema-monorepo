@@ -5,7 +5,6 @@ import {
   useImperativeHandle,
   forwardRef
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -18,6 +17,7 @@ import Modal, { ModalRef } from 'components/Modal';
 import TextInput from 'components/TextInput';
 
 import { calendarEventsKeys } from 'requests/queries/calendar-events';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 import { useCreateCalendarEvent } from 'requests/mutations/calendar-event';
 
 import { calendarEventSchema } from './rules/schema';
@@ -40,7 +40,9 @@ const CreateCalendarEventModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+
   const queryClient = useQueryClient();
   const createCalendarEvent = useCreateCalendarEvent();
 
@@ -71,12 +73,12 @@ const CreateCalendarEventModal: React.ForwardRefRenderFunction<
 
         if (confirmation) {
           await createCalendarEvent.mutateAsync({
-            school_year_id: session?.configs.school_year_id,
+            school_year_id: schoolYear?.id,
             date,
             description: values.description,
             type,
-            competence: session?.schoolId ? 'SCHOLL' : 'MUNICIPAL',
-            school_id: session?.schoolId
+            competence: profile?.school?.id ? 'SCHOLL' : 'MUNICIPAL',
+            school_id: profile?.school?.id
           });
 
           queryClient.invalidateQueries(calendarEventsKeys.lists());
@@ -95,7 +97,7 @@ const CreateCalendarEventModal: React.ForwardRefRenderFunction<
         }
       }
     },
-    [session, date, createCalendarEvent, queryClient, handleBack]
+    [schoolYear, profile, date, createCalendarEvent, queryClient, handleBack]
   );
 
   const modalTitle =

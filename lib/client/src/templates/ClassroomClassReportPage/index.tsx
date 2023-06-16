@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
 import Base from 'templates/Base';
@@ -12,6 +11,7 @@ import Tab from 'components/Tab';
 
 import { useListSchoolTermPeriods } from 'requests/queries/school-term-periods';
 import { useShowClassroom } from 'requests/queries/classrooms';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import {
   orderSchoolTerm,
@@ -23,18 +23,18 @@ import * as S from './styles';
 const SCHOOL_TERMS = ['FIRST', 'SECOND', 'THIRD', 'FOURTH'];
 const ClassroomClassReportTemplate = () => {
   const { query } = useRouter();
-  const { data: session } = useSession();
+
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const { data: classroom } = useShowClassroom(
-    session,
     {
       id: query.classroom_id as string
     },
     { enabled: !!query.classroom_id }
   );
 
-  const { data: schoolTermPeriods } = useListSchoolTermPeriods(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: schoolTermPeriods } = useListSchoolTermPeriods({
+    school_year_id: schoolYear?.id
   });
 
   const schoolTermsMap = useMemo(() => {

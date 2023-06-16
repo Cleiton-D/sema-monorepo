@@ -1,5 +1,4 @@
 import { GetServerSidePropsContext } from 'next';
-import { Session } from 'next-auth';
 
 import Enrolls from 'templates/Enrolls';
 
@@ -7,18 +6,18 @@ import { listEnrolls, enrollsKeys } from 'requests/queries/enrolls';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 import prefetchQuery from 'utils/prefetch-query';
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EnrollsPage() {
   return <Enrolls />;
 }
 
-const getData = async (session: Session | null, id?: string) => {
-  const school = id ? await getSchool(session, { id }) : null;
+const getData = async (context: GetServerSidePropsContext, id?: string) => {
+  const school = id ? await getSchool({ id }, context.req.session) : null;
 
   const filters = {
     school_id: school?.id,
-    school_year_id: session?.configs.school_year_id,
+    school_year_id: context.req.fullSession?.schoolYear.id,
     page: 1,
     size: 20
   };
@@ -26,7 +25,7 @@ const getData = async (session: Session | null, id?: string) => {
   return prefetchQuery([
     {
       key: enrollsKeys.list(JSON.stringify(filters)),
-      fetcher: () => listEnrolls(session, filters)
+      fetcher: () => listEnrolls(filters, context.req.session)
     },
     {
       key: schoolKeys.show(JSON.stringify({ id: id })),
@@ -35,37 +34,36 @@ const getData = async (session: Session | null, id?: string) => {
   ]);
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { school_id } = context.query || {};
+    if (school_id === 'me') {
+      if (context.req.fullSession?.profile.school?.id) {
+        const dehydratedState = await getData(
+          context,
+          context.req.fullSession?.profile.school?.id
+        );
+        return {
+          props: {
+            dehydratedState
+          }
+        };
+      }
 
-  const { school_id } = context.query || {};
-  if (school_id === 'me') {
-    if (session?.schoolId) {
-      const dehydratedState = await getData(session, session?.schoolId);
       return {
-        props: {
-          session,
-          dehydratedState
-        }
+        props: {} as any
       };
     }
 
+    const dehydratedState = await getData(context, school_id as string);
+
     return {
       props: {
-        session
+        dehydratedState
       }
     };
   }
-
-  const dehydratedState = await getData(session, school_id as string);
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+);
 
 EnrollsPage.auth = {
   module: 'ENROLL'

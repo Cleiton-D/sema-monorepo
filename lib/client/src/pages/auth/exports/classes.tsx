@@ -11,7 +11,7 @@ import { listGradeSchoolSubjects } from 'requests/queries/grade-school-subjects'
 import { showSchoolSubject } from 'requests/queries/school-subjects';
 import { showSchoolTermPeriod } from 'requests/queries/school-term-periods';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 export default function ClassesReport(props: ClassesReportProps) {
   useEffect(() => {
@@ -39,51 +39,61 @@ export default function ClassesReport(props: ClassesReportProps) {
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { classroom_id, school_subject_id, school_term_period_id } =
-    context.query;
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { classroom_id, school_subject_id, school_term_period_id } =
+      context.query;
 
-  const session = await protectedRoutes(context);
-  if (!session) return;
+    const schoolTermPeriod = school_term_period_id
+      ? await showSchoolTermPeriod(
+          {
+            id: school_term_period_id as string
+          },
+          context.req.session
+        )
+      : null;
 
-  const schoolTermPeriod = school_term_period_id
-    ? await showSchoolTermPeriod(session, {
-        id: school_term_period_id as string
-      })
-    : null;
+    const classroom = await showClassroom(
+      {
+        id: classroom_id as string
+      },
+      context.req.session
+    );
 
-  const classroom = await showClassroom(session, {
-    id: classroom_id as string
-  });
+    const schoolSubject = await showSchoolSubject(
+      school_subject_id as string,
+      context.req.session
+    );
 
-  const schoolSubject = await showSchoolSubject(
-    session,
-    school_subject_id as string
-  );
+    const gradeSchoolSubject = await listGradeSchoolSubjects(
+      {
+        grade_id: classroom.grade_id,
+        school_subject_id: school_subject_id as string,
+        include_multidisciplinary: true
+      },
+      context.req.session
+    );
 
-  const gradeSchoolSubject = await listGradeSchoolSubjects(session, {
-    grade_id: classroom.grade_id,
-    school_subject_id: school_subject_id as string,
-    include_multidisciplinary: true
-  });
+    const classes = await listClasses(
+      {
+        classroom_id: classroom_id as string,
+        // employee_id: classroomTeacherSchoolSubject.employee_id,
+        school_subject_id: school_subject_id as string,
+        school_term: schoolTermPeriod?.school_term,
+        sortBy: 'class_date',
+        order: 'ASC'
+      },
+      context.req.session
+    );
 
-  const classes = await listClasses(session, {
-    classroom_id: classroom_id as string,
-    // employee_id: classroomTeacherSchoolSubject.employee_id,
-    school_subject_id: school_subject_id as string,
-    school_term: schoolTermPeriod?.school_term,
-    sortBy: 'class_date',
-    order: 'ASC'
-  });
-
-  return {
-    props: {
-      session,
-      classroom,
-      schoolSubject,
-      schoolTermPeriod,
-      gradeSchoolSubject: gradeSchoolSubject?.[0] || null,
-      classes: classes?.items || []
-    }
-  };
-}
+    return {
+      props: {
+        classroom,
+        schoolSubject,
+        schoolTermPeriod,
+        gradeSchoolSubject: gradeSchoolSubject?.[0] || null,
+        classes: classes?.items || []
+      }
+    };
+  }
+);
