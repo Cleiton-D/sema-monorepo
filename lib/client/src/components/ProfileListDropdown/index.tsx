@@ -3,8 +3,6 @@ import { useRouter } from 'next/router';
 
 import { Check, ChevronsUpDown } from 'lucide-react';
 
-import { useListUserProfiles } from 'requests/queries/user-profile';
-
 import {
   Popover,
   PopoverContent,
@@ -17,8 +15,8 @@ import {
   CommandInput,
   CommandItem
 } from 'components/shadcn/command';
-import { cn } from 'utils/cnHelper';
 
+import { useListUserProfiles } from 'requests/queries/user-profile';
 import {
   fetchAllSession,
   useProfile,
@@ -26,6 +24,8 @@ import {
   useUser
 } from 'requests/queries/session';
 import { refreshSession } from 'requests/mutations/session';
+
+import { cn } from 'utils/cnHelper';
 
 const ProfileListDropdown = () => {
   const [open, setOpen] = useState(false);
@@ -72,13 +72,15 @@ const ProfileListDropdown = () => {
           aria-expanded={open}
           className="w-auto max-w-6xl justify-between"
         >
-          {selectedProfile
-            ? selectedProfile.description
-            : 'Selecione um perfil'}
+          <span className="text-ellipsis">
+            {selectedProfile
+              ? selectedProfile.description
+              : 'Selecione um perfil'}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[500px] p-0">
+      <PopoverContent className="w-[50rem] p-0">
         <Command>
           <CommandInput placeholder="Pesquisar perfil..." />
           <CommandGroup>
