@@ -1,3 +1,5 @@
+import 'styles/global.css';
+
 import { AppProps as NextAppProps } from 'next/app';
 import Head from 'next/head';
 import NextNprogress from 'nextjs-progressbar';
