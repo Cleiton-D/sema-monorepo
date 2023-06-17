@@ -1,9 +1,24 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
+import { Check, ChevronsUpDown } from 'lucide-react';
+
 import { useListUserProfiles } from 'requests/queries/user-profile';
 
-import * as S from './styles';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from 'components/shadcn/popover';
+import { Button } from 'components/shadcn/button';
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem
+} from 'components/shadcn/command';
+import { cn } from 'utils/cnHelper';
+
 import {
   fetchAllSession,
   useProfile,
@@ -32,17 +47,12 @@ const ProfileListDropdown = () => {
     return selected;
   }, [userProfiles, currentProfile]);
 
-  const profilesWithoutSelected = useMemo(() => {
-    if (!currentProfile?.id) return [];
-
-    return userProfiles?.filter((profile) => profile.id !== currentProfile?.id);
-  }, [userProfiles, currentProfile]);
-
-  const toggleDropdown = () => {
-    setOpen((current) => !current);
-  };
-
   const handleClickItem = async (profileId: string) => {
+    if (profileId === currentProfile?.id) {
+      setOpen(false);
+      return;
+    }
+
     await refreshSession({
       profileId,
       schoolYearId: schoolYear?.id
@@ -54,23 +64,45 @@ const ProfileListDropdown = () => {
   };
 
   return (
-    <S.Wrapper>
-      <S.Container isOpen={open}>
-        <S.Title onClick={toggleDropdown}>
-          {selectedProfile?.description} <S.ArrowIcon isOpen={open} />
-        </S.Title>
-        <S.Content isOpen={open}>
-          <ul>
-            {profilesWithoutSelected?.map(({ id, description }) => (
-              <S.ListItem key={id} onClick={() => handleClickItem(id)}>
-                {description}
-              </S.ListItem>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-auto max-w-6xl justify-between"
+        >
+          {selectedProfile
+            ? selectedProfile.description
+            : 'Selecione um perfil'}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[500px] p-0">
+        <Command>
+          <CommandInput placeholder="Pesquisar perfil..." />
+          <CommandGroup>
+            {userProfiles?.map((profile) => (
+              <CommandItem
+                key={profile.id}
+                onSelect={() => handleClickItem(profile.id)}
+                className="hover:cursor-pointer"
+              >
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    profile.id === currentProfile?.id
+                      ? 'opacity-100'
+                      : 'opacity-0'
+                  )}
+                />
+                {profile.description}
+              </CommandItem>
             ))}
-          </ul>
-        </S.Content>
-      </S.Container>
-      <S.Overlay isOpen={open} onClick={() => setOpen(false)} />
-    </S.Wrapper>
+          </CommandGroup>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };
 
