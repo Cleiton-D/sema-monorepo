@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Printer } from '@styled-icons/feather';
@@ -20,13 +19,12 @@ import * as S from './styles';
 
 const ClassroomTemplate = () => {
   const { query } = useRouter();
-  const { data: session } = useSession();
 
-  const { data: classroom } = useShowClassroom(session, {
+  const { data: classroom } = useShowClassroom({
     id: query.classroom_id as string
   });
 
-  const { data: enrollClassrooms = [] } = useListEnrollClassrooms(session, {
+  const { data: enrollClassrooms = [] } = useListEnrollClassrooms({
     classroom_id: query.classroom_id as string
   });
 

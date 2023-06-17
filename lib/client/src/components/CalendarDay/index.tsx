@@ -1,5 +1,4 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import format from 'date-fns/format';
 import ptBr from 'date-fns/locale/pt-BR';
@@ -15,6 +14,7 @@ import { useDeleteCalendarEvent } from 'requests/mutations/calendar-event';
 
 import * as S from './styles';
 import { useAccess } from 'hooks/AccessProvider';
+import { useProfile } from 'requests/queries/session';
 
 type CalendarDayProps = {
   date?: Date;
@@ -28,8 +28,8 @@ const CalendarDay = ({ date, calendarEvents }: CalendarDayProps) => {
   const modalRef = useRef<CreateCalendarEventModalRef>(null);
 
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
+  const { data: profile } = useProfile();
   const { enableAccess } = useAccess();
 
   const deleteCalendarEvent = useDeleteCalendarEvent();
@@ -56,10 +56,10 @@ const CalendarDay = ({ date, calendarEvents }: CalendarDayProps) => {
       return;
     }
 
-    if (session?.branch.type === 'SCHOOL') {
-      if (calendarEvent.school_id !== session?.schoolId) return;
+    if (profile?.branch?.type === 'SCHOOL') {
+      if (calendarEvent.school_id !== profile.school?.id) return;
     }
-    if (session?.branch.type === 'MUNICIPAL_SECRETARY') {
+    if (profile?.branch?.type === 'MUNICIPAL_SECRETARY') {
       if (calendarEvent.school_id) return;
     }
 

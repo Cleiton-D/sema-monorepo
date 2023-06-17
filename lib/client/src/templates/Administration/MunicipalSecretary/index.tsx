@@ -1,5 +1,4 @@
 import { useMemo, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { Edit, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -21,11 +20,10 @@ const MunicipalSecretary = () => {
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-  const { data: branch } = useShowBranch(session, {
+  const { data: branch } = useShowBranch({
     type: 'MUNICIPAL_SECRETARY'
   });
-  const { data: municipalSecretary, refetch } = useShowEmployee(session, {
+  const { data: municipalSecretary, refetch } = useShowEmployee({
     branch_id: branch?.id,
     accessCode: 'municipal-secretary'
   });

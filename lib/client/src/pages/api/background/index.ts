@@ -2,7 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import request from 'request';
 import nextConnect from 'next-connect';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
+import { withSessionRoute } from 'utils/session/withSession';
 
 const apiRoute = nextConnect<NextApiRequest, NextApiResponse>({
   attachParams: true,
@@ -34,7 +35,7 @@ apiRoute.patch(async (nextRequest, nextResponse) => {
 
     const url = `${process.env.SERVER_API_URL}/admin/background/current`;
 
-    const api = initializeApi();
+    const api = createUnstableApi(nextRequest.session);
     const { data: systemBackground } = await api.patch(url, {
       system_background_id,
       is_defined
@@ -67,7 +68,7 @@ apiRoute.delete('/:teste', async (nextRequest, nextResponse) => {
   // });
 });
 
-export default apiRoute;
+export default withSessionRoute(apiRoute);
 
 export const config = {
   api: {

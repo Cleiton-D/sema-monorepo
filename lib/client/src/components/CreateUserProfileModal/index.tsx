@@ -6,7 +6,6 @@ import {
   useMemo,
   useCallback
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
@@ -42,12 +41,11 @@ const CreateUserProfileModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const { data: accessLevels, isLoading: loadingAccess } =
-    useListAccessLevels(session);
-  const { data: branchs, isLoading: loadingBranchs } = useListBranchs(session);
+    useListAccessLevels();
+  const { data: branchs, isLoading: loadingBranchs } = useListBranchs();
 
   const createUserProfile = useCreateUserProfile();
 

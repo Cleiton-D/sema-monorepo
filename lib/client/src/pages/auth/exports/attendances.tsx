@@ -10,7 +10,7 @@ import { showSchoolSubject } from 'requests/queries/school-subjects';
 import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 import { listAttendancesByClasses } from 'requests/queries/attendances';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 export default function ClassesReport(props: AttendancesReportProps) {
   useEffect(() => {
@@ -41,50 +41,60 @@ export default function ClassesReport(props: AttendancesReportProps) {
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { classroom_id, school_subject_id, school_term_period_id } =
-    context.query;
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { classroom_id, school_subject_id, school_term_period_id } =
+      context.query;
 
-  const session = await protectedRoutes(context);
-  if (!session) return;
+    const schoolTermPeriod = school_term_period_id
+      ? await showSchoolTermPeriod(
+          {
+            id: school_term_period_id as string
+          },
+          context.req.session
+        )
+      : null;
 
-  const schoolTermPeriod = school_term_period_id
-    ? await showSchoolTermPeriod(session, {
-        id: school_term_period_id as string
-      })
-    : null;
+    const classroom = await showClassroom(
+      {
+        id: classroom_id as string
+      },
+      context.req.session
+    );
 
-  const classroom = await showClassroom(session, {
-    id: classroom_id as string
-  });
+    const schoolSubject = await showSchoolSubject(
+      school_subject_id as string,
+      context.req.session
+    );
 
-  const schoolSubject = await showSchoolSubject(
-    session,
-    school_subject_id as string
-  );
+    const enrollClassrooms = await listEnrollClassrooms(
+      {
+        classroom_id: classroom.id
+      },
+      context.req.session
+    );
 
-  const enrollClassrooms = await listEnrollClassrooms(session, {
-    classroom_id: classroom.id
-  });
+    const { classes, attendances } = await listAttendancesByClasses(
+      {
+        classroom_id: classroom.id,
+        // employee_id: classroomTeacherSchoolSubject.employee_id,
+        school_subject_id: school_subject_id as string,
+        school_term: schoolTermPeriod?.school_term,
+        sortBy: 'class_date',
+        order: 'ASC'
+      },
+      context.req.session
+    );
 
-  const { classes, attendances } = await listAttendancesByClasses(session, {
-    classroom_id: classroom.id,
-    // employee_id: classroomTeacherSchoolSubject.employee_id,
-    school_subject_id: school_subject_id as string,
-    school_term: schoolTermPeriod?.school_term,
-    sortBy: 'class_date',
-    order: 'ASC'
-  });
-
-  return {
-    props: {
-      session,
-      classroom,
-      schoolSubject,
-      schoolTermPeriod,
-      classes,
-      enrollClassrooms,
-      attendances
-    }
-  };
-}
+    return {
+      props: {
+        classroom,
+        schoolSubject,
+        schoolTermPeriod,
+        classes,
+        enrollClassrooms,
+        attendances
+      }
+    };
+  }
+);

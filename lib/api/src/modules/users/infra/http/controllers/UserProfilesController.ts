@@ -5,8 +5,21 @@ import CreateUserProfileService from '@modules/users/services/CreateUserProfileS
 import ListUserProfilesService from '@modules/users/services/ListUserProfilesService';
 import privateRoute from '@shared/decorators/privateRoute';
 import DeleteUserProfileService from '@modules/users/services/DeleteUserProfileService';
+import ShowUserProfileService from '@modules/users/services/ShowUserProfileService';
 
 class UserProfilesController {
+  @privateRoute()
+  public async showMe(request: Request, response: Response): Promise<Response> {
+    const { id } = request.profile;
+
+    const showUserProfile = container.resolve(ShowUserProfileService);
+    const userProfile = await showUserProfile.execute({
+      user_profile_id: id,
+    });
+
+    return response.json(userProfile);
+  }
+
   @privateRoute()
   public async index(request: Request, response: Response): Promise<Response> {
     const { user_id } = request.query;

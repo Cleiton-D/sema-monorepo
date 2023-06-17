@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -15,6 +14,11 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 
 import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
@@ -28,17 +32,19 @@ const SchoolReportsByClassroomTemplate = () => {
   const [filters, setFilters] =
     useState<ListClassroomsFilters>(INITIAL_FILTERS);
 
-  const { data: session } = useSession();
+  const { data: user } = useUser();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const classroomsFilters = useMemo(() => {
     return {
-      school_id: session?.schoolId,
-      employee_id: session?.user.employeeId,
-      school_year_id: session?.configs.school_year_id,
+      school_id: profile?.school?.id,
+      employee_id: user?.employee?.id,
+      school_year_id: schoolYear?.id,
       ...filters
     };
-  }, [session, filters]);
-  const { data: classrooms } = useListClassrooms(session, classroomsFilters);
+  }, [filters, user, profile, schoolYear]);
+  const { data: classrooms } = useListClassrooms(classroomsFilters);
 
   return (
     <Base>

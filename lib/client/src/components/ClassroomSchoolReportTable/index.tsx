@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import addDays from 'date-fns/addDays';
 import isBefore from 'date-fns/isBefore';
 
@@ -18,6 +17,7 @@ import { SchoolSubject } from 'models/SchoolSubject';
 
 import { useListSchoolReports } from 'requests/queries/school-reports';
 import { useListSchoolTermPeriods } from 'requests/queries/school-term-periods';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useRegisterSchoolReports } from 'requests/mutations/school-reports';
 
 import { schoolReportsEnrollsMapper } from 'utils/mappers/schoolReportsMapper';
@@ -35,7 +35,7 @@ const ClassroomSchoolReportTable = ({
   classroom,
   schoolSubject
 }: ClassroomSchoolReportTableProps): JSX.Element => {
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
   const { enableAccess } = useAccess();
 
   const registerSchoolReports = useRegisterSchoolReports();
@@ -71,12 +71,12 @@ const ClassroomSchoolReportTable = ({
     });
   };
 
-  const { data: schoolReports } = useListSchoolReports(session, {
+  const { data: schoolReports } = useListSchoolReports({
     classroom_id: classroom.id as string,
     school_subject_id: schoolSubject.id
   });
-  const { data: termPeriods, isLoading } = useListSchoolTermPeriods(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: termPeriods, isLoading } = useListSchoolTermPeriods({
+    school_year_id: schoolYear?.id
   });
 
   const mappedSchoolReports = useMemo(() => {

@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -15,6 +14,11 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -26,26 +30,29 @@ const TotalAttendancesTemplate = (): JSX.Element => {
   const [filters, setFilters] =
     useState<ListClassroomsFilters>(INITIAL_FILTERS);
 
-  const { data: session } = useSession();
+  const { data: user } = useUser();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const handleSearch = (searchData: ListClassroomsFilters) => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
   };
 
   const searchFilters = useMemo(() => {
-    const school_id = session?.schoolId || filters.school_id;
+    const school_id = profile?.school?.id || filters.school_id;
     const resultFilters = {
       ...filters,
       school_id,
-      school_year_id: session?.configs.school_year_id
+      school_year_id: schoolYear?.id
     };
-    if (session?.accessLevel?.code === 'teacher') {
-      return { ...resultFilters, employee_id: session.user.employeeId };
+    if (profile?.access_level?.code === 'teacher') {
+      return { ...resultFilters, employee_id: user?.employee?.id };
     }
 
     return resultFilters;
-  }, [filters, session]);
+  }, [filters, user, profile, schoolYear]);
 
-  const { data: classrooms } = useListClassrooms(session, searchFilters);
+  const { data: classrooms } = useListClassrooms(searchFilters);
 
   const renderSubTable = ({ id }: Classroom) => (
     <FinalAttendancesTable classroomId={id} isMinimal linkToAttendancesReport />
@@ -70,7 +77,7 @@ const TotalAttendancesTemplate = (): JSX.Element => {
             })
           }}
           subTable={
-            session?.accessLevel?.code === 'teacher'
+            profile?.access_level?.code === 'teacher'
               ? undefined
               : renderSubTable
           }

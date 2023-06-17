@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useUpdateAtom, RESET } from 'jotai/utils';
 
 import Base from 'templates/Base';
@@ -32,15 +31,13 @@ export type EditStudentPageTemplateProps = {
 };
 const EditStudentPageTemplate = ({ ufs }: EditStudentPageTemplateProps) => {
   const router = useRouter();
-  const { data: session } = useSession();
 
   const updateStudentAtom = useUpdateAtom(basicEnrollData);
   const updateStudentDocuments = useUpdateAtom(enrollDocumentsData);
   const updateStudentContacts = useUpdateAtom(enrollContactsData);
 
   const { data: enroll } = useGetEnrollDetails(
-    router.query.enroll_id as string,
-    session
+    router.query.enroll_id as string
   );
 
   const updateStudent = useUpdateStudent();

@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { AccessModule } from 'models/AccessModule';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export const acessModulesKeys = {
   all: 'acess-modules' as const,
@@ -17,10 +16,10 @@ type ListAccessModulesFilters = {
 };
 
 export const listAccessModules = (
-  session: Session | null,
-  filters: ListAccessModulesFilters = {}
+  filters: ListAccessModulesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<AccessModule[]>('/app/access-modules', { params: filters })
@@ -29,21 +28,17 @@ export const listAccessModules = (
 };
 
 export const useListAccessModules = (
-  session: Session | null,
   filters: ListAccessModulesFilters = {},
   queryOptions: QueryObserverOptions<AccessModule[] | undefined> = {}
 ) => {
   const key = useMemo(
-    () =>
-      acessModulesKeys.list(
-        JSON.stringify({ ...filters, token: session?.jwt })
-      ),
-    [filters, session]
+    () => acessModulesKeys.list(JSON.stringify({ ...filters })),
+    [filters]
   );
 
   const result = useQuery<AccessModule[] | undefined>(
     key,
-    () => listAccessModules(session, filters),
+    () => listAccessModules(filters),
     queryOptions
   );
 

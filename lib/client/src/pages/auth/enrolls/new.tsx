@@ -4,29 +4,30 @@ import NewEnroll, { NewEnrollProps } from 'templates/Enrolls/New';
 
 import { getSchool } from 'requests/queries/schools';
 
-import protectedRoutes from 'utils/protected-routes';
-
 import ufs from 'assets/data/uf.json';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function NewEnrollPage(props: NewEnrollProps) {
   return <NewEnroll {...props} />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { school_id } = context.query || {};
 
-  const { school_id } = context.query || {};
+    const school = await getSchool(
+      { id: school_id as string },
+      context.req.session
+    );
 
-  const school = await getSchool(session, { id: school_id as string });
-
-  return {
-    props: {
-      session,
-      school,
-      ufs
-    }
-  };
-}
+    return {
+      props: {
+        school,
+        ufs
+      }
+    };
+  }
+);
 
 NewEnrollPage.auth = {
   module: 'ENROLL',

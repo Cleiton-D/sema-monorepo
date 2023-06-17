@@ -5,7 +5,6 @@ import {
   forwardRef,
   useMemo
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 
 import Modal, { ModalRef } from 'components/Modal';
@@ -17,6 +16,7 @@ import { Classroom } from 'models/Classroom';
 import { useListSchoolsSubjects } from 'requests/queries/school-subjects';
 import { useListTeacherSchoolSubjects } from 'requests/queries/teacher-school-subjects';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useLinkClassroomTeacherSchoolSubject } from 'requests/mutations/classroom-teacher-school-subjects';
 
 import * as S from './styles';
@@ -35,14 +35,14 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<
   const linkClassroomTeacherSchoolSubjects =
     useLinkClassroomTeacherSchoolSubject(modalRef);
 
-  const { data: session } = useSession();
-  const { data: schoolSubjects } = useListSchoolsSubjects(session, {
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: schoolSubjects } = useListSchoolsSubjects({
     grade_id: classroom?.grade_id,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   const { data: classroomTeacherSchoolSubjects, refetch } =
-    useListClassroomTeacherSchoolSubjects(session, {
+    useListClassroomTeacherSchoolSubjects({
       classroom_id: classroom?.id
     });
 
@@ -56,7 +56,7 @@ const LinkClassroomTeacherSchoolSubjectsModal: React.ForwardRefRenderFunction<
   }, [schoolSubjects, classroom]);
 
   const { data: teacherSchoolSubjects, isLoading } =
-    useListTeacherSchoolSubjects(session, teacherSchoolSubjectsFilters);
+    useListTeacherSchoolSubjects(teacherSchoolSubjectsFilters);
 
   const selectOptions = useMemo(() => {
     if (!schoolSubjects) return {};

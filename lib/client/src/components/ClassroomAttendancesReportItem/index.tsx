@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import { Printer } from '@styled-icons/feather';
 
 import { SchoolTermPeriod } from 'models/SchoolTermPeriod';
@@ -11,6 +10,7 @@ import AttendancesReportTable from 'components/AttendancesReportTable';
 
 import { useShowClassroom } from 'requests/queries/classrooms';
 import { useShowGrade } from 'requests/queries/grades';
+import { useProfile, useUser } from 'requests/queries/session';
 
 import { useListSchoolSubjects } from './hooks';
 import * as S from './styles';
@@ -26,18 +26,22 @@ const ClassroomAttendancesReportItem = ({
   // const [size, setSize] = useState(20);
 
   const { query } = useRouter();
-  const { data: session } = useSession();
+
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
 
   const { data: classroom } = useShowClassroom(
-    session,
     {
       id: query.classroom_id as string
     },
     { enabled: !!query.classroom_id }
   );
 
-  const { data: grade } = useShowGrade(session, classroom?.grade_id);
-  const { data: schoolSubjects } = useListSchoolSubjects(session, {
+  const { data: grade } = useShowGrade(classroom?.grade_id);
+  const { data: schoolSubjects } = useListSchoolSubjects({
+    isTeacher: profile?.access_level?.code === 'teacher',
+    accessLevel: profile?.access_level?.code,
+    userEmployeeId: user?.employee?.id,
     grade_id: classroom?.grade_id,
     is_multidisciplinary: grade?.is_multidisciplinary
   });

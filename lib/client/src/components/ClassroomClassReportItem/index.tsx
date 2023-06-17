@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import { Printer } from '@styled-icons/feather';
 import format from 'date-fns/format';
 
@@ -16,6 +15,7 @@ import { useShowClassroom } from 'requests/queries/classrooms';
 import { useListClasses, ListClassesFilters } from 'requests/queries/class';
 import { useShowGrade } from 'requests/queries/grades';
 import { useListSchoolSubjects } from 'requests/queries/custom-school-subjects';
+import { useProfile, useUser } from 'requests/queries/session';
 
 import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 
@@ -31,19 +31,23 @@ const ClassroomClassReportItem = ({
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(20);
 
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
+
   const { query } = useRouter();
-  const { data: session } = useSession();
 
   const { data: classroom } = useShowClassroom(
-    session,
     {
       id: query.classroom_id as string
     },
     { enabled: !!query.classroom_id }
   );
 
-  const { data: grade } = useShowGrade(session, classroom?.grade_id);
-  const { data: schoolSubjects } = useListSchoolSubjects(session, {
+  const { data: grade } = useShowGrade(classroom?.grade_id);
+  const { data: schoolSubjects } = useListSchoolSubjects({
+    isTeacher: profile?.access_level?.code === 'teacher',
+    accessLevel: profile?.access_level?.code,
+    userEmployeeId: user?.employee?.id,
     grade_id: classroom?.grade_id,
     is_multidisciplinary: grade?.is_multidisciplinary
   });
@@ -75,7 +79,7 @@ const ClassroomClassReportItem = ({
     size
   ]);
 
-  const { data: classes } = useListClasses(session, listClassesFilters, {
+  const { data: classes } = useListClasses(listClassesFilters, {
     enabled: enabledListClasses
   });
 

@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 import TableColumn from 'components/TableColumn';
@@ -19,18 +18,13 @@ type FinalAtaTable = {
   classroom: Classroom;
 };
 const FinalAtaTable = ({ classroom }: FinalAtaTable) => {
-  const { data: session } = useSession();
-
-  const { data: gradeSchoolSubjects = [] } = useListGradeSchoolSubjects(
-    session,
-    {
-      grade_id: classroom.grade_id
-    }
-  );
-  const { data: enrolls } = useListEnrolls(session, {
+  const { data: gradeSchoolSubjects = [] } = useListGradeSchoolSubjects({
+    grade_id: classroom.grade_id
+  });
+  const { data: enrolls } = useListEnrolls({
     classroom_id: classroom.id
   });
-  const { data: schoolReports = [] } = useListSchoolReports(session, {
+  const { data: schoolReports = [] } = useListSchoolReports({
     classroom_id: classroom.id
   });
 

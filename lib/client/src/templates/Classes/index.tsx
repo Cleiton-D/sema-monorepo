@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { X, Edit3, PlusCircle } from '@styled-icons/feather';
 
@@ -23,6 +22,11 @@ import {
   useListClasses,
   classesKeys
 } from 'requests/queries/class';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 import { useDeleteClass } from 'requests/mutations/classes';
 
 import * as S from './styles';
@@ -36,25 +40,28 @@ const ClassesTemplate = () => {
   const { enableAccess } = useAccess();
 
   const router = useRouter();
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const listClassesFilters = useMemo(() => {
-    const isTeacher = session?.accessLevel?.code === 'teacher';
-    const employee_id = isTeacher ? session?.user.employeeId : undefined;
+    const isTeacher = profile?.access_level?.code === 'teacher';
+    const employee_id = isTeacher ? user?.employee?.id : undefined;
 
     return {
-      school_id: session?.schoolId,
+      school_id: profile?.school?.id,
       employee_id,
       sortBy: 'created_at',
       page: 1,
       size: 20,
       ...filters,
-      school_year_id: session?.configs.school_year_id
+      school_year_id: schoolYear?.id
     };
-  }, [session, filters]);
+  }, [filters, profile, schoolYear, user]);
 
-  const { data: classes } = useListClasses(session, listClassesFilters);
+  const { data: classes } = useListClasses(listClassesFilters);
 
   const deleteClass = useDeleteClass();
 

@@ -1,10 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Session } from 'next-auth';
 import * as grpc from '@grpc/grpc-js';
 
 import { listSchoolReports } from 'requests/queries/school-reports';
 
-import { getApiSession } from 'utils/getApiSession';
 import { showClassroom } from 'requests/queries/classrooms';
 import { showGrade } from 'requests/queries/grades';
 import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
@@ -16,7 +14,8 @@ import {
 
 import { FinalResultServiceClient } from 'grpc/generated/report_grpc_pb';
 import { grpcFinalResultMapper } from 'utils/mappers/grpc/grpcFinalResultMapper';
-import { showSchoolYear } from 'requests/queries/school-year';
+import { withSessionRoute } from 'utils/session/withSession';
+import { createUnstableApi } from 'services/api';
 
 // const client = new ClassDiaryClient(
 //   'localhost:9000',
@@ -28,65 +27,76 @@ const client = new FinalResultServiceClient(
   grpc.credentials.createInsecure()
 );
 
-export default async (request: NextApiRequest, response: NextApiResponse) => {
-  const { classroom_id } = request.query;
+export default withSessionRoute(
+  async (request: NextApiRequest, response: NextApiResponse) => {
+    const { classroom_id } = request.query;
 
-  const session = await getApiSession<Session>(request);
-  if (!session) return;
+    const api = createUnstableApi();
+    api.defaults.headers = { cookie: request.headers.cookie };
 
-  const schoolYear = await showSchoolYear(session, {
-    id: session.configs.school_year_id
-  });
-  if (!schoolYear) return;
+    const schoolYear = await api
+      .get(`${process.env.APP_URL_INTERNAL}/api/session/school-year`)
+      .then((response) => response.data)
+      .catch(() => undefined);
 
-  const classroom = await showClassroom(session, {
-    id: classroom_id as string
-  });
-  const grade = await showGrade(session, classroom.grade_id);
-  if (!grade) return;
+    const classroom = await showClassroom(
+      {
+        id: classroom_id as string
+      },
+      request.session
+    );
+    const grade = await showGrade(classroom.grade_id, request.session);
+    if (!grade) return;
 
-  const enrollClassrooms = await listEnrollClassrooms(session, {
-    classroom_id: classroom_id as string
-  });
+    const enrollClassrooms = await listEnrollClassrooms(
+      {
+        classroom_id: classroom_id as string
+      },
+      request.session
+    );
 
-  const schoolReports = await listSchoolReports(session, {
-    classroom_id: classroom.id,
-    grade_id: grade.id
-  });
+    const schoolReports = await listSchoolReports(
+      {
+        classroom_id: classroom.id,
+        grade_id: grade.id
+      },
+      request.session
+    );
 
-  const finalResult = grpcFinalResultMapper({
-    enrollClassrooms,
-    schoolReports
-  });
-
-  const requestData = new FinalResultGenerateRequest();
-  requestData.setSchoolname(classroom.school?.name as string);
-  requestData.setGrade(grade.description);
-  requestData.setClassroom(classroom.description);
-  requestData.setClassperiod(classroom.class_period.description);
-  requestData.setReferenceyear(schoolYear.reference_year);
-  requestData.setFinalresultList(finalResult);
-
-  const promise = new Promise<FileResponse>((resolve, reject) => {
-    client.generate(requestData, (error, result) => {
-      if (error) reject(error);
-      resolve(result);
+    const finalResult = grpcFinalResultMapper({
+      enrollClassrooms,
+      schoolReports
     });
-  });
 
-  const result = await promise;
-  const byteArray = Buffer.from(result.getFilechunk_asU8());
+    const requestData = new FinalResultGenerateRequest();
+    requestData.setSchoolname(classroom.school?.name as string);
+    requestData.setGrade(grade.description);
+    requestData.setClassroom(classroom.description);
+    requestData.setClassperiod(classroom.class_period.description);
+    requestData.setReferenceyear(schoolYear.reference_year);
+    requestData.setFinalresultList(finalResult);
 
-  const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
-    classroom.school?.name
-  }.pdf`;
+    const promise = new Promise<FileResponse>((resolve, reject) => {
+      client.generate(requestData, (error, result) => {
+        if (error) reject(error);
+        resolve(result);
+      });
+    });
 
-  response.setHeader('Content-Type', 'application/pdf');
-  //response.setHeader(
-   // 'Content-Type',
-   // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  //);
-  response.setHeader('Content-Disposition', `inline; filename=${filename}`);
+    const result = await promise;
+    const byteArray = Buffer.from(result.getFilechunk_asU8());
 
-  return response.send(byteArray);
-};
+    const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
+      classroom.school?.name
+    }.pdf`;
+
+    response.setHeader('Content-Type', 'application/pdf');
+    //response.setHeader(
+    // 'Content-Type',
+    // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    //);
+    response.setHeader('Content-Disposition', `inline; filename=${filename}`);
+
+    return response.send(byteArray);
+  }
+);

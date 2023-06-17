@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { QueryObserverOptions, useQuery } from 'react-query';
 
 import { GradeSchoolSubject } from 'models/GradeSchoolSubject';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type GradeSchoolSubjectsFilters = {
   grade_id?: string;
@@ -13,10 +12,10 @@ type GradeSchoolSubjectsFilters = {
 };
 
 export const listGradeSchoolSubjects = (
-  session?: Session | null,
-  filters: GradeSchoolSubjectsFilters = {}
+  filters: GradeSchoolSubjectsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const {
     grade_id,
@@ -44,7 +43,6 @@ export const listGradeSchoolSubjects = (
 };
 
 export const useListGradeSchoolSubjects = (
-  session?: Session | null,
   filters: GradeSchoolSubjectsFilters = {},
   queryOptions: QueryObserverOptions<GradeSchoolSubject[]> = {}
 ) => {
@@ -55,7 +53,7 @@ export const useListGradeSchoolSubjects = (
 
   return useQuery<GradeSchoolSubject[]>(
     `list-grade-school-subjects${key}`,
-    () => listGradeSchoolSubjects(session, filters),
+    () => listGradeSchoolSubjects(filters),
     queryOptions
   );
 };

@@ -1,23 +1,16 @@
 import { useCallback } from 'react';
-import { Session } from 'next-auth';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 import { Grade } from 'models/Grade';
 
-export function useAddGradeMutation(
-  onMutate: () => void,
-  session?: Session | null
-) {
-  const addGrade = useCallback(
-    async (values: any) => {
-      const api = initializeApi(session);
-      return api.post('/education/admin/grades', values);
-    },
-    [session]
-  );
+export function useAddGradeMutation(onMutate: () => void) {
+  const addGrade = useCallback(async (values: any) => {
+    const api = createUnstableApi();
+    return api.post('/education/admin/grades', values);
+  }, []);
 
   return useMutation('add-grades', addGrade, {
     onMutate: onMutate,
@@ -34,15 +27,12 @@ export function useAddGradeMutation(
   });
 }
 
-export function useDeleteGradeMutation(session?: Session | null) {
-  const deleteGrade = useCallback(
-    async (grade: Grade) => {
-      const api = initializeApi(session);
+export function useDeleteGradeMutation() {
+  const deleteGrade = useCallback(async (grade: Grade) => {
+    const api = createUnstableApi();
 
-      return api.delete(`/education/admin/grades/${grade.id}`);
-    },
-    [session]
-  );
+    return api.delete(`/education/admin/grades/${grade.id}`);
+  }, []);
 
   return useMutation('delete-grade', deleteGrade, {
     renderLoading: function render(deletedGrade) {

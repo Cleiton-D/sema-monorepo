@@ -1,12 +1,4 @@
-import { Session } from 'next-auth';
-import { initializeApi } from 'services/api';
-
-type DatabaseDumpResponse = {
-  filename: string;
-  content: Buffer;
-};
-
-export const getDatabaseDump = async (session: Session | null) => {
+export const getDatabaseDump = async () => {
   const now = new Date();
   const currentDate = `${now.getFullYear()}.${
     now.getMonth() + 1

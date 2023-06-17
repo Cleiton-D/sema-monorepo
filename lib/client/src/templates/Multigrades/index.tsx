@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { PlusCircle, X, Edit } from '@styled-icons/feather';
 
@@ -27,14 +26,16 @@ import { translateDescription } from 'utils/mappers/classPeriodMapper';
 
 import * as S from './styles';
 import MultigradeClassroomsTable from 'components/MultigradeClassroomsTable';
+import { useProfile } from 'requests/queries/session';
 
 const MultigradesTemplate = () => {
   const [filters, setFilters] = useState<ListMultigradesFilters>({});
 
   const { enableAccess } = useAccess();
 
+  const { data: profile } = useProfile();
+
   const { query, push } = useRouter();
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const deleteMultigrade = useDeleteMultigrade();
@@ -55,10 +56,10 @@ const MultigradesTemplate = () => {
 
   const schoolId = useMemo(() => {
     if (query.school_id === 'me') {
-      return session?.schoolId;
+      return profile?.school?.id;
     }
     return query.school_id as string;
-  }, [query, session]);
+  }, [query, profile]);
 
   const multigradesFilters = useMemo(() => {
     return {
@@ -67,7 +68,7 @@ const MultigradesTemplate = () => {
     };
   }, [filters, schoolId]);
 
-  const { data: multigrades } = useListMultigrades(session, multigradesFilters);
+  const { data: multigrades } = useListMultigrades(multigradesFilters);
 
   const canChangeClassroom = useMemo(
     () => enableAccess({ module: 'CLASSROOM', rule: 'WRITE' }),
@@ -106,7 +107,7 @@ const MultigradesTemplate = () => {
             )}
           </TableColumn>
 
-          {!session?.schoolId && (
+          {!profile?.school?.id && (
             <TableColumn label="Escola" tableKey="school.name" />
           )}
 

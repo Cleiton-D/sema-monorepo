@@ -1,8 +1,6 @@
-import { Session } from 'next-auth';
-
 import { MultigradeClassroom } from 'models/multigrade-classroom';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 import { useQuery } from 'react-query';
 
 export const multigradesClassroomsKeys = {
@@ -16,10 +14,10 @@ export type ListMultigradeClassroomsFilters = {
 };
 
 export const listMultigradeClassrooms = (
-  session: Session | null,
-  filters: ListMultigradeClassroomsFilters
+  filters: ListMultigradeClassroomsFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { multigrade_id } = filters;
   return api
@@ -28,10 +26,9 @@ export const listMultigradeClassrooms = (
 };
 
 export const useListMultigradeClassrooms = (
-  session: Session | null,
   filters: ListMultigradeClassroomsFilters
 ) => {
   return useQuery(multigradesClassroomsKeys.list(JSON.stringify(filters)), () =>
-    listMultigradeClassrooms(session, filters)
+    listMultigradeClassrooms(filters)
   );
 };

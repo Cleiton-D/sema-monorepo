@@ -1,25 +1,17 @@
-import { Session } from 'next-auth';
 import { RefObject, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ModalRef } from 'components/Modal';
-
-import { initializeApi, useMutation } from 'services/api';
-import { FormattedUser } from 'models/User';
-
 import ToastContent from 'components/ToastContent';
 
-export function useAddUserMutation(
-  modalRef: RefObject<ModalRef>,
-  session?: Session | null
-) {
-  const addUser = useCallback(
-    async (values: any) => {
-      const api = initializeApi(session);
-      return api.post('/users', values);
-    },
-    [session]
-  );
+import { createUnstableApi, useMutation } from 'services/api';
+import { FormattedUser } from 'models/User';
+
+export function useAddUserMutation(modalRef: RefObject<ModalRef>) {
+  const addUser = useCallback(async (values: any) => {
+    const api = createUnstableApi();
+    return api.post('/users', values);
+  }, []);
 
   return useMutation('add-user', addUser, {
     linkedQueries: {
@@ -42,15 +34,12 @@ export function useAddUserMutation(
   });
 }
 
-export function useDeleteUserMutation(session?: Session | null) {
-  const deleteUser = useCallback(
-    async (user: FormattedUser) => {
-      const api = initializeApi(session);
+export function useDeleteUserMutation() {
+  const deleteUser = useCallback(async (user: FormattedUser) => {
+    const api = createUnstableApi();
 
-      return api.delete(`/users/${user.id}`);
-    },
-    [session]
-  );
+    return api.delete(`/users/${user.id}`);
+  }, []);
 
   return useMutation('delete-user', deleteUser, {
     linkedQueries: {
@@ -76,14 +65,14 @@ export function useDeleteUserMutation(session?: Session | null) {
 type ResetPasswordRequest = {
   user_id: string;
 };
-export function useResetPassword(session?: Session | null) {
+export function useResetPassword() {
   const resetPassword = useCallback(
     async ({ user_id }: ResetPasswordRequest) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       return api.patch(`/users/reset-pass`, { user_id });
     },
-    [session]
+    []
   );
 
   return useMutation('reset-password', resetPassword, {

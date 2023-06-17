@@ -6,6 +6,7 @@ const userProfilesRouter = Router();
 
 const userProfilesController = new UserProfilesController();
 
+userProfilesRouter.get('/me', userProfilesController.showMe);
 userProfilesRouter.get('/', userProfilesController.index);
 userProfilesRouter.post('/', userProfilesController.create);
 userProfilesRouter.delete('/', userProfilesController.delete);

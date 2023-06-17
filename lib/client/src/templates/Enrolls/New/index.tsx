@@ -26,6 +26,7 @@ import {
   selectedStudent as selectedStudentAtom
 } from 'store/atoms/create-enroll';
 
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useCreateEnroll } from 'requests/mutations/enroll';
 
 import * as S from './styles';
@@ -41,6 +42,8 @@ const NewEnroll = ({ school, ufs }: NewEnrollProps) => {
   const router = useRouter();
   const resetForm = useResetAtom(createEnrollData);
   const resetSelectedStudent = useResetAtom(selectedStudentAtom);
+
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const mutationCreateEnroll = useCreateEnroll();
 
@@ -71,6 +74,7 @@ const NewEnroll = ({ school, ufs }: NewEnrollProps) => {
         enroll_date: newEnrollDate,
         school_reports: schoolReports,
         school_id: school.id,
+        school_year_id: schoolYear?.id,
         student: {
           ...newStudent,
           birth_date: newBirthDate,
@@ -82,7 +86,7 @@ const NewEnroll = ({ school, ufs }: NewEnrollProps) => {
       resetForms();
       router.push(`/auth/enrolls?school_id=${school.id}`);
     },
-    [router, school]
+    [router, school, schoolYear]
   );
 
   useEffect(() => {

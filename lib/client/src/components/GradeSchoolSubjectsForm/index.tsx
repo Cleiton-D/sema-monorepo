@@ -1,6 +1,5 @@
 import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import { useQueryClient } from 'react-query';
-import { useSession } from 'next-auth/react';
 import { useAtomValue } from 'jotai/utils';
 import { X, PlusCircle } from '@styled-icons/feather';
 
@@ -27,13 +26,12 @@ const GradeSchoolSubjectsForm: React.ForwardRefRenderFunction<FormHandles> = (
 
   const addGradeModalRef = useRef<ModalRef>(null);
 
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  const { data: grades } = useListGrades(session, {
+  const { data: grades } = useListGrades({
     school_year_id: schoolYearAtomValue?.schoolYear.id
   });
-  const deleteGrade = useDeleteGradeMutation(session);
+  const deleteGrade = useDeleteGradeMutation();
 
   const handleSelectGrade = (grade: Grade) => {
     if (selectedGrade?.id === grade.id) {

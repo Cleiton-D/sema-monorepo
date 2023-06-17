@@ -42,17 +42,17 @@ class GenerateUserTokenService {
       throw new AppError('Profile not found');
     }
 
-    const { secret, expiresIn } = authConfig.jwt;
-    const token = sign({ pfl: userProfile?.id }, secret, {
-      subject: user_id,
-      expiresIn,
-    });
-
     const schoolYear = await this.showSchoolYear
       .execute({
         school_year_id: school_year_id || 'current',
       })
       .catch(() => undefined);
+
+    const { secret, expiresIn } = authConfig.jwt;
+    const token = sign({ pfl: userProfile?.id, scy: schoolYear?.id }, secret, {
+      subject: user_id,
+      expiresIn,
+    });
 
     return { token, profile: userProfile, school_year_id: schoolYear?.id };
   }

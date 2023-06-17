@@ -5,7 +5,6 @@ import {
   useRef,
   useState
 } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -19,8 +18,9 @@ import Checkbox from 'components/Checkbox';
 
 import { ClassPeriod, ClassPeriodForm } from 'models/ClassPeriod';
 
-import { useMutateClassPeriod } from 'requests/mutations/class-period';
 import { classPeriodsKeys } from 'requests/queries/class-periods';
+import { useSessionSchoolYear } from 'requests/queries/session';
+import { useMutateClassPeriod } from 'requests/mutations/class-period';
 
 import { createClassPeriodSchema } from './rules/schema';
 
@@ -53,8 +53,10 @@ const CreateClassPeriodsModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
+  const { data: schoolYear } = useSessionSchoolYear();
+
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
+
   const mutation = useMutateClassPeriod(modalRef);
 
   const handleSubmit = useCallback(
@@ -90,7 +92,7 @@ const CreateClassPeriodsModal: React.ForwardRefRenderFunction<
         };
 
         await mutation.mutateAsync({
-          school_year_id: session?.configs.school_year_id,
+          school_year_id: schoolYear?.id,
           class_periods: requestData
         });
         queryClient.invalidateQueries(...classPeriodsKeys.all);
@@ -108,7 +110,7 @@ const CreateClassPeriodsModal: React.ForwardRefRenderFunction<
         }
       }
     },
-    [hasBreakTime, mutation, queryClient, session]
+    [hasBreakTime, mutation, queryClient, schoolYear]
   );
 
   const openModal = useCallback((class_period?: ClassPeriod) => {

@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 import { Multigrade } from 'models/Multigrade';
 
 type CreateMultigradePayload = {
@@ -11,26 +10,21 @@ type CreateMultigradePayload = {
   class_period_id: string;
   school_id: string;
   is_multigrade?: boolean;
+  school_year_id?: string;
 };
 
 export function useAddMultigrade() {
-  const { data: session } = useSession();
+  const addMultigrade = useCallback(async (values: CreateMultigradePayload) => {
+    const api = createUnstableApi();
+    const { ...data } = values;
 
-  const addMultigrade = useCallback(
-    async (values: CreateMultigradePayload) => {
-      const api = initializeApi(session);
-      const { ...data } = values;
+    const requestData = {
+      ...data
+    };
+    const { data: responseData } = await api.post(`/classrooms`, requestData);
 
-      const requestData = {
-        ...data,
-        school_year_id: session?.configs.school_year_id
-      };
-      const { data: responseData } = await api.post(`/classrooms`, requestData);
-
-      return responseData;
-    },
-    [session]
-  );
+    return responseData;
+  }, []);
 
   return useMutation('add-multigrade', addMultigrade, {
     renderLoading: function render(newMultigrade) {
@@ -48,17 +42,12 @@ export function useAddMultigrade() {
 }
 
 export function useDeleteMultigrade() {
-  const { data: session } = useSession();
+  const deleteMultigrade = useCallback(async (multigrade: Multigrade) => {
+    const api = createUnstableApi();
+    const { id } = multigrade;
 
-  const deleteMultigrade = useCallback(
-    async (multigrade: Multigrade) => {
-      const api = initializeApi(session);
-      const { id } = multigrade;
-
-      await api.delete(`/classrooms/${id}`);
-    },
-    [session]
-  );
+    await api.delete(`/classrooms/${id}`);
+  }, []);
 
   return useMutation('delete-multigrade', deleteMultigrade, {
     renderLoading: function render(multigrade) {

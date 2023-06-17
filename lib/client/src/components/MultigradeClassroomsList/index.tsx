@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { useIsFetching, useQueryClient } from 'react-query';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { X } from '@styled-icons/feather';
@@ -23,7 +22,6 @@ type MultigradeClassroomsListProps = {
 const MultigradeClassroomsList = ({
   multigradeId
 }: MultigradeClassroomsListProps): JSX.Element => {
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const multigradesClassroomsQueryKey = useMemo(() => {
@@ -32,10 +30,6 @@ const MultigradeClassroomsList = ({
     );
   }, [multigradeId]);
   const isFetching = useIsFetching(multigradesClassroomsQueryKey);
-
-  const multigradeParams = useMemo(() => {
-    return { session, multigradeId };
-  }, [session, multigradeId]);
 
   // const multigradesClassrooms = useAtomValue(
   //   multigradeClassroomsAtom(multigradeParams)

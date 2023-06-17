@@ -1,5 +1,3 @@
-import { useSession } from 'next-auth/react';
-
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
@@ -8,25 +6,21 @@ import { useEnrollCount } from 'requests/queries/enrolls';
 import { useCountSchools } from 'requests/queries/schools';
 import { useGradesCount } from 'requests/queries/grades';
 import { useEmployeesCount } from 'requests/queries/employee';
-import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useCountSchoolSubjects } from 'requests/queries/school-subjects';
+import { useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
 const MunicipalSecretaryDashboard = () => {
-  const { data: session } = useSession();
-
-  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
-    id: session?.configs.school_year_id
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: enrollCount } = useEnrollCount({});
+  const { data: schoolsCount } = useCountSchools();
+  const { data: gradesCount } = useGradesCount({
+    school_year_id: schoolYear?.id
   });
-  const { data: enrollCount } = useEnrollCount(session, {});
-  const { data: schoolsCount } = useCountSchools(session);
-  const { data: gradesCount } = useGradesCount(session, {
-    school_year_id: session?.configs.school_year_id
-  });
-  const { data: employeesCount } = useEmployeesCount(session);
-  const { data: schoolSubjectsCount } = useCountSchoolSubjects(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: employeesCount } = useEmployeesCount();
+  const { data: schoolSubjectsCount } = useCountSchoolSubjects({
+    school_year_id: schoolYear?.id
   });
 
   return (

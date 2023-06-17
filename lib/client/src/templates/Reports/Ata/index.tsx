@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { Printer } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -14,6 +13,7 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -25,7 +25,8 @@ const AtaTemplate = (): JSX.Element => {
   const [filters, setFilters] =
     useState<ListClassroomsFilters>(INITIAL_FILTERS);
 
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
   const handleSearch = useCallback((searchData: ListClassroomsFilters) => {
     setFilters({ ...INITIAL_FILTERS, ...searchData });
@@ -33,13 +34,13 @@ const AtaTemplate = (): JSX.Element => {
 
   const searchFilters = useMemo(() => {
     return {
-      school_id: session?.schoolId as string,
-      school_year_id: session?.configs.school_year_id,
+      school_id: profile?.school?.id as string,
+      school_year_id: schoolYear?.id,
       ...filters
     };
-  }, [session, filters]);
+  }, [filters, profile, schoolYear]);
 
-  const { data: classrooms } = useListClassrooms(session, searchFilters);
+  const { data: classrooms } = useListClassrooms(searchFilters);
 
   return (
     <Base>

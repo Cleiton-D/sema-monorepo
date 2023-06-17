@@ -1,30 +1,24 @@
-import { useSession } from 'next-auth/react';
-
 import Base from 'templates/Base';
 
 import Card from 'components/Card';
 
-import { useSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { useEnrollCount } from 'requests/queries/enrolls';
 import { useCountClassrooms } from 'requests/queries/classrooms';
-import { useGetSchool } from 'requests/queries/schools';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
 const SchoolAdministrationDashboard = () => {
-  const { data: session } = useSession();
+  const { data: profile } = useProfile();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: school } = useGetSchool(session, { id: 'me' });
-
-  const { data: schoolYear } = useSchoolYearWithSchoolTerms(session, {
-    id: session?.configs.school_year_id
+  const { data: enrollCount } = useEnrollCount({
+    school_id: profile?.school?.id,
+    school_year_id: schoolYear?.id
   });
-  const { data: enrollCount } = useEnrollCount(session, {
-    school_id: school?.id
-  });
-  const { data: classroomsCount } = useCountClassrooms(session, {
-    school_id: school?.id,
-    school_year_id: session?.configs.school_year_id
+  const { data: classroomsCount } = useCountClassrooms({
+    school_id: profile?.school?.id,
+    school_year_id: schoolYear?.id
   });
 
   return (

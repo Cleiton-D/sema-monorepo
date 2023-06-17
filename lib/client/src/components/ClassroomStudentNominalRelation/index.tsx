@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Table from 'components/Table';
 
@@ -14,9 +13,7 @@ type ClassroomStudentNominalRelationProps = {
 const ClassroomStudentNominalRelation = ({
   classroomId
 }: ClassroomStudentNominalRelationProps) => {
-  const { data: session } = useSession();
-
-  const { data: enrolls } = useListEnrolls(session, {
+  const { data: enrolls } = useListEnrolls({
     classroom_id: classroomId
   });
 

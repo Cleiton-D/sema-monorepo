@@ -1,30 +1,26 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
 import Heading from 'components/Heading';
 import CalendarMonth from 'components/CalendarMonth';
 
-import { useShowSchoolYear } from 'requests/queries/school-year';
 import { useListCalendarEvents } from 'requests/queries/calendar-events';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import { calendarEventMapper } from 'utils/mappers/calendarEventsMapper';
 
 import * as S from './styles';
 
 const CalendarTemplate = () => {
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
 
-  const { data: schoolYear } = useShowSchoolYear(session, {
-    id: session?.configs.school_year_id
-  });
   const { data: calendarEvents } = useListCalendarEvents(
-    session,
     {
       school_year_id: schoolYear?.id,
-      competence: session?.schoolId ? 'ALL' : 'MUNICIPAL',
-      school_id: session?.schoolId
+      competence: profile?.school?.id ? 'ALL' : 'MUNICIPAL',
+      school_id: profile?.school?.id
     },
     {
       enabled: !!schoolYear?.id
@@ -46,7 +42,9 @@ const CalendarTemplate = () => {
         {Array.from({ length: 12 }).map((_, month) => (
           <CalendarMonth
             month={month}
-            year={schoolYear?.reference_year ? +schoolYear.reference_year : 2022}
+            year={
+              schoolYear?.reference_year ? +schoolYear.reference_year : 2022
+            }
             key={String(month)}
             calendarEvents={mappedCalendarEvents}
           />

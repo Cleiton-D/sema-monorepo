@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import Image from 'next/image';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { Check } from '@styled-icons/feather';
 
@@ -23,10 +22,9 @@ import {
 import * as S from './styles';
 
 const BackgroundsTemplate = () => {
-  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
-  const { data: backgrounds = [] } = useListSystemBackgrounds(session);
+  const { data: backgrounds = [] } = useListSystemBackgrounds();
 
   const createSystemBackground = useCreateCurrentSystemBackgroundMutation();
   const changeSystemBackground = useChangeCurrentSystemBackgroundMutation();

@@ -1,8 +1,6 @@
-import { SchoolYear } from 'models/SchoolYear';
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 import {
   mapSchoolTermPeriodsToObject,
@@ -12,6 +10,7 @@ import {
 import { schoolYearMapper } from 'utils/mappers/schoolYearMapper';
 
 import { listSchoolTermPeriods } from './school-term-periods';
+import { SchoolYear } from 'models/SchoolYear';
 import { Status } from 'models/Status';
 
 type GetSchoolYearFilters = {
@@ -19,10 +18,10 @@ type GetSchoolYearFilters = {
 };
 
 export const getSchoolYearWithSchoolTerms = async (
-  session?: Session | null,
-  filters: GetSchoolYearFilters = {}
+  filters: GetSchoolYearFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { id, ...params } = filters;
 
@@ -34,9 +33,12 @@ export const getSchoolYearWithSchoolTerms = async (
     .catch(() => undefined);
 
   const schoolTermPeriodsResponse = schoolYear
-    ? await listSchoolTermPeriods(session, {
-        school_year_id: schoolYear.id
-      }).catch(() => [])
+    ? await listSchoolTermPeriods(
+        {
+          school_year_id: schoolYear.id
+        },
+        session
+      ).catch(() => [])
     : [];
 
   const schoolTermPeriodsArray = schoolTermPeriodsResponse
@@ -51,19 +53,18 @@ export const getSchoolYearWithSchoolTerms = async (
 };
 
 export const useSchoolYearWithSchoolTerms = (
-  session?: Session | null,
   filters: GetSchoolYearFilters = {}
 ) => {
   return useQuery(['show-school-year', 'detail', JSON.stringify(filters)], () =>
-    getSchoolYearWithSchoolTerms(session, filters)
+    getSchoolYearWithSchoolTerms(filters)
   );
 };
 
 export const showSchoolYear = async (
-  session?: Session | null,
-  filters: GetSchoolYearFilters = {}
+  filters: GetSchoolYearFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { id, ...params } = filters;
 
@@ -75,12 +76,9 @@ export const showSchoolYear = async (
     .catch(() => undefined);
 };
 
-export const useShowSchoolYear = (
-  session?: Session | null,
-  filters: GetSchoolYearFilters = {}
-) => {
+export const useShowSchoolYear = (filters: GetSchoolYearFilters = {}) => {
   return useQuery(['show-school-year', JSON.stringify(filters)], () =>
-    showSchoolYear(session, filters)
+    showSchoolYear(filters)
   );
 };
 
@@ -88,10 +86,10 @@ type ListSchoolYearsFilters = {
   status?: Status | Status[];
 };
 export const listSchoolYears = async (
-  session?: Session | null,
-  params: ListSchoolYearsFilters = {}
+  params: ListSchoolYearsFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<SchoolYear[]>(`/education/admin/school-years`, {
@@ -101,11 +99,8 @@ export const listSchoolYears = async (
     .catch(() => []);
 };
 
-export const useListSchoolYears = (
-  session?: Session | null,
-  filters: ListSchoolYearsFilters = {}
-) => {
+export const useListSchoolYears = (filters: ListSchoolYearsFilters = {}) => {
   return useQuery(['list-school-years', JSON.stringify(filters)], () =>
-    listSchoolYears(session, filters)
+    listSchoolYears(filters)
   );
 };

@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest } from 'next/server';
 
-import { getMiddlewareSession } from 'utils/getMiddlewareSession';
+import { getMiddlewareSession } from 'utils/session/edge';
 
 const PUBLIC_FILE = /\.(.*)$/;
 
 export async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
+
   const pathname = request.nextUrl.pathname;
 
   const isSign = pathname.startsWith('/sign-in');
@@ -18,16 +20,16 @@ export async function middleware(request: NextRequest) {
     pathname.includes('.') ||
     PUBLIC_FILE.test(pathname)
   ) {
-    return NextResponse.next();
+    return response;
   }
 
   const url = request.nextUrl.clone();
-  const session = await getMiddlewareSession(request);
-
   const requestUrl = request.headers.get('referer');
+
+  const session = await getMiddlewareSession(request, response);
   if (!session) {
     if (isSign) {
-      return NextResponse.next();
+      return response;
     }
 
     url.pathname = `/sign-in`;
@@ -37,9 +39,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(url, request.url));
   }
 
-  if (session.changePassword) {
+  const user = await fetch(`${process.env.APP_URL_INTERNAL}/api/session/user`, {
+    headers: { cookie: request.headers.get('cookie') || '' }
+  })
+    .then((res) => res.json())
+    .catch(() => undefined);
+
+  if (user.change_password) {
     if (pathname.startsWith('/auth/change-password')) {
-      return NextResponse.next();
+      return response;
     }
 
     url.pathname = '/auth/change-password';
@@ -52,8 +60,19 @@ export async function middleware(request: NextRequest) {
 
   if (!isAuth) {
     url.pathname = '/auth';
+    url.searchParams.delete('callbackUrl');
     return NextResponse.redirect(new URL(url, request.url));
   }
 
-  return NextResponse.next();
+  if (pathname.startsWith('/auth/change-password')) {
+    const callbackUrl = url.searchParams.get('callbackUrl');
+    url.pathname = callbackUrl || '/auth';
+    url.searchParams.delete('callbackUrl');
+
+    return NextResponse.redirect(new URL(url, request.url));
+  }
+
+  return response;
 }
+
+export const config = { matcher: '/:path*' };

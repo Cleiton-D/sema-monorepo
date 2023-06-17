@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { X } from '@styled-icons/feather';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,6 +17,7 @@ import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroo
 import { useListSchoolTeachers } from 'requests/queries/school-teachers';
 import { useShowGrade } from 'requests/queries/grades';
 import { useListGradeSchoolSubjects } from 'requests/queries/grade-school-subjects';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import {
   useDeleteClassroomTeacherSchoolSubject,
   useLinkClassroomTeacherSchoolSubject
@@ -39,11 +39,10 @@ type ClassroomTeachersTableData = {
 const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
 
-  const { data: grade } = useShowGrade(session, classroom.grade_id);
+  const { data: grade } = useShowGrade(classroom.grade_id);
   const { data: gradeSchoolSubjects } = useListGradeSchoolSubjects(
-    session,
     {
       grade_id: classroom.grade_id,
       is_multidisciplinary: grade?.is_multidisciplinary
@@ -52,14 +51,14 @@ const ClassroomTeachersTable = ({ classroom }: ClassroomTeachersTableProps) => {
   );
 
   const { data: classroomTeacherSchoolSubjects, refetch } =
-    useListClassroomTeacherSchoolSubjects(session, {
+    useListClassroomTeacherSchoolSubjects({
       classroom_id: classroom.id,
       is_multidisciplinary: null
     });
 
-  const { data: schoolTeachers } = useListSchoolTeachers(session, {
+  const { data: schoolTeachers } = useListSchoolTeachers({
     school_id: classroom?.school_id,
-    school_year_id: session?.configs.school_year_id
+    school_year_id: schoolYear?.id
   });
 
   const deleteClassroomTeacherSchoolSubject =

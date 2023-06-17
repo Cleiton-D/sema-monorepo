@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 
 import Select from 'components/Select';
@@ -9,6 +8,7 @@ import Button from 'components/Button';
 import { useListSchools } from 'requests/queries/schools';
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassPeriods } from 'requests/queries/class-periods';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -22,18 +22,18 @@ const ClassroomsSearch = ({
 
   const { query } = useRouter();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
 
-  const { data: schools, isLoading: isLoadingSchools } =
-    useListSchools(session);
+  const { data: schools, isLoading: isLoadingSchools } = useListSchools();
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_year_id: schoolYear?.id
     });
 
   const schoolsOptions = useMemo(() => {
@@ -81,7 +81,7 @@ const ClassroomsSearch = ({
             emptyOption
           /> */}
 
-          {!session?.schoolId && (
+          {!profile?.school?.id && (
             <Select
               name="school_id"
               label="Escola"

@@ -4,43 +4,35 @@ import SchoolSubject from 'templates/Administration/SchoolSubjects';
 
 import { listSchoolSubjects } from 'requests/queries/school-subjects';
 
-import { withAccess } from 'hooks/AccessProvider';
-
 import prefetchQuery from 'utils/prefetch-query';
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 const SchoolSubjectPage = () => {
   return <SchoolSubject />;
 };
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const dehydratedState = await prefetchQuery([
+      {
+        key: 'get-school-subjects',
+        fetcher: () =>
+          listSchoolSubjects(
+            {
+              school_year_id: context.req.fullSession?.schoolYear.id
+            },
+            context.req.session
+          )
+      }
+    ]);
 
-  const { queryKey, modules } = await withAccess(context, session, {
-    module: 'SCHOOL-SUBJECT'
-  });
-
-  const dehydratedState = await prefetchQuery([
-    {
-      key: 'get-school-subjects',
-      fetcher: () =>
-        listSchoolSubjects(session, {
-          school_year_id: session?.configs.school_year_id
-        })
-    },
-    {
-      key: queryKey,
-      fetcher: () => modules
-    }
-  ]);
-
-  return {
-    props: {
-      session,
-      dehydratedState
-    }
-  };
-}
+    return {
+      props: {
+        dehydratedState
+      }
+    };
+  }
+);
 
 SchoolSubjectPage.auth = {
   module: 'SCHOOL-SUBJECT'

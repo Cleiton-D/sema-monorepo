@@ -1,7 +1,6 @@
 import { useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { PlusCircle, Edit, X, PlusSquare } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
@@ -31,10 +30,9 @@ const Employees = () => {
     useRef<CreateEmployeeUserProfileModalRef>(null);
 
   const router = useRouter();
-  const { data: session } = useSession();
-  const { data: employees, refetch } = useListEmployees(session);
+  const { data: employees, refetch } = useListEmployees();
 
-  const deleteEmployee = useDeleteEmployee(session);
+  const deleteEmployee = useDeleteEmployee();
 
   const handleDelete = async (employee: Employee) => {
     const confirmation = window.confirm(

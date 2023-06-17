@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { SchoolTeacher } from 'models/SchoolTeacher';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 type SchoolTeachersFilters = {
   school_id?: string;
@@ -15,10 +14,10 @@ type CountSchoolTeachersResponse = {
 };
 
 export const listSchoolTeachers = (
-  session: Session | null,
-  filters: SchoolTeachersFilters
+  filters: SchoolTeachersFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { school_id, ...params } = filters;
 
@@ -29,22 +28,19 @@ export const listSchoolTeachers = (
     .then((response) => response.data);
 };
 
-export const useListSchoolTeachers = (
-  session: Session | null,
-  filters: SchoolTeachersFilters
-) => {
+export const useListSchoolTeachers = (filters: SchoolTeachersFilters) => {
   const key = `list-school-teachers-${JSON.stringify(filters)}`;
 
-  const result = useQuery(key, () => listSchoolTeachers(session, filters));
+  const result = useQuery(key, () => listSchoolTeachers(filters));
 
   return { ...result, key };
 };
 
 export const countSchoolTeachers = (
-  session: Session | null,
-  filters: SchoolTeachersFilters
+  filters: SchoolTeachersFilters,
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   const { school_id, ...params } = filters;
 
@@ -58,13 +54,10 @@ export const countSchoolTeachers = (
     .catch(() => undefined);
 };
 
-export const useCountSchoolTeachers = (
-  session: Session | null,
-  filters: SchoolTeachersFilters
-) => {
+export const useCountSchoolTeachers = (filters: SchoolTeachersFilters) => {
   const key = `count-school-teachers-${JSON.stringify(filters)}`;
 
-  const result = useQuery(key, () => countSchoolTeachers(session, filters));
+  const result = useQuery(key, () => countSchoolTeachers(filters));
 
   return { ...result, key };
 };

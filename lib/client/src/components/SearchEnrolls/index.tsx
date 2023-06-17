@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import { Form } from '@unform/web';
 
 import TextInput from 'components/TextInput';
@@ -11,6 +10,7 @@ import { useListSchools } from 'requests/queries/schools';
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { useListGrades } from 'requests/queries/grades';
 import { useListClassPeriods } from 'requests/queries/class-periods';
+import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
 import * as S from './styles';
 
@@ -24,28 +24,27 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
 
   const { query } = useRouter();
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
 
-  const { data: schools, isLoading: isLoadingSchools } =
-    useListSchools(session);
+  const { data: schools, isLoading: isLoadingSchools } = useListSchools();
 
-  const { data: grades, isLoading: isLoadingGrades } = useListGrades(session, {
-    school_year_id: session?.configs.school_year_id
+  const { data: grades, isLoading: isLoadingGrades } = useListGrades({
+    school_year_id: schoolYear?.id
   });
 
   const { data: classPeriods, isLoading: isLoadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_year_id: schoolYear?.id
     });
 
   const { data: classrooms, isLoading: isLoadingClassrooms } =
     useListClassrooms(
-      session,
       {
         school_id: school,
         grade_id: grade,
         class_period_id: classPeriod,
-        school_year_id: session?.configs.school_year_id
+        school_year_id: schoolYear?.id
       },
       { enabled: !!school }
     );
@@ -116,11 +115,11 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    const schoolId = query.school_id || session?.schoolId;
+    const schoolId = query.school_id || profile?.school?.id;
     if (schoolId && !Array.isArray(schoolId)) {
       setSchool(schoolId);
     }
-  }, [query, session]);
+  }, [query, profile]);
 
   return (
     <S.SearchSection>
@@ -143,7 +142,7 @@ const SearchEnrolls = ({ handleSearch }: SearchEnrollsProps): JSX.Element => {
             emptyOption
           />
 
-          {!session?.schoolId && (
+          {!profile?.school?.id && (
             <Select
               name="school_id"
               label="Escola"

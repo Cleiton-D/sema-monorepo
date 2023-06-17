@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 
 import TextInput from 'components/TextInput';
@@ -20,6 +19,11 @@ import {
 } from 'requests/queries/classrooms';
 import { classesKeys } from 'requests/queries/class';
 import { useShowGrade } from 'requests/queries/grades';
+import {
+  useProfile,
+  useSessionSchoolYear,
+  useUser
+} from 'requests/queries/session';
 import { useEditClass } from 'requests/mutations/classes';
 
 import { generateTimetable } from 'utils/generateTimetable';
@@ -52,45 +56,48 @@ const EditClassForm = ({ classEntity }: EditClassFormProps) => {
 
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
+  const { data: profile } = useProfile();
+  const { data: user } = useUser();
+
   const queryClient = useQueryClient();
 
   const editClass = useEditClass();
 
-  const { data: classroom } = useShowClassroom(session, {
+  const { data: classroom } = useShowClassroom({
     id: classEntity.classroom_id
   });
-  const { data: grade } = useShowGrade(session, classroom?.grade_id);
+  const { data: grade } = useShowGrade(classroom?.grade_id);
 
   const { data: schoolSubjects, isLoading: isLoadingSchoolSubjects } =
-    useListSchoolSubjects(session, {
+    useListSchoolSubjects({
+      isTeacher: profile?.access_level?.code === 'teacher',
+      accessLevel: profile?.access_level?.code,
+      userEmployeeId: user?.employee?.id,
       classroom_id: classEntity.classroom_id,
-      school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id,
+      school_id: profile?.school?.id,
+      school_year_id: schoolYear?.id,
       include_multidisciplinary: true,
       is_multidisciplinary: grade?.is_multidisciplinary || undefined,
       grade_id: classroom?.grade_id
     });
 
-  const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms(
-    session,
-    {
-      school_id: session?.schoolId,
-      employee_id: session?.user.employeeId,
-      with_in_multigrades: false,
-      with_multigrades: true,
-      school_year_id: session?.configs.school_year_id
-    }
-  );
+  const { data: classrooms, isLoading: loadingClassrooms } = useListClassrooms({
+    school_id: profile?.school?.id,
+    employee_id: user?.employee?.id,
+    with_in_multigrades: false,
+    with_multigrades: true,
+    school_year_id: schoolYear?.id
+  });
 
   const { data: classPeriods, isLoading: loadingClassPeriods } =
-    useListClassPeriods(session, {
-      school_id: session?.schoolId,
-      school_year_id: session?.configs.school_year_id
+    useListClassPeriods({
+      school_id: profile?.school?.id,
+      school_year_id: schoolYear?.id
     });
 
-  const { data: schoolTermPeriod } = useShowSchoolTermPeriod(session, {
-    school_year_id: session?.configs.school_year_id,
+  const { data: schoolTermPeriod } = useShowSchoolTermPeriod({
+    school_year_id: schoolYear?.id,
     contain_date: selectedDay,
     status: 'ACTIVE'
   });

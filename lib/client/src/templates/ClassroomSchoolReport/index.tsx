@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 
 import Base from 'templates/Base';
 
@@ -10,21 +9,23 @@ import Tab from 'components/Tab';
 
 import { useShowClassroom } from 'requests/queries/classrooms';
 import { useListClassroomTeacherSchoolSubjects } from 'requests/queries/classroom-teacher-school-subjects';
+import { useUser } from 'requests/queries/session';
 
 import * as S from './styles';
 
 const ClassroomSchoolReport = (): JSX.Element => {
   const { query } = useRouter();
-  const { data: session } = useSession();
 
-  const { data: classroom } = useShowClassroom(session, {
+  const { data: user } = useUser();
+
+  const { data: classroom } = useShowClassroom({
     id: query.classroom_id as string
   });
 
   const { data: classroomSchoolSubjects } =
-    useListClassroomTeacherSchoolSubjects(session, {
+    useListClassroomTeacherSchoolSubjects({
       classroom_id: query.classroom_id as string,
-      employee_id: session?.user.employeeId,
+      employee_id: user?.employee?.id,
       is_multidisciplinary: 0
     });
 

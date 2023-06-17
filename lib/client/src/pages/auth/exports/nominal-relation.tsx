@@ -9,7 +9,7 @@ import NominalRelation, {
 import { showClassroom } from 'requests/queries/classrooms';
 import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 export default function SchoolReports(props: NominalRelationReportProps) {
   useEffect(() => {
@@ -29,25 +29,29 @@ export default function SchoolReports(props: NominalRelationReportProps) {
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { classroom_id } = context.query;
+export const getServerSideProps = withProtectedRoute(
+  async (context: GetServerSidePropsContext) => {
+    const { classroom_id } = context.query;
 
-  const session = await protectedRoutes(context);
-  if (!session) return;
+    const classroom = await showClassroom(
+      {
+        id: classroom_id as string
+      },
+      context.req.session
+    );
 
-  const classroom = await showClassroom(session, {
-    id: classroom_id as string
-  });
+    const enrollClassrooms = await listEnrollClassrooms(
+      {
+        classroom_id: classroom_id as string
+      },
+      context.req.session
+    );
 
-  const enrollClassrooms = await listEnrollClassrooms(session, {
-    classroom_id: classroom_id as string
-  });
-
-  return {
-    props: {
-      session,
-      classroom,
-      enrollClassrooms
-    }
-  };
-}
+    return {
+      props: {
+        classroom,
+        enrollClassrooms
+      }
+    };
+  }
+);

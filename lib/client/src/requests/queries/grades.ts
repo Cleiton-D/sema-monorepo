@@ -1,9 +1,8 @@
-import { Session } from 'next-auth';
+import { useMemo } from 'react';
 import { useQuery } from 'react-query';
 
 import { Grade } from 'models/Grade';
-import { initializeApi } from 'services/api';
-import { useMemo } from 'react';
+import { createUnstableApi } from 'services/api';
 
 type CountGradesResponse = {
   count: number;
@@ -24,10 +23,10 @@ export const gradesKeys = {
 };
 
 export const listGrades = (
-  session?: Session | null,
-  params: ListGradesFilters = {}
+  params: ListGradesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Grade[]>('/education/admin/grades', { params })
@@ -35,10 +34,10 @@ export const listGrades = (
 };
 
 export const gradesCount = (
-  session?: Session | null,
-  params: ListGradesFilters = {}
+  params: ListGradesFilters = {},
+  session?: AppSession
 ) => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<CountGradesResponse>('/education/admin/grades/count', { params })
@@ -46,41 +45,35 @@ export const gradesCount = (
     .catch(() => undefined);
 };
 
-export const useListGrades = (
-  session?: Session | null,
-  params: ListGradesFilters = {}
-) => {
+export const useListGrades = (params: ListGradesFilters = {}) => {
   const key = useMemo(() => gradesKeys.list(JSON.stringify(params)), [params]);
 
-  return useQuery(key, () => listGrades(session, params));
+  return useQuery(key, () => listGrades(params));
 };
 
-export const useGradesCount = (
-  session?: Session | null,
-  params: ListGradesFilters = {}
-) => {
+export const useGradesCount = (params: ListGradesFilters = {}) => {
   const key = useMemo(() => gradesKeys.count(JSON.stringify(params)), [params]);
 
-  const result = useQuery(key, () => gradesCount(session, params));
+  const result = useQuery(key, () => gradesCount(params));
 
   return { ...result, key };
 };
 
-export const showGrade = (session?: Session | null, gradeId?: string) => {
+export const showGrade = (gradeId?: string, session?: AppSession) => {
   if (!gradeId) return undefined;
 
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<Grade>(`/education/admin/grades/${gradeId}`)
     .then((response) => response.data);
 };
 
-export const useShowGrade = (session?: Session | null, gradeId?: string) => {
+export const useShowGrade = (gradeId?: string) => {
   const key = useMemo(
     () => gradesKeys.show(JSON.stringify({ gradeId })),
     [gradeId]
   );
 
-  return useQuery(key, () => showGrade(session, gradeId));
+  return useQuery(key, () => showGrade(gradeId));
 };

@@ -1,5 +1,4 @@
 import { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -15,6 +14,7 @@ import { Classroom } from 'models/Classroom';
 import { useListClassrooms } from 'requests/queries/classrooms';
 import { multigradesClassroomsKeys } from 'requests/queries/multigrade-classrooms';
 import { multigradesKeys } from 'requests/queries/multigrades';
+import { useSessionSchoolYear } from 'requests/queries/session';
 import { useAddMultigradeClassroom } from 'requests/mutations/multigrade-classrooms';
 
 import { classroomsAtom } from 'store/atoms/create-multigrade';
@@ -42,16 +42,16 @@ const SelectClassroomToMultigradeModal: React.ForwardRefRenderFunction<
   const modalRef = useRef<ModalRef>(null);
   const formRef = useRef<FormHandles>(null);
 
-  const { data: session } = useSession();
+  const { data: schoolYear } = useSessionSchoolYear();
   const queryClient = useQueryClient();
 
   const [multigradesClassrooms, setMultigradesClassrooms] =
     useAtom(classroomsAtom);
 
-  const { data: classrooms, isLoading } = useListClassrooms(session, {
+  const { data: classrooms, isLoading } = useListClassrooms({
     class_period_id: classPeriodId,
     school_id: schoolId,
-    school_year_id: session?.configs.school_year_id,
+    school_year_id: schoolYear?.id,
     with_in_multigrades: false
   });
 

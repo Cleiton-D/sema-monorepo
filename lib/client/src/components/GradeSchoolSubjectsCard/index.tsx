@@ -1,5 +1,4 @@
 import { useRef, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { Edit3, X } from '@styled-icons/feather';
 
@@ -29,13 +28,9 @@ const GradeSchoolSubjectsCard = ({ gradeId }: GradeSchoolSubjectsCardProps) => {
   const { enableAccess } = useAccess();
 
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
-  const { data: grade, isLoading: isLoadingGrade } = useShowGrade(
-    session,
-    gradeId
-  );
-  const { data, isLoading, refetch } = useListGradeSchoolSubjects(session, {
+  const { data: grade, isLoading: isLoadingGrade } = useShowGrade(gradeId);
+  const { data, isLoading, refetch } = useListGradeSchoolSubjects({
     grade_id: gradeId,
     include_multidisciplinary: true
   });

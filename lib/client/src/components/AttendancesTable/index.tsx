@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import format from 'date-fns/format';
 
 import Table from 'components/Table';
@@ -47,11 +46,8 @@ export const AttendancesTable = ({
 
   const { enableAccess } = useAccess();
 
-  const { data: session } = useSession();
-
   const { data: { classes: oldClasses, attendances } = {} } =
     useListAttendancesByClasses(
-      session,
       {
         classroom_id: classEntity?.classroom_id,
         school_subject_id: classEntity?.school_subject_id,
@@ -63,7 +59,7 @@ export const AttendancesTable = ({
       { enabled: !!classEntity?.classroom_id }
     );
 
-  const { data: enrollClassrooms } = useListEnrollClassrooms(session, {
+  const { data: enrollClassrooms } = useListEnrollClassrooms({
     classroom_id: classEntity?.classroom_id
   });
 

@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import format from 'date-fns/format';
 import { FilePlus, Edit, FileMinus } from '@styled-icons/feather';
 
@@ -25,10 +24,8 @@ type EnrollAbsencesTableProps = {
 const EnrollAbsencesTable = ({ enrollId }: EnrollAbsencesTableProps) => {
   const justifyAbsenceModalRef = useRef<JustifyAbsenceModalRef>(null);
 
-  const { data: session } = useSession();
-
   const removeAbsenceJustification = useRemoveAbsenceJustification();
-  const { data: absences, refetch } = useListAttendances(session, {
+  const { data: absences, refetch } = useListAttendances({
     enroll_id: enrollId,
     attendance: false
   });

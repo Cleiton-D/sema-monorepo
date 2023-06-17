@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
 import { Class } from 'models/Class';
 import { SchoolTerm } from 'models/SchoolTerm';
 
-import { initializeApi, isApiError, useMutation } from 'services/api';
+import { createUnstableApi, isApiError, useMutation } from 'services/api';
 
 type CreateClassRequestData = {
   classroom_id: string;
@@ -17,17 +16,12 @@ type CreateClassRequestData = {
 };
 
 export function useCreateClass() {
-  const { data: session } = useSession();
+  const createClass = useCallback(async (values: CreateClassRequestData) => {
+    const api = createUnstableApi();
 
-  const createClass = useCallback(
-    async (values: CreateClassRequestData) => {
-      const api = initializeApi(session);
-
-      const { data: responseData } = await api.post('/classes', values);
-      return responseData;
-    },
-    [session]
-  );
+    const { data: responseData } = await api.post('/classes', values);
+    return responseData;
+  }, []);
 
   return useMutation('create-class', createClass, {
     renderLoading: function render() {
@@ -51,19 +45,14 @@ export function useCreateClass() {
 }
 
 export function useFinishClass() {
-  const { data: session } = useSession();
+  const finishClass = useCallback(async (classEntity: Class) => {
+    const api = createUnstableApi();
 
-  const finishClass = useCallback(
-    async (classEntity: Class) => {
-      const api = initializeApi(session);
-
-      const { data: responseData } = await api.put(
-        `/classes/${classEntity.id}/finish`
-      );
-      return responseData;
-    },
-    [session]
-  );
+    const { data: responseData } = await api.put(
+      `/classes/${classEntity.id}/finish`
+    );
+    return responseData;
+  }, []);
 
   return useMutation('finish-class', finishClass, {
     renderLoading: function render() {
@@ -84,22 +73,17 @@ type EditClassRequestData = {
 };
 
 export function useEditClass() {
-  const { data: session } = useSession();
+  const editClass = useCallback(async (values: EditClassRequestData) => {
+    const api = createUnstableApi();
 
-  const editClass = useCallback(
-    async (values: EditClassRequestData) => {
-      const api = initializeApi(session);
+    const { class_id, ...requestData } = values;
 
-      const { class_id, ...requestData } = values;
-
-      const { data: responseData } = await api.put(
-        `/classes/${class_id}`,
-        requestData
-      );
-      return responseData;
-    },
-    [session]
-  );
+    const { data: responseData } = await api.put(
+      `/classes/${class_id}`,
+      requestData
+    );
+    return responseData;
+  }, []);
 
   return useMutation('edit-class', editClass, {
     renderLoading: function render() {
@@ -111,19 +95,14 @@ export function useEditClass() {
 }
 
 export function useDeleteClass() {
-  const { data: session } = useSession();
+  const deleteClass = useCallback(async (classEntity: Class) => {
+    const api = createUnstableApi();
 
-  const deleteClass = useCallback(
-    async (classEntity: Class) => {
-      const api = initializeApi(session);
+    const { id } = classEntity;
 
-      const { id } = classEntity;
-
-      const { data: responseData } = await api.delete(`/classes/${id}`);
-      return responseData;
-    },
-    [session]
-  );
+    const { data: responseData } = await api.delete(`/classes/${id}`);
+    return responseData;
+  }, []);
 
   return useMutation('delete-class', deleteClass, {
     renderLoading: function render() {

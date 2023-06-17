@@ -1,13 +1,14 @@
 import { memo } from 'react';
-import { useSession } from 'next-auth/react';
 
 import UserDropdown from 'components/UserDropdown';
 import ProfileListDropdown from 'components/ProfileListDropdown';
 
+import { useUser } from 'requests/queries/session';
+
 import * as S from './styles';
 
 const Header = () => {
-  const { data: session } = useSession();
+  const { data: user } = useUser();
 
   return (
     <S.Wrapper>
@@ -16,10 +17,7 @@ const Header = () => {
         <ProfileListDropdown />
       </S.ProfileContainer>
       <div style={{ height: '100%' }}>
-        <UserDropdown
-          username={session?.user.name || ''}
-          image="/img/user2.png"
-        />
+        <UserDropdown username={user?.username || ''} image="/img/user2.png" />
       </div>
     </S.Wrapper>
   );

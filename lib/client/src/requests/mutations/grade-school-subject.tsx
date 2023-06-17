@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 import { ModalRef } from 'components/Modal';
@@ -10,16 +9,14 @@ import {
   UpdateGradeSchoolSubjectsRequest
 } from 'models/GradeSchoolSubject';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 
 export function useMutateGradeSchoolSubject(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const { data: session } = useSession();
-
   const mutateGradeSchoolSubject = useCallback(
     async (values: CreateGradeSchoolSubjectsRequest) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { grade_id, ...data } = values;
 
@@ -30,7 +27,7 @@ export function useMutateGradeSchoolSubject(
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('mutate-grade-school-subject', mutateGradeSchoolSubject, {
@@ -46,11 +43,9 @@ export function useMutateGradeSchoolSubject(
 export function useUpdateGradeSchoolSubject(
   modalRef: React.RefObject<ModalRef>
 ) {
-  const { data: session } = useSession();
-
   const updateGradeSchoolSubject = useCallback(
     async (values: UpdateGradeSchoolSubjectsRequest) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { grade_id, id, ...data } = values;
 
@@ -61,7 +56,7 @@ export function useUpdateGradeSchoolSubject(
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('update-grade-school-subject', updateGradeSchoolSubject, {
@@ -75,11 +70,9 @@ export function useUpdateGradeSchoolSubject(
 }
 
 export function useDeleteGradeSchoolSubject() {
-  const { data: session } = useSession();
-
   const deleteGradeSchoolSubject = useCallback(
     async (gradeSchoolSubject: GradeSchoolSubject) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { id, grade_id } = gradeSchoolSubject;
 
@@ -89,7 +82,7 @@ export function useDeleteGradeSchoolSubject() {
 
       return response;
     },
-    [session]
+    []
   );
 
   return useMutation('delete-grade-school-subject', deleteGradeSchoolSubject, {

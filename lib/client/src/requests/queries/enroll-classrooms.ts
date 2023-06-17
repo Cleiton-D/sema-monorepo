@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
-import { Session } from 'next-auth';
 import { useQuery } from 'react-query';
 
 import { EnrollClassroom } from 'models/EnrollClassroom';
 
-import { initializeApi } from 'services/api';
+import { createUnstableApi } from 'services/api';
 
 export type EnrollClassroomsFilters = {
   classroom_id?: string;
@@ -21,10 +20,10 @@ export const enrollClassroomsKeys = {
 };
 
 export const listEnrollClassrooms = (
-  session?: Session | null,
-  filters: EnrollClassroomsFilters = {}
+  filters: EnrollClassroomsFilters = {},
+  session?: AppSession
 ): Promise<EnrollClassroom[]> => {
-  const api = initializeApi(session);
+  const api = createUnstableApi(session);
 
   return api
     .get<EnrollClassroom[]>('/enrolls/classrooms', { params: filters })
@@ -32,7 +31,6 @@ export const listEnrollClassrooms = (
 };
 
 export const useListEnrollClassrooms = (
-  session?: Session | null,
   filters: EnrollClassroomsFilters = {}
 ) => {
   const key = useMemo(
@@ -40,6 +38,6 @@ export const useListEnrollClassrooms = (
     [filters]
   );
 
-  const result = useQuery(key, () => listEnrollClassrooms(session, filters));
+  const result = useQuery(key, () => listEnrollClassrooms(filters));
   return { ...result, key };
 };

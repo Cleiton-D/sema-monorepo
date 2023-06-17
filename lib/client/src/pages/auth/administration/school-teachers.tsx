@@ -1,22 +1,16 @@
-import { GetServerSidePropsContext } from 'next';
-
 import SchoolTeachers from 'templates/Administration/SchoolTeachers';
 
-import protectedRoutes from 'utils/protected-routes';
+import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolTeachersPage() {
   return <SchoolTeachers />;
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await protectedRoutes(context);
-
+export const getServerSideProps = withProtectedRoute(() => {
   return {
-    props: {
-      session
-    }
+    props: {}
   };
-}
+});
 
 SchoolTeachersPage.auth = {
   module: 'SCHOOL_TEACHER'

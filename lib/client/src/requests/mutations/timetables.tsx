@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
-import { useSession } from 'next-auth/react';
 
 import { DayOfWeek } from 'models/DafOfWeek';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 import { Timetable } from 'models/Timetable';
 import ToastContent from 'components/ToastContent';
 
@@ -23,11 +22,9 @@ type UpdateTimetablesRequest = {
 };
 
 export function useUpdateTimetables() {
-  const { data: session } = useSession();
-
   const updateTimetables = useCallback(
     async (values: UpdateTimetablesRequest) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
 
       const { data: responseData } = await api.put<Timetable[]>(
         `/timetables`,
@@ -36,7 +33,7 @@ export function useUpdateTimetables() {
 
       return responseData;
     },
-    [session]
+    []
   );
 
   return useMutation('update-timetables', updateTimetables, {

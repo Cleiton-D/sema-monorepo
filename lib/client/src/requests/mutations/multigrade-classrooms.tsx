@@ -1,10 +1,8 @@
 import { useCallback } from 'react';
-import { Session } from 'next-auth';
-import { useSession } from 'next-auth/react';
 
 import ToastContent from 'components/ToastContent';
 
-import { initializeApi, useMutation } from 'services/api';
+import { createUnstableApi, useMutation } from 'services/api';
 import { MultigradeClassroom } from 'models/multigrade-classroom';
 
 type CreateMultigradeClassroomPayload = {
@@ -21,14 +19,13 @@ const addMultigradeClassroom = async <
     | CreateMultigradeClassroomPayload
     | CreateMultigradeClassroomPayload[]
 >(
-  session: Session | null,
   values: T
 ): Promise<AddMultigradeClassroomResponse<T>> => {
-  const api = initializeApi(session);
+  const api = createUnstableApi();
 
   if (Array.isArray(values)) {
     const res = await Promise.all(
-      values.map((value) => addMultigradeClassroom(session, value))
+      values.map((value) => addMultigradeClassroom(value))
     );
     return res as AddMultigradeClassroomResponse<T>;
   }
@@ -44,11 +41,9 @@ const addMultigradeClassroom = async <
 };
 
 export function useAddMultigradeClassroom() {
-  const { data: session } = useSession();
-
   return useMutation(
     'add-multigrade-classroom',
-    (payload) => addMultigradeClassroom(session, payload),
+    (payload) => addMultigradeClassroom(payload),
     {
       renderLoading: function render() {
         return <ToastContent showSpinner>Salvando ...</ToastContent>;
@@ -60,17 +55,15 @@ export function useAddMultigradeClassroom() {
 }
 
 export function useDeleteMultigradeClassroom() {
-  const { data: session } = useSession();
-
   const deleteMultigradeClassroom = useCallback(
     async (multigradeClassroom: MultigradeClassroom) => {
-      const api = initializeApi(session);
+      const api = createUnstableApi();
       const { owner_id, id } = multigradeClassroom;
       if (!owner_id) return;
 
       await api.delete(`/multigrades/${owner_id}/classrooms/${id}`);
     },
-    [session]
+    []
   );
 
   return useMutation('delete-multigrade-classroom', deleteMultigradeClassroom, {

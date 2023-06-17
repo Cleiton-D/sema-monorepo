@@ -1,5 +1,4 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQueryClient } from 'react-query';
 import { X, Edit3, PlusCircle } from '@styled-icons/feather';
 
@@ -26,9 +25,8 @@ const SchoolYearClassPeriodForm: React.ForwardRefRenderFunction<FormHandles> = (
   ref
 ) => {
   const queryClient = useQueryClient();
-  const { data: session } = useSession();
 
-  const { data: classPeriods } = useListClassPeriods(session, {});
+  const { data: classPeriods } = useListClassPeriods({});
   const deleteClassPeriodMutation = useDeleteClassPeriod();
 
   const handleDelete = async (item: FormattedClassPeriod) => {
