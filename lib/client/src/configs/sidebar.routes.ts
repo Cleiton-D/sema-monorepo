@@ -1,4 +1,10 @@
-const municipalSecretary = [
+type Route = {
+  name: string;
+  path: string;
+  pathname?: string;
+};
+
+const municipalSecretary: Route[] = [
   {
     path: '/auth/administration/school-year',
     name: 'Ano Letivo'
@@ -57,7 +63,7 @@ const municipalSecretary = [
   }
 ];
 
-const teacher = [
+const teacher: Route[] = [
   {
     path: '/auth/administration/school-year',
     name: 'Ano Letivo'
@@ -84,7 +90,7 @@ const teacher = [
   }
 ];
 
-const administrator = [
+const administrator: Route[] = [
   {
     path: '/auth/administration/municipal-secretary',
     name: 'Secretaria Municipal'
@@ -151,17 +157,19 @@ const administrator = [
   }
 ];
 
-export const schoolAdministration = [
+export const schoolAdministration: Route[] = [
   {
     path: '/auth/administration/school-year',
     name: 'Ano Letivo'
   },
   {
     path: '/auth/enrolls?school_id=me',
+    pathname: '/auth/enrolls',
     name: 'Matrículas'
   },
   {
     path: '/auth/school/me/classrooms',
+    pathname: '/auth/school/[school_id]/classrooms',
     name: 'Turmas'
   },
   // {
@@ -170,10 +178,12 @@ export const schoolAdministration = [
   // },
   {
     path: '/auth/school/me/classroom-teacher',
+    pathname: '/auth/school/[school_id]/classroom-teacher',
     name: 'Turmas x Professores'
   },
   {
     path: '/auth/school/me/timetables',
+    pathname: '/auth/school/[school_id]/timetables',
     name: 'Horários'
   },
   {

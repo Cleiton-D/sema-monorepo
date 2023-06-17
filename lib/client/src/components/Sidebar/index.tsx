@@ -66,16 +66,21 @@ const Sidebar = () => {
                 </Link>
               </Button>
 
-              {routes.map(({ name, path }) => (
+              {routes.map((route) => (
                 <Button
-                  key={`${name}-${path}`}
-                  variant={path === pathname ? 'secondary' : 'ghost'}
+                  key={`${route.name}-${route.path}`}
+                  variant={
+                    (route.pathname && route.pathname === pathname) ||
+                    route.path === pathname
+                      ? 'secondary'
+                      : 'ghost'
+                  }
                   size="sm"
                   className="w-full justify-start"
                 >
-                  <Link href={path} passHref>
+                  <Link href={route.path} passHref>
                     <a className="w-full h-full flex flex-wrap justify-start content-center">
-                      {name}
+                      {route.name}
                     </a>
                   </Link>
                 </Button>
