@@ -2,24 +2,26 @@ import { memo } from 'react';
 
 import UserDropdown from 'components/UserDropdown';
 import ProfileListDropdown from 'components/ProfileListDropdown';
-
-import { useUser } from 'requests/queries/session';
-
-import * as S from './styles';
+import SchoolYearSelector from 'components/SchoolYearSelector';
 
 const Header = () => {
-  const { data: user } = useUser();
-
   return (
-    <S.Wrapper>
-      <S.ProfileContainer>
-        <span>Perfil:</span>
+    <header
+      style={{ gridArea: 'header' }}
+      className="flex items-center justify-between py-0 px-6 bg-background border-b"
+    >
+      <div className="flex items-center">
+        <span className="mr-2">Perfil:</span>
         <ProfileListDropdown />
-      </S.ProfileContainer>
-      <div style={{ height: '100%' }}>
-        <UserDropdown username={user?.username || ''} image="/img/user2.png" />
       </div>
-    </S.Wrapper>
+
+      <div className="flex items-center">
+        <span className="mr-2">Ano Letivo:</span>
+        <SchoolYearSelector />
+      </div>
+
+      <UserDropdown />
+    </header>
   );
 };
 

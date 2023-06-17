@@ -1,5 +1,14 @@
-import type { ChangeEvent } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import { Check, ChevronsUpDown } from 'lucide-react';
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from 'components/shadcn/popover';
+import { Button } from 'components/shadcn/button';
+import { Command, CommandInput, CommandItem } from 'components/shadcn/command';
 
 import { useListSchoolYears } from 'requests/queries/school-year';
 import {
@@ -9,9 +18,11 @@ import {
 } from 'requests/queries/session';
 import { refreshSession } from 'requests/mutations/session';
 
-import * as S from './styles';
+import { cn } from 'utils/cnHelper';
 
 const SchoolYearSelector = (): JSX.Element => {
+  const [open, setOpen] = useState(false);
+
   const { push } = useRouter();
 
   const { data: currentSchoolYear } = useSessionSchoolYear();
@@ -19,10 +30,11 @@ const SchoolYearSelector = (): JSX.Element => {
 
   const { data: schoolYears } = useListSchoolYears();
 
-  const handleChangeSchoolYear = async (
-    event: ChangeEvent<HTMLSelectElement>
-  ) => {
-    const schoolyearId = event.target.value;
+  const handleChangeSchoolYear = async (schoolyearId: string) => {
+    if (schoolyearId === currentSchoolYear?.id) {
+      setOpen(false);
+      return;
+    }
 
     await refreshSession({
       schoolYearId: schoolyearId,
@@ -30,24 +42,55 @@ const SchoolYearSelector = (): JSX.Element => {
     });
     await fetchAllSession();
 
+    setOpen(false);
     push('/auth');
   };
 
+  const ordenedSchoolYears = useMemo(() => {
+    return schoolYears?.sort(
+      (a, b) => Number(b.reference_year) - Number(a.reference_year)
+    );
+  }, [schoolYears]);
+
   return (
-    <S.Wrapper>
-      Ano:
-      <S.Selector onChange={handleChangeSchoolYear}>
-        {schoolYears?.map((schoolYear) => (
-          <option
-            key={schoolYear.id}
-            value={schoolYear.id}
-            selected={currentSchoolYear?.id === schoolYear.id}
-          >
-            {schoolYear.reference_year}
-          </option>
-        ))}
-      </S.Selector>
-    </S.Wrapper>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-auto justify-between"
+        >
+          {currentSchoolYear
+            ? currentSchoolYear.reference_year
+            : 'Selecione um ano letivo'}
+
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[20rem] p-0">
+        <Command>
+          <CommandInput placeholder="Pesquisar ano letivo..." />
+          {ordenedSchoolYears?.map((schoolYear) => (
+            <CommandItem
+              key={schoolYear.id}
+              onSelect={() => handleChangeSchoolYear(schoolYear.id)}
+              className="hover:cursor-pointer"
+            >
+              <Check
+                className={cn(
+                  'mr-2 h-4 w-4',
+                  schoolYear.id === currentSchoolYear?.id
+                    ? 'opacity-100'
+                    : 'opacity-0'
+                )}
+              />
+              {schoolYear.reference_year}
+            </CommandItem>
+          ))}
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 };
 
