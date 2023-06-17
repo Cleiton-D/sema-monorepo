@@ -8,7 +8,7 @@ import {
   PopoverTrigger
 } from 'components/shadcn/popover';
 import { Button } from 'components/shadcn/button';
-import { Command, CommandInput, CommandItem } from 'components/shadcn/command';
+import { Command, CommandItem } from 'components/shadcn/command';
 
 import { useListSchoolYears } from 'requests/queries/school-year';
 import {
@@ -70,7 +70,6 @@ const SchoolYearSelector = (): JSX.Element => {
       </PopoverTrigger>
       <PopoverContent className="w-[20rem] p-0">
         <Command>
-          <CommandInput placeholder="Pesquisar ano letivo..." />
           {ordenedSchoolYears?.map((schoolYear) => (
             <CommandItem
               key={schoolYear.id}
