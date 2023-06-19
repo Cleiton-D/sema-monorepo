@@ -14,8 +14,8 @@ type CreateDatabaseDumpResponse = {
 @injectable()
 class CreateDatabaseDumpService {
   public async execute(): Promise<CreateDatabaseDumpResponse> {
-    const username = 'postgres';
-    const pass = process.env.POSTGRES_ADMIN_PASS;
+    const username = process.env.POSTGRES_USERNAME;
+    const pass = process.env.POSTGRES_PASSWORD;
     const database = process.env.POSTGRES_DATABASE;
     const host = process.env.POSTGRES_HOST;
     const port = process.env.POSTGRES_PORT;
@@ -27,7 +27,7 @@ class CreateDatabaseDumpService {
 
     const scriptFileDir = fileDir.replace(/(\s+)/g, '\\$1');
     shell.exec(
-      `PGPASSWORD="${pass}" pg_dumpall -U ${username} -h ${host} -p ${port} -l ${database} -f ${scriptFileDir} -O --column-inserts
+      `PGPASSWORD="${pass}" pg_dump -U ${username} -h ${host} -p ${port} ${database} > ${scriptFileDir} -O --column-inserts
       `,
     );
 
