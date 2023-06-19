@@ -1,16 +1,35 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
+import { sessionOptions } from 'utils/session/config';
 
 import { getMiddlewareSession } from 'utils/session/edge';
 
 const PUBLIC_FILE = /\.(.*)$/;
+
+const redirectToSignIn = (request: NextRequest, response: NextResponse) => {
+  const requestUrl = request.headers.get('referer');
+  const pathname = request.nextUrl.pathname;
+  const url = request.nextUrl.clone();
+
+  const isSign = pathname.startsWith('/sign-in');
+
+  if (isSign) {
+    return response;
+  }
+
+  url.pathname = `/sign-in`;
+  if (requestUrl) {
+    url.searchParams.set('callbackUrl', requestUrl);
+  }
+
+  return NextResponse.redirect(new URL(url, request.url));
+};
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   const pathname = request.nextUrl.pathname;
 
-  const isSign = pathname.startsWith('/sign-in');
   const isAuth = pathname.startsWith('/auth');
 
   if (
@@ -28,15 +47,7 @@ export async function middleware(request: NextRequest) {
 
   const session = await getMiddlewareSession(request, response);
   if (!session) {
-    if (isSign) {
-      return response;
-    }
-
-    url.pathname = `/sign-in`;
-    if (requestUrl) {
-      url.searchParams.set('callbackUrl', requestUrl);
-    }
-    return NextResponse.redirect(new URL(url, request.url));
+    return redirectToSignIn(request, response);
   }
 
   const user = await fetch(`${process.env.APP_URL_INTERNAL}/api/session/user`, {
@@ -44,6 +55,14 @@ export async function middleware(request: NextRequest) {
   })
     .then((res) => res.json())
     .catch(() => undefined);
+
+  if (!user) {
+    const res = redirectToSignIn(request, response);
+    res.cookies.set(sessionOptions.cookieName, '', {
+      expires: new Date(1998, 1, 1)
+    });
+    return res;
+  }
 
   if (user.change_password) {
     if (pathname.startsWith('/auth/change-password')) {
