@@ -74,6 +74,11 @@ spec:
                 secretKeyRef:
                   name: diarioonline-api-secret
                   key: POSTGRES_PORT
+            - name: POSTGRES_ADMIN_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: diarioonline-api-secret
+                  key: POSTGRES_ADMIN_PASS
                   
           livenessProbe:
             httpGet:

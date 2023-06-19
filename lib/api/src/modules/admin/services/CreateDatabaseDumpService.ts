@@ -14,8 +14,8 @@ type CreateDatabaseDumpResponse = {
 @injectable()
 class CreateDatabaseDumpService {
   public async execute(): Promise<CreateDatabaseDumpResponse> {
-    const username = process.env.POSTGRES_USERNAME;
-    const pass = process.env.POSTGRES_PASSWORD;
+    const username = 'postgres';
+    const pass = process.env.POSTGRES_ADMIN_PASS;
     const database = process.env.POSTGRES_DATABASE;
     const host = process.env.POSTGRES_HOST;
     const port = process.env.POSTGRES_PORT;
