@@ -33,7 +33,7 @@ const SchoolDayDatepicker = ({
   const { data: calendarEvents } = useListCalendarEvents(
     {
       school_year_id: schoolYear?.id,
-      school_id: profile?.id,
+      school_id: profile?.school?.id,
       competence: 'ALL'
     },
     {
