@@ -56,7 +56,7 @@ const NominalRelationReport = ({
                 <span>Curso: Ensino Fundamental</span>
                 <span>Turno: {classroom.class_period.description}</span>
                 <span>Sala: {classroom.description}</span>
-                <span>2022</span>
+                <span>{classroom.school_year?.reference_year}</span>
               </S.Row>
             </th>
           </tr>

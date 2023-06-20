@@ -55,7 +55,7 @@ export const ClassesReport = ({
                   </span>
                 )}
 
-                <span>Ano: 2022</span>
+                <span>Ano: {classroom.school_year?.reference_year}</span>
               </S.Row>
             </th>
           </tr>
