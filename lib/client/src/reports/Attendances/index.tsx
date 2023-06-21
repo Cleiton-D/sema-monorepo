@@ -86,7 +86,7 @@ const AttendancesReport = ({
                 <span>Nivel: Ensino Fundamental</span>
                 <span>Turma: {classroom.description}</span>
                 <span>Turno: {classroom.class_period.description}</span>
-                <span>Ano Letivo: 2022</span>
+                <span>Ano Letivo: {classroom.school_year?.reference_year}</span>
               </S.TitleRow>
             </th>
           </tr>
@@ -119,7 +119,7 @@ const AttendancesReport = ({
                     style={{ borderLeft: 'none', borderRight: 'none' }}
                   ></td>
                 ) : (
-                  <td key={id}>{item.attendances[id] ? 'X' : '-'}</td>
+                  <td key={id}>{item.attendances[id] ? '-' : 'F'}</td>
                 )
               )}
             </tr>
