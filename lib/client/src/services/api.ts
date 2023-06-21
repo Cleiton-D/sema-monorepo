@@ -12,7 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast, Flip, ToastContent } from 'react-toastify';
 
 import { isServer } from 'utils/isServer';
-import { SESSION_KEYS } from 'requests/queries/session';
+
+import { SESSION_KEYS, getSession } from 'requests/queries/session';
 
 const createApi = (session?: any) => {
   const jwt = session?.jwt;
@@ -198,13 +199,24 @@ export const queryClient = new QueryClient({
 const unstable__api = createApi();
 
 if (!isServer) {
-  unstable__api.interceptors.request.use((config) => {
+  unstable__api.interceptors.request.use(async (config) => {
     const session = queryClient.getQueryData<{ token?: string }>([
       SESSION_KEYS.all
     ]);
+    let token = session?.token;
 
-    const token = session?.token ? `Bearer ${session.token}` : '';
-    config.headers.authorization = token;
+    const isSessionRequest =
+      config.url === `${process.env.NEXT_PUBLIC_APP_URL}/api/session`;
+
+    if (!token && !isSessionRequest) {
+      const newSession = await getSession();
+      queryClient.setQueryData([SESSION_KEYS.all], newSession);
+
+      token = newSession?.token;
+    }
+
+    const authorization = token ? `Bearer ${token}` : '';
+    config.headers.authorization = authorization;
 
     return config;
   });
