@@ -28,25 +28,25 @@ const TeacherDashboard = () => {
     <Base>
       <S.Wrapper>
         <Card
-          description={`${schoolYear?.reference_year || 'não definido'}`}
+          description="Ano Letivo"
           link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
         >
-          Ano Letivo
+          {schoolYear?.reference_year || 'não definido'}
         </Card>
 
         <Card
-          description={`${classesCount?.count}`}
+          description="Aulas registradas"
           link="/auth/classes"
           module="CLASS"
         >
-          Aulas registradas
+          {classesCount?.count}
         </Card>
 
         <Card
           description="Notas"
           module="SCHOOL_REPORT"
-          icon={<CardChecklist />}
+          icon={<CardChecklist style={{ width: '4rem', strokeWidth: 2 }} />}
           iconAlign="right"
           link="/auth/school-reports/by-classroom"
         />
