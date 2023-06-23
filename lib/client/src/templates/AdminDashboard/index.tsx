@@ -34,9 +34,8 @@ const AdminDashboard = () => {
           rule="READ"
         />
 
-        {/* Gambeta aqui para dar espaçamento */}
         <Card
-          description="Níveis de acesso&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+          description="Níveis de acesso"
           link="/auth/administration/access-levels"
           module="ACCESS_LEVEL"
           rule="READ"
@@ -60,12 +59,12 @@ const AdminDashboard = () => {
         </Card>
 
         <Card
-          description={`${schoolYear?.reference_year || 'não definido'}`}
+          description="Ano Letivo"
           link="/auth/administration/school-year"
           module="SCHOOL_YEAR"
           rule="READ"
         >
-          Ano Letivo
+          {schoolYear?.reference_year || 'não definido'}
         </Card>
 
         <Card
