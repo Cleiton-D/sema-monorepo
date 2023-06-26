@@ -23,6 +23,13 @@ const formatDate = (date?: Date | string) => {
   return format(parseDateWithoutTimezone(date), 'dd/MM/yyyy');
 };
 
+const situation = (situation?:string , date?: Date | string) => {
+  if(situation == "TRANSFERRED") return formatDate(date);
+  if(situation == "RELOCATED") return 'Remanejado ';
+  
+  
+}
+
 const getAge = (date?: Date | string) => {
   if (!date) return '';
   if (date instanceof Date) {
@@ -95,7 +102,7 @@ const NominalRelationReport = ({
               <td>{enrollClassroom.enroll.student.breed}</td>
               <td>{formatDate(enrollClassroom.enroll.student.birth_date)}</td>
               <td>{getAge(enrollClassroom.enroll.student.birth_date)}</td>
-              <td>{formatDate(enrollClassroom.enroll.transfer_date)}</td>
+              <td>{situation(enrollClassroom.status, enrollClassroom.enroll.transfer_date)}</td>
             </tr>
           ))}
         </tbody>
