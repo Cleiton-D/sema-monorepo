@@ -41,6 +41,6 @@ USER nodejs
 
 WORKDIR /app
 
-CMD ["yarn", "start"]
+CMD ["yarn", "start:server"]
 
 EXPOSE 3333
