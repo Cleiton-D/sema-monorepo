@@ -120,7 +120,7 @@ jobs:
       - name: Deploy
         run: |
           echo '${{ secrets.KUBECONFIG }}' > config.yaml && \
-          kubectl --kubeconfig ./config.yaml apply -f ci_v2 -n prod 
+          kubectl --kubeconfig ./config.yaml apply -f ci_v2 -R -n prod 
 
 #  deploy-on-kubernetes:
 #    runs-on: ubuntu-latest
