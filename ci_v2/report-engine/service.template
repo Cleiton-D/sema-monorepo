@@ -11,3 +11,6 @@ spec:
         - name: regcred
       containers:
         - image: docker.io/cleiton45/sema:${REPORT_IMAGE}
+          ports:
+            - name: h2c
+              containerPort: 8080
