@@ -96,6 +96,31 @@ jobs:
       - name: Docker push
         run: docker push ${{ secrets.DOCKER_USER }}/sema:report-engine-${{ github.sha }}-$BUILD_ID
 
+  deploy-on-kubernetes:
+    runs-on: ubuntu-latest
+    needs: [create-build-id, build-api, build-client, build-report-engine]
+
+    env:
+      API_IMAGE: api-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
+      CLIENT_IMAGE: client-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
+      REPORT_IMAGE: report-engine-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Replace variables
+        run: |
+          envsubst < ci_v2/api/service.yml && \
+          envsubst < ci_v2/client/service.yml && \
+          envsubst < ci_v2/report-engine/service.yml
+      
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: v1.25.0
+      - name: Deploy
+        run: |
+          echo '${{ secrets.KUBECONFIG }}' > config.yaml && \
+          kubectl --kubeconfig ./config.yaml apply -f ci_v2 -n prod 
 
 #  deploy-on-kubernetes:
 #    runs-on: ubuntu-latest
