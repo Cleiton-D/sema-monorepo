@@ -107,18 +107,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Replace variables
-        run: |
-          envsubst < ci_v2/api/service.yml && \
-          envsubst < ci_v2/client/service.yml && \
-          envsubst < ci_v2/report-engine/service.yml
-      
       - uses: azure/setup-kubectl@v3
         with:
           version: v1.25.0
       - name: Deploy
         run: |
+          envsubst < ci_v2/api/service.yml && \
+          envsubst < ci_v2/client/service.yml && \
+          envsubst < ci_v2/report-engine/service.yml &&\
           echo '${{ secrets.KUBECONFIG }}' > config.yaml && \
           kubectl --kubeconfig ./config.yaml apply -f ci_v2 -R -n prod 
 
