@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: DomainMapping
+metadata:
+ name: api.diarioescolar.net.br
+spec:
+ ref:
+   name: api
+   kind: Service
+   apiVersion: serving.knative.dev/v1
