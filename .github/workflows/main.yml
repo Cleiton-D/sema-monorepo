@@ -97,22 +97,22 @@ jobs:
         run: docker push ${{ secrets.DOCKER_USER }}/sema:report-engine-${{ github.sha }}-$BUILD_ID
 
 
-  deploy-on-kubernetes:
-    runs-on: ubuntu-latest
-    needs: [create-build-id, build-api, build-client, build-report-engine]
-
-    env:
-      BUILD_ID: ${{ needs.create-build-id.outputs.build_id }}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: 'Deploy'
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          exec: helm upgrade --install app ci/app --set client.image.tag=client-${{ github.sha }}-${{ env.BUILD_ID }} --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} --set api.image.tag=api-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
-#           exec: helm upgrade --install app ci/app --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
-          kubeconfig: '${{ secrets.KUBECONFIG }}'
+#  deploy-on-kubernetes:
+#    runs-on: ubuntu-latest
+#    needs: [create-build-id, build-api, build-client, build-report-engine]
+#
+#    env:
+#      BUILD_ID: ${{ needs.create-build-id.outputs.build_id }}
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: 'Deploy'
+#        uses: WyriHaximus/github-action-helm3@v2
+#        with:
+#          exec: helm upgrade --install app ci/app --set client.image.tag=client-${{ github.sha }}-${{ env.BUILD_ID }} --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} --set api.image.tag=api-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
+##           exec: helm upgrade --install app ci/app --set report-engine.image.tag=report-engine-${{ github.sha }}-${{ env.BUILD_ID }} -n prod
+#          kubeconfig: '${{ secrets.KUBECONFIG }}'
 
       # - name: 'Deploy'
       #   uses: 'deliverybot/helm@v1'
