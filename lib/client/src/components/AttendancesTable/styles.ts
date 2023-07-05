@@ -12,11 +12,15 @@ export const TableSection = styled(SectionContent)`
 
 export const SectionTitle = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: ${theme.font.sizes.large};
     font-weight: ${theme.font.bold};
     color: ${theme.colors.lightSilver};
     padding: 2rem;
     padding-top: 1.5rem;
+    margin-bottom: 2rem;
   `}
 `;
 

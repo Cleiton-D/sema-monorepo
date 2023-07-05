@@ -79,7 +79,7 @@ class RegisterClassAttendancesService {
       class_id,
     });
 
-    const newAttendances = currentAttendances.map(attendance => {
+    const updateAttendances = currentAttendances.map(attendance => {
       const requestAttendance = enrollAttendances[attendance.enroll_id];
       if (requestAttendance === undefined) return attendance;
 
@@ -89,7 +89,7 @@ class RegisterClassAttendancesService {
     });
 
     const updatedAttendances = await this.attendancesRepository.updateMany(
-      newAttendances,
+      updateAttendances,
     );
 
     updatedAttendances.forEach(attendance => {

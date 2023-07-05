@@ -22,6 +22,8 @@ import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
 import { getEnrollsWithAttendances } from 'utils/mappers/attendances';
 
 import * as S from './styles';
+import { SingleStudentModal } from './single-student-modal';
+import { useProfile } from 'requests/queries/session';
 
 type AttendancesTableProps = {
   class?: Class;
@@ -43,6 +45,8 @@ export const AttendancesTable = ({
   const [saving, setSaving] = useState(false);
 
   const enrollAttendancesRef = useRef<EnrollAttendances>({});
+
+  const { data: profile } = useProfile();
 
   const { enableAccess } = useAccess();
 
@@ -122,6 +126,11 @@ export const AttendancesTable = ({
     [attendances, enrollClassrooms]
   );
 
+  const thisClassAttendances = useMemo(() => {
+    if (!attendances) return [];
+    return attendances?.filter(({ class_id }) => class_id === classEntity?.id);
+  }, [attendances, classEntity]);
+
   const canChangeAttendances = useMemo(
     () => enableAccess({ module: 'ATTENDANCE', rule: 'WRITE' }),
     [enableAccess]
@@ -146,6 +155,13 @@ export const AttendancesTable = ({
     <S.TableSection>
       <S.SectionTitle>
         <h4>Frequência</h4>
+        {classEntity && profile?.access_level?.code === 'administrator' && (
+          <SingleStudentModal
+            classroomId={classEntity.classroom_id}
+            attendances={thisClassAttendances}
+            classId={classEntity.id}
+          />
+        )}
       </S.SectionTitle>
       <Table
         items={enrollsWithAttendances}

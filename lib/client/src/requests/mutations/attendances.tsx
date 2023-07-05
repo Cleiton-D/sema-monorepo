@@ -99,3 +99,28 @@ export function useRemoveAbsenceJustification() {
     }
   );
 }
+
+type AddAttendanceFormData = {
+  enroll_classroom_id: string;
+  class_id: string;
+};
+export function useAddAttendance() {
+  const addAttendance = useCallback(async (values: AddAttendanceFormData) => {
+    const api = createUnstableApi();
+
+    const { data: responseData } = await api.post<Attendance[]>(
+      `/attendances/add`,
+      values
+    );
+
+    return responseData;
+  }, []);
+
+  return useMutation('add-attendance', addAttendance, {
+    renderLoading: function render() {
+      return <ToastContent showSpinner>Salvando...</ToastContent>;
+    },
+    renderError: () => `Falha ao salvar alterações.`,
+    renderSuccess: () => `Alterações realizadas com sucesso.`
+  });
+}

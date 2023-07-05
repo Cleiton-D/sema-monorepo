@@ -18,9 +18,11 @@ class EnrollClassroomsRepository implements IEnrollClassroomsRepository {
     classroom_id,
     enroll_id,
     status,
+    id,
     with_old_multigrades,
   }: FindEnrollClassroomDTO) {
     const where: FindOptionsWhere<EnrollClassroom> = {};
+    if (id) where.id = id;
     if (classroom_id) where.classroom_id = classroom_id;
     if (status) where.status = status;
 

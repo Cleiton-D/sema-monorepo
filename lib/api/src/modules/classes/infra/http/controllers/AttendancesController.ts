@@ -13,6 +13,7 @@ import ListAttendancesByClassesService from '@modules/classes/services/ListAtten
 import JustifyAbsenceService from '@modules/classes/services/JustifyAbsenceService';
 import RemoveAbsenceJustificationService from '@modules/classes/services/RemoveAbsenceJustificationService';
 
+import AddClassAttendancesService from '@modules/classes/services/AddClassAttendancesService';
 import { ClassStatus } from '../../typeorm/entities/Class';
 
 class AttendancesController {
@@ -124,6 +125,20 @@ class AttendancesController {
     });
 
     return response.json(updatedAttendances);
+  }
+
+  @privateRoute()
+  public async add(request: Request, response: Response): Promise<Response> {
+    const { enroll_classroom_id, class_id } = request.body;
+
+    const addClassAttendance = container.resolve(AddClassAttendancesService);
+
+    const createdAttendance = await addClassAttendance.execute({
+      enroll_classroom_id,
+      class_id,
+    });
+
+    return response.json(createdAttendance);
   }
 
   public async justify(

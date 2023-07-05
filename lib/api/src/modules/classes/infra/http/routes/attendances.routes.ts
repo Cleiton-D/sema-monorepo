@@ -10,6 +10,7 @@ attendancesRouter.put('/', attendancesController.update);
 attendancesRouter.get('/', attendancesController.index);
 attendancesRouter.get('/by-classes', attendancesController.indexByClasses);
 attendancesRouter.get('/count', attendancesController.count);
+attendancesRouter.post('/add', attendancesController.add);
 
 attendancesRouter.patch(
   '/:attendance_id/justify',

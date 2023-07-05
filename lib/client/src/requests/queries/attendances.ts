@@ -80,7 +80,7 @@ export const useListAttendancesByClasses = (
   filters: ListAttendancesByClassesFilters = {},
   queryOptions?: QueryObserverOptions<ListAttendancesByClassResponseDTO>
 ) => {
-  const key = `list-attendances-by-classes-${JSON.stringify(filters)}`;
+  const key = ['list-attendances-by-classes', JSON.stringify(filters)];
   const result = useQuery<ListAttendancesByClassResponseDTO>(
     key,
     () => listAttendancesByClasses(filters),

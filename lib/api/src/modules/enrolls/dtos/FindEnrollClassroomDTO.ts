@@ -1,5 +1,6 @@
 type FindEnrollClassroomDTO = {
   classroom_id?: string;
+  id?: string;
   enroll_id?: string | string[];
   status?: string;
   with_old_multigrades?: boolean;
