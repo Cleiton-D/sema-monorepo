@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as grpc from '@grpc/grpc-js';
 
 import { listSchoolReports } from 'requests/queries/school-reports';
 
@@ -7,25 +6,9 @@ import { showClassroom } from 'requests/queries/classrooms';
 import { showGrade } from 'requests/queries/grades';
 import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 
-import {
-  FileResponse,
-  FinalResultGenerateRequest
-} from 'grpc/generated/report_pb';
-
-import { FinalResultServiceClient } from 'grpc/generated/report_grpc_pb';
 import { grpcFinalResultMapper } from 'utils/mappers/grpc/grpcFinalResultMapper';
 import { withSessionRoute } from 'utils/session/withSession';
 import { createUnstableApi } from 'services/api';
-
-// const client = new ClassDiaryClient(
-//   'localhost:9000',
-//   grpc.credentials.createInsecure()
-// );
-
-const client = new FinalResultServiceClient(
-  process.env.REPORT_ENGINE_URL as string,
-  grpc.credentials.createInsecure()
-);
 
 export default withSessionRoute(
   async (request: NextApiRequest, response: NextApiResponse) => {
@@ -68,23 +51,20 @@ export default withSessionRoute(
       schoolReports
     });
 
-    const requestData = new FinalResultGenerateRequest();
-    requestData.setSchoolname(classroom.school?.name as string);
-    requestData.setGrade(grade.description);
-    requestData.setClassroom(classroom.description);
-    requestData.setClassperiod(classroom.class_period.description);
-    requestData.setReferenceyear(schoolYear.reference_year);
-    requestData.setFinalresultList(finalResult);
+    const newRequestData = {
+      schoolName: classroom.school?.name,
+      grade: grade.description,
+      classroom: classroom.description,
+      classPeriod: classroom.class_period.description,
+      referenceYear: schoolYear.reference_year,
+      finalResult: finalResult
+    };
 
-    const promise = new Promise<FileResponse>((resolve, reject) => {
-      client.generate(requestData, (error, result) => {
-        if (error) reject(error);
-        resolve(result);
-      });
-    });
-
-    const result = await promise;
-    const byteArray = Buffer.from(result.getFilechunk_asU8());
+    const { data } = await api.post(
+      `${process.env.REPORT_ENGINE_URL}/generate/final-result`,
+      newRequestData,
+      { responseType: 'arraybuffer' }
+    );
 
     const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
       classroom.school?.name
@@ -97,6 +77,6 @@ export default withSessionRoute(
     //);
     response.setHeader('Content-Disposition', `inline; filename=${filename}`);
 
-    return response.send(byteArray);
+    return response.send(data);
   }
 );
