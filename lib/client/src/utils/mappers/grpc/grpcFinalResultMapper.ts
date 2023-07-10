@@ -1,4 +1,3 @@
-import { FinalResult as GrpcFinalResult } from 'grpc/generated/report_pb';
 import { Enroll } from 'models/Enroll';
 
 import { EnrollClassroom } from 'models/EnrollClassroom';
@@ -14,7 +13,7 @@ type Params = {
 export const grpcFinalResultMapper = ({
   enrollClassrooms,
   schoolReports
-}: Params): GrpcFinalResult[] => {
+}: Params): any[] => {
   const enrollClassroomsMap = enrollClassrooms.reduce<Record<string, Enroll>>(
     (acc, enrollClassroom) => {
       return { ...acc, [enrollClassroom.enroll_id]: enrollClassroom.enroll };
@@ -29,14 +28,13 @@ export const grpcFinalResultMapper = ({
 
       const average = String(schoolReport.final_average || 0);
 
-      const finalResult = new GrpcFinalResult();
-      finalResult.setSchoolsubject(schoolReport.school_subject.description);
-      finalResult.setSchoolsubjectorder(schoolReport.school_subject.index);
-      finalResult.setAverage(masks['school-report'](average));
-      finalResult.setStudentname(enroll.student.name);
-      finalResult.setFinalresult(translateStatus(enroll.status));
-
-      return finalResult;
+      return {
+        studentName: enroll.student.name,
+        schoolSubject: schoolReport.school_subject.description,
+        schoolSubjectOrder: schoolReport.school_subject.index,
+        finalResult: translateStatus(enroll.status),
+        average: masks['school-report'](average)
+      };
     })
-    .filter((finalResult) => !!finalResult) as GrpcFinalResult[];
+    .filter((finalResult) => !!finalResult);
 };

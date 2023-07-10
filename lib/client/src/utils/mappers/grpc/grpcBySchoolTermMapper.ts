@@ -53,7 +53,7 @@ export const grpcBySchoolTermMapper = ({
   schoolTermPeriods,
   schoolReports,
   attendancesCount
-}: Params): GrpcSchoolTermItems[] => {
+}: Params): any[] => {
   const groupedEnrolls = enrollClassrooms.reduce<
     Record<string, EnrollClassroom>
   >((acc, enrollClassroom) => {
@@ -95,46 +95,37 @@ export const grpcBySchoolTermMapper = ({
       const classes =
         groupedClassesBySchoolTerm[schoolTermPeriod.school_term] || [];
 
-      const attendances = classes.reduce<MinifiedAttendanceGrpc[]>(
-        (acc, classEntity) => {
-          const classAttendances =
-            groupedAttendancesByClass[classEntity.id] || [];
-          const minifiedClass = groupedMinifiedClasses[classEntity.id];
+      const attendances = classes.reduce<any[]>((acc, classEntity) => {
+        const classAttendances =
+          groupedAttendancesByClass[classEntity.id] || [];
+        const minifiedClass = groupedMinifiedClasses[classEntity.id];
 
-          const grpcAttendances = classAttendances.map((attendance) => {
-            const enrollClassroom =
-              groupedEnrolls[attendance.enroll_classroom_id];
+        const grpcAttendances = classAttendances.map((attendance) => {
+          const enrollClassroom =
+            groupedEnrolls[attendance.enroll_classroom_id];
 
-            return grpcMinifiedAttendancesMapper({
-              attendance,
-              enrollClassroom,
-              minifiedClass: minifiedClass
-            });
-          });
-          return [...acc, ...grpcAttendances];
-        },
-        []
-      );
+          return {
+            student_name: enrollClassroom.enroll.student.name,
+            class_date: parseDateWithoutTimezone(minifiedClass.class_date),
+            attendance: attendance.attendance
+          };
+        });
+        return [...acc, ...grpcAttendances];
+      }, []);
       const classList = classes.map((classEntity) => {
-        const grpcClass = new GrpcClass();
-        grpcClass.setClassdate(formatDate(classEntity.class_date));
-        grpcClass.setTaughtcontent(classEntity.taught_content);
-        return grpcClass;
+        return {
+          class_date: formatDate(classEntity.class_date),
+          taught_content: classEntity.taught_content
+        };
       });
 
-      const grpcSchoolTermItems = new GrpcSchoolTermItems();
-      grpcSchoolTermItems.setSchoolterm(
-        shortTranslateSchoolTerm(schoolTermPeriod.school_term)
-      );
-      grpcSchoolTermItems.setSchooltermend(
-        Timestamp.fromDate(parseDateWithoutTimezone(schoolTermPeriod.date_end))
-      );
-      grpcSchoolTermItems.setAttendancesList(attendances);
-      grpcSchoolTermItems.setClassesList(classList);
-      grpcSchoolTermItems.setSchoolreportList(
-        grpcSchoolReportsBySchoolTerm[schoolTermPeriod.school_term]
-      );
-
-      return grpcSchoolTermItems;
+      return {
+        schoolTerm: schoolTermPeriod.school_term,
+        schoolTermEnd: parseDateWithoutTimezone(schoolTermPeriod.date_end),
+        attendances: attendances,
+        classes: classList,
+        schoolReports:
+          grpcSchoolReportsBySchoolTerm[schoolTermPeriod.school_term]
+      };
     });
 };

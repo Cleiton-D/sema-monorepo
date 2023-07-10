@@ -1,5 +1,3 @@
-import { SchoolSubjectClassDiary } from 'grpc/generated/report_pb';
-
 import { AttendanceCount, MinifiedAttendance } from 'models/Attendance';
 import { FormattedClass, MinifiedClass } from 'models/Class';
 import { ClassroomTeacherSchoolSubject } from 'models/ClassroomTeacherSchoolSubject';
@@ -38,20 +36,12 @@ export const grpcRequestItemMapper = ({
   gradeSchoolSubject,
   schoolReports,
   grade
-}: Params): SchoolSubjectClassDiary => {
+}: Params): any => {
   const schoolReportsOfThisSchoolSubject = grade.is_multidisciplinary
     ? schoolReports
     : schoolReports.filter((schoolReport) => {
         return schoolReport.school_subject_id === school_subject.id;
       });
-
-  const result = new SchoolSubjectClassDiary();
-  result.setSchoolsubject(school_subject.description);
-  result.setWorkload(gradeSchoolSubject.workload);
-
-  if (classroomTeacherSchoolSubject?.employee.name) {
-    result.setTeacher(classroomTeacherSchoolSubject.employee.name);
-  }
 
   const bySchoolTerm = grpcBySchoolTermMapper({
     enrollClassrooms,
@@ -62,7 +52,16 @@ export const grpcRequestItemMapper = ({
     schoolReports: schoolReportsOfThisSchoolSubject,
     attendancesCount
   });
-  result.setByschooltermList(bySchoolTerm);
 
-  return result;
+  const newResult: any = {
+    schoolSubject: school_subject.description,
+    workload: gradeSchoolSubject.workload,
+    bySchoolTermItems: bySchoolTerm
+  };
+
+  if (classroomTeacherSchoolSubject?.employee.name) {
+    newResult.teacher = classroomTeacherSchoolSubject.employee.name;
+  }
+
+  return newResult;
 };

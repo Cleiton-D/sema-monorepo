@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as grpc from '@grpc/grpc-js';
 
 import { Classroom } from 'models/Classroom';
 import { Grade } from 'models/Grade';
@@ -19,28 +18,14 @@ import { showGrade } from 'requests/queries/grades';
 import { listSchoolSubjects } from 'requests/queries/school-subjects';
 import { listEnrollClassrooms } from 'requests/queries/enroll-classrooms';
 
-import {
-  ClassDiaryGenerateRequest,
-  FileResponse
-} from 'grpc/generated/report_pb';
-
-import { ClassDiaryClient } from 'grpc/generated/report_grpc_pb';
 import { grpcEnrollmentMapper } from 'utils/mappers/grpc/grpcEnrollmentMapper';
 import { grpcRequestItemMapper } from 'utils/mappers/grpc/grpcRequestItemMapper';
 import { listSchoolTermPeriods } from 'requests/queries/school-term-periods';
 import { grpcFinalResultMapper } from 'utils/mappers/grpc/grpcFinalResultMapper';
+
 import { withSessionRoute } from 'utils/session/withSession';
+
 import { createUnstableApi } from 'services/api';
-
-// const client = new ClassDiaryClient(
-//   'localhost:9000',
-//   grpc.credentials.createInsecure()
-// );
-
-const client = new ClassDiaryClient(
-  process.env.REPORT_ENGINE_URL as string,
-  grpc.credentials.createInsecure()
-);
 
 const getItemsBySchoolSubject = async (
   classroom: Classroom,
@@ -114,11 +99,11 @@ const getItemsBySchoolSubject = async (
 };
 
 export default withSessionRoute(
-  async (request: NextApiRequest, response: NextApiResponse) => {
-    const { classroom_id } = request.query;
+  async (nextRequest: NextApiRequest, nextResponse: NextApiResponse) => {
+    const { classroom_id } = nextRequest.query;
 
     const api = createUnstableApi();
-    api.defaults.headers = { cookie: request.headers.cookie };
+    api.defaults.headers = { cookie: nextRequest.headers.cookie };
 
     const schoolYear = await api
       .get(`${process.env.APP_URL_INTERNAL}/api/session/school-year`)
@@ -129,9 +114,9 @@ export default withSessionRoute(
       {
         id: classroom_id as string
       },
-      request.session
+      nextRequest.session
     );
-    const grade = await showGrade(classroom.grade_id, request.session);
+    const grade = await showGrade(classroom.grade_id, nextRequest.session);
     if (!grade) return;
 
     const schoolSubjects = await listSchoolSubjects(
@@ -140,7 +125,7 @@ export default withSessionRoute(
         is_multidisciplinary: grade?.is_multidisciplinary,
         school_year_id: schoolYear.id
       },
-      request.session
+      nextRequest.session
     );
 
     const groupedItems = await Promise.all(
@@ -149,7 +134,7 @@ export default withSessionRoute(
           classroom,
           grade,
           schoolSubject,
-          request.session
+          nextRequest.session
         )
       )
     );
@@ -158,14 +143,14 @@ export default withSessionRoute(
       {
         classroom_id: classroom_id as string
       },
-      request.session
+      nextRequest.session
     );
 
     const schoolTermPeriods = await listSchoolTermPeriods(
       {
         school_year_id: schoolYear.id
       },
-      request.session
+      nextRequest.session
     );
 
     const schoolReports = await listSchoolReports(
@@ -176,7 +161,7 @@ export default withSessionRoute(
         //   : undefined,
         grade_id: grade.id
       },
-      request.session
+      nextRequest.session
     );
 
     const items = groupedItems.map((item) =>
@@ -195,34 +180,34 @@ export default withSessionRoute(
       schoolReports
     });
 
-    const requestData = new ClassDiaryGenerateRequest();
-    requestData.setSchoolname(classroom.school?.name as string);
-    requestData.setGrade(grade.description);
-    requestData.setClassroom(classroom.description);
-    requestData.setClassperiod(classroom.class_period.description);
-    requestData.setReferenceyear(schoolYear.reference_year);
-    requestData.setItemsList(items);
-    requestData.setEnrollsList(enrolls);
-    requestData.setFinalresultList(finalResult);
+    const newRequestData = {
+      schoolName: classroom.school?.name,
+      referenceYear: schoolYear.reference_year,
+      grade: grade.description,
+      classroom: classroom.description,
+      classPeriod: classroom.class_period.description,
+      items: items,
+      enrolls: enrolls,
+      finalResult: finalResult
+    };
 
-    const promise = new Promise<FileResponse>((resolve, reject) => {
-      client.generate(requestData, (error, result) => {
-        if (error) reject(error);
-        resolve(result);
-      });
-    });
-
-    const result = await promise;
-    const byteArray = Buffer.from(result.getFilechunk_asU8());
+    const { data } = await api.post(
+      `${process.env.REPORT_ENGINE_URL}/generate/class-diary`,
+      newRequestData,
+      { responseType: 'arraybuffer' }
+    );
 
     const filename = `Relatorio_final_${classroom.description.replace(
       /\s/g,
       '_'
     )}_${classroom.school?.name}.pdf`;
 
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader('Content-Disposition', `inline; filename=${filename}`);
+    nextResponse.setHeader('Content-Type', 'application/pdf');
+    nextResponse.setHeader(
+      'Content-Disposition',
+      `inline; filename=${filename}`
+    );
 
-    return response.send(byteArray);
+    return nextResponse.send(data);
   }
 );

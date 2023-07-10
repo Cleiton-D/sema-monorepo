@@ -57,7 +57,7 @@ const FinalReportsTemplate = () => {
 
   return (
     <Base>
-      <Heading>Relatório de final</Heading>
+      <Heading>Relatório final</Heading>
 
       <ClassroomsSearch handleSearch={handleSearch} />
 
