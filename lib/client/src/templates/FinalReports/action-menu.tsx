@@ -1,4 +1,5 @@
 import { FileText } from '@styled-icons/feather';
+import { FiletypePdf, FiletypeXlsx } from '@styled-icons/bootstrap';
 
 import {
   DropdownMenu,
@@ -35,11 +36,13 @@ export const ActionMenu = ({ classroomId }: ActionMenuProps) => {
         <DropdownMenuLabel>Formatos</DropdownMenuLabel>
         <DropdownMenuItem className="hover:cursor-pointer" asChild>
           <a target="_blank" href={createUrl('pdf')} rel="noreferrer">
+            <FiletypePdf className="mr-2 h-5 w-5" />
             PDF
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem className="hover:cursor-pointer" asChild>
           <a target="_blank" href={createUrl('xlsx')} rel="noreferrer">
+            <FiletypeXlsx className="mr-2 h-5 w-5" />
             Excel
           </a>
         </DropdownMenuItem>
