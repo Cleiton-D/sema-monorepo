@@ -1,7 +1,6 @@
 import format from 'date-fns/format';
 import differenceInYears from 'date-fns/differenceInYears';
 
-import { Enrollment } from 'grpc/generated/report_pb';
 import { EnrollClassroom } from 'models/EnrollClassroom';
 
 import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
@@ -24,21 +23,15 @@ const getAge = (date?: Date | string) => {
   return differenceInYears(new Date(), parseDateWithoutTimezone(date));
 };
 
-export const grpcEnrollmentMapper = (
-  enrollClassroom: EnrollClassroom
-): Enrollment => {
-  const enrollment = new Enrollment();
-
-  enrollment.setStudentName(enrollClassroom.enroll.student.name);
-  enrollment.setEnrollDate(formatDate(enrollClassroom.enroll.enroll_date));
-  enrollment.setGender(enrollClassroom.enroll.student.gender || '-');
-  enrollment.setOrigin(enrollClassroom.enroll.origin === 'NEW' ? 'Nov' : 'Rep');
-  enrollment.setBreed(enrollClassroom.enroll.student.breed);
-  enrollment.setBirthDate(
-    formatDate(enrollClassroom.enroll.student.birth_date)
-  );
-  enrollment.setAge(`${getAge(enrollClassroom.enroll.student.birth_date)}`);
-  enrollment.setTransferDate(formatDate(enrollClassroom.enroll.transfer_date));
-
-  return enrollment;
+export const grpcEnrollmentMapper = (enrollClassroom: EnrollClassroom): any => {
+  return {
+    student_name: enrollClassroom.enroll.student.name,
+    enroll_date: formatDate(enrollClassroom.enroll.enroll_date),
+    gender: enrollClassroom.enroll.student.gender || '-',
+    origin: enrollClassroom.enroll.origin === 'NEW' ? 'Nov' : 'Rep',
+    breed: enrollClassroom.enroll.student.breed,
+    birth_date: formatDate(enrollClassroom.enroll.student.birth_date),
+    age: `${getAge(enrollClassroom.enroll.student.birth_date)}`,
+    transfer_date: formatDate(enrollClassroom.enroll.transfer_date)
+  };
 };

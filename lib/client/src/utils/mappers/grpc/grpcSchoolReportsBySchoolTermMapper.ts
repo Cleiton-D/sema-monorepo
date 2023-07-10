@@ -27,30 +27,31 @@ export const createItem = ({
   const average = String(schoolReport[key] || 0);
   const absencesCount = absences[schoolTerm];
 
-  const item = new SchoolTermSchoolReport();
-  item.setStudentname(schoolReport.enroll.student.name);
-  item.setSchoolsubject(schoolReport.school_subject.description);
-  item.setSchoolsubjectorder(schoolReport.school_subject.index);
-  item.setAverage(masks['school-report'](average));
+  const result: any = {
+    studentName: schoolReport.enroll.student.name,
+    schoolSubject: schoolReport.school_subject.description,
+    schoolSubjectOrder: schoolReport.school_subject.index,
+    average: masks['school-report'](average)
+  };
 
   if (typeof absencesCount !== 'undefined') {
-    item.setAbsences(absencesCount);
+    result.absences = absencesCount;
   }
 
-  return item;
+  return result;
 };
 
 export const grpcSchoolReportsBySchoolTermMapper = ({
   schoolReports,
   attendancesCount
-}: Params): Record<SchoolTerm, SchoolTermSchoolReport[]> => {
-  const firstItems: SchoolTermSchoolReport[] = [];
-  const secondItems: SchoolTermSchoolReport[] = [];
-  const firstRecItems: SchoolTermSchoolReport[] = [];
-  const thirdItems: SchoolTermSchoolReport[] = [];
-  const fourthItems: SchoolTermSchoolReport[] = [];
-  const secondRecItems: SchoolTermSchoolReport[] = [];
-  const examItems: SchoolTermSchoolReport[] = [];
+}: Params): Record<SchoolTerm, any[]> => {
+  const firstItems: any[] = [];
+  const secondItems: any[] = [];
+  const firstRecItems: any[] = [];
+  const thirdItems: any[] = [];
+  const fourthItems: any[] = [];
+  const secondRecItems: any[] = [];
+  const examItems: any[] = [];
 
   const totalAbsencesByEnroll = attendancesCount.reduce<
     Record<string, AbsensesBySchoolTerm>
