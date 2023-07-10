@@ -26,7 +26,7 @@ public class FinalResultGrpcController implements br.net.diarioescolar.grpc.Fina
 
     try {
       FinalResultService service = new FinalResultService();
-      ByteArrayOutputStream output = service.generate(generateFinalResultDto);
+      ByteArrayOutputStream output = service.generate(generateFinalResultDto, "pdf");
 
       return Uni.createFrom().item(() -> {
         return FileResponse

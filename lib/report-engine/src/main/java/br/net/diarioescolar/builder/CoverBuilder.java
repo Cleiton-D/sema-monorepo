@@ -30,6 +30,9 @@ public class CoverBuilder {
   }
   
   public JasperPrint build() throws JRException {
-    return JasperFillManager.fillReport("reports/cover.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/cover.jasper", this.params, new JREmptyDataSource());
+    page.setName("Capa");
+
+    return page;
   }
 }

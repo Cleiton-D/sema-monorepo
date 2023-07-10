@@ -100,7 +100,7 @@ const getItemsBySchoolSubject = async (
 
 export default withSessionRoute(
   async (nextRequest: NextApiRequest, nextResponse: NextApiResponse) => {
-    const { classroom_id } = nextRequest.query;
+    const { classroom_id, extension } = nextRequest.query;
 
     const api = createUnstableApi();
     api.defaults.headers = { cookie: nextRequest.headers.cookie };
@@ -194,15 +194,23 @@ export default withSessionRoute(
     const { data } = await api.post(
       `${process.env.REPORT_ENGINE_URL}/generate/class-diary`,
       newRequestData,
-      { responseType: 'arraybuffer' }
+      { params: { extension }, responseType: 'arraybuffer' }
     );
 
     const filename = `Relatorio_final_${classroom.description.replace(
       /\s/g,
       '_'
-    )}_${classroom.school?.name}.pdf`;
+    )}_${classroom.school?.name}.${extension}`;
 
-    nextResponse.setHeader('Content-Type', 'application/pdf');
+    const contentTypeMap = {
+      pdf: 'application/pdf',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    };
+
+    nextResponse.setHeader(
+      'Content-Type',
+      contentTypeMap[extension as 'pdf' | 'xlsx']
+    );
     nextResponse.setHeader(
       'Content-Disposition',
       `inline; filename=${filename}`

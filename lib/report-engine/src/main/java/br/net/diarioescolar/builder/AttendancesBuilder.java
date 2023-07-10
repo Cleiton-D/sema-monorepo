@@ -36,6 +36,9 @@ public class AttendancesBuilder<T> {
 
     this.params.put("attendanceDataSource", dataSource);
 
-    return JasperFillManager.fillReport("reports/attendances.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/attendances.jasper", this.params, new JREmptyDataSource());
+    page.setName("Relatório de presença");
+
+    return page;
   }
 }

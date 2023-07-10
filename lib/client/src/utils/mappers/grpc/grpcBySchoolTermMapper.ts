@@ -120,7 +120,7 @@ export const grpcBySchoolTermMapper = ({
       });
 
       return {
-        schoolTerm: schoolTermPeriod.school_term,
+        schoolTerm: shortTranslateSchoolTerm(schoolTermPeriod.school_term),
         schoolTermEnd: parseDateWithoutTimezone(schoolTermPeriod.date_end),
         attendances: attendances,
         classes: classList,

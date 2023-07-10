@@ -12,7 +12,7 @@ import { createUnstableApi } from 'services/api';
 
 export default withSessionRoute(
   async (request: NextApiRequest, response: NextApiResponse) => {
-    const { classroom_id } = request.query;
+    const { classroom_id, extension } = request.query;
 
     const api = createUnstableApi();
     api.defaults.headers = { cookie: request.headers.cookie };
@@ -63,18 +63,23 @@ export default withSessionRoute(
     const { data } = await api.post(
       `${process.env.REPORT_ENGINE_URL}/generate/final-result`,
       newRequestData,
-      { responseType: 'arraybuffer' }
+      { params: { extension }, responseType: 'arraybuffer' }
     );
 
     const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
       classroom.school?.name
-    }.pdf`;
+    }.${extension}`;
 
-    response.setHeader('Content-Type', 'application/pdf');
-    //response.setHeader(
-    // 'Content-Type',
-    // 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    //);
+    const contentTypeMap = {
+      pdf: 'application/pdf',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    };
+
+    response.setHeader(
+      'Content-Type',
+      contentTypeMap[extension as 'pdf' | 'xlsx']
+    );
+
     response.setHeader('Content-Disposition', `inline; filename=${filename}`);
 
     return response.send(data);

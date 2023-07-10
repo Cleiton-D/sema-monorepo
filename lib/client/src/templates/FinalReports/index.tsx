@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react';
-import { FileText } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -15,15 +14,16 @@ import {
   ListClassroomsFilters,
   useListClassrooms
 } from 'requests/queries/classrooms';
-
-import { translateDescription } from 'utils/mappers/classPeriodMapper';
-
-import * as S from './styles';
 import {
   useProfile,
   useSessionSchoolYear,
   useUser
 } from 'requests/queries/session';
+
+import { translateDescription } from 'utils/mappers/classPeriodMapper';
+
+import { ActionMenu } from './action-menu';
+import * as S from './styles';
 
 const INITIAL_FILTERS = {
   page: 1,
@@ -90,17 +90,7 @@ const FinalReportsTemplate = () => {
             tableKey=""
             contentAlign="center"
             actionColumn
-            render={(classroom) => (
-              <S.ActionButton
-                title="Imprimir relatório final"
-                target="_blank"
-                href={`/api/reports/class-diary?classroom_id=${encodeURIComponent(
-                  classroom.id
-                )}`}
-              >
-                <FileText title="Imprimir relatório final" />
-              </S.ActionButton>
-            )}
+            render={(classroom) => <ActionMenu classroomId={classroom.id} />}
           />
         </Table>
         <S.PaginatorContainer>

@@ -35,6 +35,9 @@ public class NominalRelationBuilder<T> {
 
     this.params.put("enrollmentListDataSource", dataSource);
 
-    return JasperFillManager.fillReport("reports/nominal-relation.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/nominal-relation.jasper", this.params, new JREmptyDataSource());
+    page.setName("Relação Nominal");
+
+    return page;
   }
 }
