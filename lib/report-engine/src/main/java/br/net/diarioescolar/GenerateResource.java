@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import br.net.diarioescolar.dto.GenerateClassDiaryDTO;
@@ -19,10 +20,10 @@ public class GenerateResource {
 
     @POST
     @Path("/class-diary")
-    public Uni<Response> generateClassDiary(GenerateClassDiaryDTO data) throws IOException {
+    public Uni<Response> generateClassDiary(GenerateClassDiaryDTO data, @QueryParam("extension") String extension) throws IOException {
         try {
             ClassDiaryService service = new ClassDiaryService();
-            ByteArrayOutputStream output = service.generate(data);
+            ByteArrayOutputStream output = service.generate(data, extension);
 
             return Uni.createFrom().item(() -> Response.ok(output.toByteArray()).build());
         } catch (JRException e) {
@@ -32,10 +33,10 @@ public class GenerateResource {
 
     @POST
     @Path("/final-result")
-    public Uni<Response> generateFinalResult(GenerateFinalResultDTO data) throws IOException {
+    public Uni<Response> generateFinalResult(GenerateFinalResultDTO data, @QueryParam("extension") String extension) throws IOException {
         try {
             FinalResultService service = new FinalResultService();
-            ByteArrayOutputStream output = service.generate(data);
+            ByteArrayOutputStream output = service.generate(data, extension);
 
             return Uni.createFrom().item(() -> Response.ok(output.toByteArray()).build());
         } catch (JRException e) {

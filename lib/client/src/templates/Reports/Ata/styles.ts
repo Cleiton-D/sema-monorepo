@@ -26,7 +26,7 @@ export const PaginatorContainer = styled.div`
   padding: 2rem 3rem;
 `;
 
-export const ActionButton = styled.a`
+export const ActionButton = styled.button`
   ${({ theme }) => css`
     display: flex;
     text-decoration: none;

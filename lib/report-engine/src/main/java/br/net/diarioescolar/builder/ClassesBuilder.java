@@ -35,6 +35,9 @@ public class ClassesBuilder<T> {
 
     this.params.put("classesListDataSource", dataSource);
 
-    return JasperFillManager.fillReport("reports/classes.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/classes.jasper", this.params, new JREmptyDataSource());
+    page.setName("Relatório de aulas");
+
+    return page;
   }
 }

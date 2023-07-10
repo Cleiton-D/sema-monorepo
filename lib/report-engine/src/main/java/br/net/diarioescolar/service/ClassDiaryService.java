@@ -23,12 +23,13 @@ import br.net.diarioescolar.dto.SchoolReportBySchoolTermDTO;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 public class ClassDiaryService {
 
-  public ByteArrayOutputStream generate(GenerateClassDiaryDTO data) throws JRException {
+  public ByteArrayOutputStream generate(GenerateClassDiaryDTO data, String extension) throws JRException {
     List<List<JasperPrint>> reports = data.getItems().stream()
       .map(item -> this.generatePages(data, item))
       .filter(item -> item != null)
@@ -55,11 +56,21 @@ public class ClassDiaryService {
 
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-    JRPdfExporter exporter = new JRPdfExporter();
-    exporter.setExporterInput(SimpleExporterInput.getInstance(pages));
-    exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
+    if (extension.equals("pdf")) {
+      JRPdfExporter exporter = new JRPdfExporter();
+      exporter.setExporterInput(SimpleExporterInput.getInstance(pages));
+      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
 
-    exporter.exportReport();
+      exporter.exportReport();
+    } else if (extension.equals("xlsx")) {
+      JRXlsxExporter exporter = new JRXlsxExporter();
+      exporter.setExporterInput(SimpleExporterInput.getInstance(pages));
+      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
+
+      exporter.exportReport();
+    } else {
+      throw new Error("invalid file extension");
+    }
 
     return byteArrayOutputStream;
   }
@@ -117,6 +128,7 @@ public class ClassDiaryService {
         .setParam("class_period", data.getClassPeriod())
         .setParam("reference_year", data.getReferenceYear())
         .build();
+      attendances.setName("Relatório de presença " + item.getSchoolTerm());
 
       JasperPrint classes = new ClassesBuilder<ClassDTO>()
         .setList(item.getClasses())
@@ -130,6 +142,7 @@ public class ClassDiaryService {
         .setParam("date_end", item.getSchoolTermEnd())
         .setParam("classes_taught", item.getClasses().size())
         .build();
+      classes.setName("Relatório de aulas " + item.getSchoolTerm());
 
       JasperPrint schoolReportsResume = new SchoolSubjectResumeBuilder<SchoolReportBySchoolTermDTO>()
         .setList(item.getSchoolReports())
@@ -144,6 +157,7 @@ public class ClassDiaryService {
         .setParam("classes_taught", item.getClasses().size())
         .setParam("teacher_name", schoolSubjectClassDiary.getTeacher())
         .build();
+      schoolReportsResume.setName("Notas " + item.getSchoolTerm());
 
       pageList.add(attendances);
       pageList.add(classes);

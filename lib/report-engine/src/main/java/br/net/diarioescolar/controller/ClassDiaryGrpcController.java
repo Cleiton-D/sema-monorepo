@@ -26,7 +26,7 @@ public class ClassDiaryGrpcController implements ClassDiary {
 
     try {
       ClassDiaryService service = new ClassDiaryService();
-      ByteArrayOutputStream output = service.generate(generateClassDiaryDto);
+      ByteArrayOutputStream output = service.generate(generateClassDiaryDto, "pdf");
 
       return Uni.createFrom().item(() -> {
         return FileResponse

@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Printer } from '@styled-icons/feather';
 
 import Base from 'templates/Base';
 
@@ -15,6 +14,7 @@ import {
 } from 'requests/queries/classrooms';
 import { useProfile, useSessionSchoolYear } from 'requests/queries/session';
 
+import { ActionMenu } from './action-menu';
 import * as S from './styles';
 
 const INITIAL_FILTERS = {
@@ -52,17 +52,7 @@ const AtaTemplate = (): JSX.Element => {
         <ClassroomsTable
           classrooms={classrooms?.items || []}
           subTable={(classroom) => <FinalAtaTable classroom={classroom} />}
-          actions={(classroom) => (
-            <S.ActionButton
-              title="Imprimir Ata"
-              target="_blank"
-              href={`/api/reports/final-report?classroom_id=${encodeURIComponent(
-                classroom.id
-              )}`}
-            >
-              <Printer size={20} title="Imprimir Ata" />
-            </S.ActionButton>
-          )}
+          actions={(classroom) => <ActionMenu classroomId={classroom.id} />}
         />
         <S.PaginatorContainer>
           <Paginator

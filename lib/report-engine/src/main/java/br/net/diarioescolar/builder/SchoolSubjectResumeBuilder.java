@@ -35,6 +35,9 @@ public class SchoolSubjectResumeBuilder<T> {
 
     this.params.put("schoolSubjectResumeDataSource", dataSource);
 
-    return JasperFillManager.fillReport("reports/school-reports-per-school-term-resume.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/school-reports-per-school-term-resume.jasper", this.params, new JREmptyDataSource());
+    page.setName("Notas");
+
+    return page;
   }
 }

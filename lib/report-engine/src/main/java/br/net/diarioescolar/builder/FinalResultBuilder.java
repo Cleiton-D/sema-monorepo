@@ -35,6 +35,9 @@ public class FinalResultBuilder<T> {
 
     this.params.put("finalResultDataSource", dataSource);
 
-    return JasperFillManager.fillReport("reports/ata.jasper", this.params, new JREmptyDataSource());
+    JasperPrint page = JasperFillManager.fillReport("reports/ata.jasper", this.params, new JREmptyDataSource());
+    page.setName("Ata");
+
+    return page;
   }
 }
