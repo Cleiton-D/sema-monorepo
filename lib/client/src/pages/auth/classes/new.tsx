@@ -2,9 +2,6 @@ import { GetServerSidePropsContext } from 'next';
 
 import NewClass from 'templates/Classes/NewClass';
 
-import { showSchoolSubject } from 'requests/queries/school-subjects';
-import { showClassroom } from 'requests/queries/classrooms';
-import { showSchoolYear } from 'requests/queries/school-year';
 import {
   calendarEventsKeys,
   listCalendarEvents,
@@ -26,6 +23,15 @@ export const getServerSideProps = withProtectedRoute(
       key: 'show-school-year',
       fetcher: () => schoolYear
     };
+
+    if (schoolYear?.status !== 'ACTIVE') {
+      return {
+        redirect: {
+          destination: '/auth/classes',
+          permanent: false
+        }
+      };
+    }
 
     if (!schoolYear) {
       dehydratedState = await prefetchQuery([schoolYearFetcher]);

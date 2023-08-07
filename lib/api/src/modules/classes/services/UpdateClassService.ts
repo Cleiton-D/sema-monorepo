@@ -5,6 +5,9 @@ import IEmployeesRepository from '@modules/employees/repositories/IEmployeesRepo
 import AppError from '@shared/errors/AppError';
 import SchoolTerm from '@shared/infra/typeorm/enums/SchoolTerm';
 
+import IClassroomsRepository from '@modules/schools/repositories/IClassroomsRepository';
+import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISchoolSubjectsRepository';
+import ShowSchoolYearService from '@modules/education_core/services/ShowSchoolYearService';
 import Class from '../infra/typeorm/entities/Class';
 import IClassesRepository from '../repositories/IClassesRepository';
 
@@ -24,6 +27,11 @@ class UpdateClassService {
     @inject('ClassesRepository') private classesRepository: IClassesRepository,
     @inject('EmployeesRepository')
     private employeesRepository: IEmployeesRepository,
+    @inject('ClassroomsRepository')
+    private classroomsRepository: IClassroomsRepository,
+    @inject('SchoolSubjectsRepository')
+    private schoolSubjectsRepository: ISchoolSubjectsRepository,
+    private showSchoolYear: ShowSchoolYearService,
   ) {}
 
   public async execute({
@@ -43,6 +51,33 @@ class UpdateClassService {
     const classEntity = await this.classesRepository.findOne({ id: class_id });
     if (!classEntity) {
       throw new AppError('Class not found');
+    }
+
+    if (school_subject_id) {
+      const classroom = await this.classroomsRepository.findById(
+        classEntity.classroom_id,
+      );
+      if (!classroom) {
+        throw new AppError('Classroom not found');
+      }
+
+      const schoolSubject = await this.schoolSubjectsRepository.findOne({
+        id: school_subject_id,
+      });
+      if (!schoolSubject) {
+        throw new AppError('School Subject not found');
+      }
+
+      if (classroom.school_year_id !== schoolSubject.school_year_id) {
+        throw new AppError('Invalid school subject');
+      }
+
+      const schoolYear = await this.showSchoolYear.execute({
+        school_year_id: classroom.school_year_id,
+      });
+      if (schoolYear.status !== 'ACTIVE') {
+        throw new AppError('School year not active');
+      }
     }
 
     const newClass = Object.assign(classEntity, {

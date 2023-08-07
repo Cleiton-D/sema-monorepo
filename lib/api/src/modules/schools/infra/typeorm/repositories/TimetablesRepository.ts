@@ -70,6 +70,7 @@ class TimetablesRepository implements ITimetablesRepository {
       school_id,
       classroom_id,
       school_subject_id,
+      school_year_id,
       day_of_week,
       time_start,
       time_end,
@@ -96,6 +97,12 @@ class TimetablesRepository implements ITimetablesRepository {
       andWhere.push({
         condition: 'classroom.school_id = :schoolId',
         parameters: { schoolId: school_id },
+      });
+    }
+    if (school_year_id) {
+      andWhere.push({
+        condition: 'classroom.school_year_id = :schoolYearId',
+        parameters: { schoolYearId: school_year_id },
       });
     }
 

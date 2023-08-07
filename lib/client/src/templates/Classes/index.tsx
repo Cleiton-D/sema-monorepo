@@ -82,10 +82,11 @@ const ClassesTemplate = () => {
     }
   };
 
-  const canChangeClass = useMemo(
-    () => enableAccess({ module: 'CLASS', rule: 'WRITE' }),
-    [enableAccess]
-  );
+  const canChangeClass = useMemo(() => {
+    if (schoolYear?.status !== 'ACTIVE') return false;
+
+    return enableAccess({ module: 'CLASS', rule: 'WRITE' });
+  }, [enableAccess, schoolYear]);
 
   return (
     <Base>
@@ -139,7 +140,7 @@ const ClassesTemplate = () => {
             contentAlign="center"
             actionColumn
             render={(item: Class) =>
-              !item.edit_available ? (
+              !item.edit_available || !canChangeClass ? (
                 <></>
               ) : (
                 <S.ActionButtons>

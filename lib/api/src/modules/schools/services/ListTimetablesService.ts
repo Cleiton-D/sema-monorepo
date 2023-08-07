@@ -8,6 +8,7 @@ type ListTimetablesRequest = {
   classroom_id?: string;
   school_id?: string;
   school_subject_id?: string;
+  school_year_id?: string;
   day_of_week?: DayOfWeek;
   time_start?: string;
   time_end?: string;
@@ -25,6 +26,7 @@ class ListTimetablesService {
     classroom_id,
     school_id,
     school_subject_id,
+    school_year_id,
     day_of_week,
     time_start,
     time_end,
@@ -34,6 +36,7 @@ class ListTimetablesService {
       classroom_id,
       school_id,
       school_subject_id,
+      school_year_id,
       day_of_week,
       time_start,
       time_end,

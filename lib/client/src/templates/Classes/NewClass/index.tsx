@@ -67,6 +67,7 @@ const NewClass = () => {
   const { data: timetables } = useListTimetables({
     school_id: profile?.school?.id,
     employee_id: user?.employee?.id,
+    school_year_id: schoolYear?.id,
     day_of_week: dayOfWeek
   });
 

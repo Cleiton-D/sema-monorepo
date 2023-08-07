@@ -11,6 +11,7 @@ import {
   enrollClassroomsKeys,
   listEnrollClassrooms
 } from 'requests/queries/enroll-classrooms';
+import { showSchoolYear } from 'requests/queries/school-year';
 
 import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
@@ -27,6 +28,21 @@ export const getServerSideProps = withProtectedRoute(
       class_id as string,
       context.req.session
     );
+    const schoolYear = await showSchoolYear(
+      {
+        id: classEntity?.classroom.school_year_id
+      },
+      context.req.session
+    );
+
+    if (schoolYear?.status !== 'ACTIVE') {
+      return {
+        redirect: {
+          destination: '/auth/classes',
+          permanent: false
+        }
+      };
+    }
 
     const attendancesFilter: ListAttendancesByClassesFilters = {
       classroom_id: classEntity?.classroom_id,

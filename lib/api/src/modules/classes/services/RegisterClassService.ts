@@ -9,6 +9,7 @@ import ShowSchoolTermPeriodService from '@modules/education_core/services/ShowSc
 
 import AppError from '@shared/errors/AppError';
 
+import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISchoolSubjectsRepository';
 import Class from '../infra/typeorm/entities/Class';
 import IClassesRepository from '../repositories/IClassesRepository';
 import CreateClassAttendancesService from './CreateClassAttendancesService';
@@ -32,6 +33,8 @@ class RegisterClassService {
     private classroomsRepository: IClassroomsRepository,
     @inject('MultigradesClassroomsRepository')
     private multigradesClassroomsRepository: IMultigradesClassroomsRepository,
+    @inject('SchoolSubjectsRepository')
+    private schoolSubjectsRepository: ISchoolSubjectsRepository,
     private createClassAttendances: CreateClassAttendancesService,
     private showSchoolYear: ShowSchoolYearService,
     private showSchoolTermPeriod: ShowSchoolTermPeriodService,
@@ -45,13 +48,6 @@ class RegisterClassService {
     class_date,
     taught_content,
   }: RegisterClassRequest): Promise<Class> {
-    const schoolYear = await this.showSchoolYear.execute({
-      school_year_id: 'current',
-    });
-    if (schoolYear.status !== 'ACTIVE') {
-      throw new AppError('Not exist a school year active');
-    }
-
     const employee = await this.employeesRepository.findOne({ user_id });
     if (!employee) {
       throw new AppError('You cannot register an class');
@@ -60,6 +56,26 @@ class RegisterClassService {
     const classroom = await this.classroomsRepository.findById(classroom_id);
     if (!classroom) {
       throw new AppError('Classroom not found');
+    }
+
+    const schoolSubject = await this.schoolSubjectsRepository.findOne({
+      id: school_subject_id,
+    });
+    if (!schoolSubject) {
+      throw new AppError('School Subject not found');
+    }
+
+    if (classroom.school_year_id !== schoolSubject.school_year_id) {
+      throw new AppError(
+        'Different school year at classroom and school subject',
+      );
+    }
+
+    const schoolYear = await this.showSchoolYear.execute({
+      school_year_id: classroom.school_year_id,
+    });
+    if (schoolYear.status !== 'ACTIVE') {
+      throw new AppError('School year not active');
     }
 
     const schoolTermPeriod = await this.showSchoolTermPeriod.execute({
@@ -73,7 +89,6 @@ class RegisterClassService {
       class_date,
       period,
     });
-    console.log(existentClass);
     if (existentClass) {
       throw new AppError(
         'Already exist a class registered for you in this period',
