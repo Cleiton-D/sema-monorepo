@@ -6,9 +6,6 @@ metadata:
     networking.knative.dev/visibility: cluster-local
 spec:
   template:
-    metadata:
-      annotations:
-        autoscaling.knative.dev/min-scale: "1"
     spec:
       imagePullSecrets:
         - name: regcred
