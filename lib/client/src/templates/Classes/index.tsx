@@ -140,7 +140,7 @@ const ClassesTemplate = () => {
             contentAlign="center"
             actionColumn
             render={(item: Class) =>
-              !item.edit_available || !canChangeClass ? (
+              !item.edit_available ? (
                 <></>
               ) : (
                 <S.ActionButtons>
