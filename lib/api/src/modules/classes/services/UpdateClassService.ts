@@ -63,6 +63,7 @@ class UpdateClassService {
 
       const schoolSubject = await this.schoolSubjectsRepository.findOne({
         id: school_subject_id,
+        include_multidisciplinary: true,
       });
       if (!schoolSubject) {
         throw new AppError('School Subject not found');
