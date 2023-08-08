@@ -28,7 +28,7 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
   public async findOne(
     filters: FindSchoolSubjectDTO = {},
   ): Promise<SchoolSubject | undefined> {
-    const { id, is_multidisciplinary } = filters;
+    const { id, include_multidisciplinary, is_multidisciplinary } = filters;
 
     const where: FindOptionsWhere<SchoolSubject> = {};
     if (id) {
@@ -38,10 +38,12 @@ class SchoolSubjectsRepository implements ISchoolSubjectsRepository {
         where.id = id;
       }
     }
-    if (is_multidisciplinary) {
-      where.is_multidisciplinary = true;
-    } else {
-      where.is_multidisciplinary = false;
+
+    if (
+      !include_multidisciplinary &&
+      typeof is_multidisciplinary !== 'undefined'
+    ) {
+      where.is_multidisciplinary = !!is_multidisciplinary;
     }
 
     const schoolSubject = await this.ormRepository.findOne({
