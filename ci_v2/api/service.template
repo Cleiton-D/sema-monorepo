@@ -10,9 +10,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: api-data
+          persistentVolumeClaim:
+            claimName: api-data-claim
+            readOnly: false
       containers:
         - image: docker.io/cleiton45/sema:${API_IMAGE}
+          volumeMounts:
+            - mountPath: /data
+              name: api-data
+              readOnly: false
           env:
+            - name: STORAGE_PATH
+              value: /data
             - name: API_URL
               valueFrom:
                 configMapKeyRef:
