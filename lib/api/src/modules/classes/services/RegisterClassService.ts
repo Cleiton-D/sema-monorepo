@@ -10,6 +10,7 @@ import ShowSchoolTermPeriodService from '@modules/education_core/services/ShowSc
 import AppError from '@shared/errors/AppError';
 
 import ISchoolSubjectsRepository from '@modules/education_core/repositories/ISchoolSubjectsRepository';
+import IClassroomTeacherSchoolSubjectsRepository from '@modules/schools/repositories/IClassroomTeacherSchoolSubjectsRepository';
 import Class from '../infra/typeorm/entities/Class';
 import IClassesRepository from '../repositories/IClassesRepository';
 import CreateClassAttendancesService from './CreateClassAttendancesService';
@@ -35,6 +36,8 @@ class RegisterClassService {
     private multigradesClassroomsRepository: IMultigradesClassroomsRepository,
     @inject('SchoolSubjectsRepository')
     private schoolSubjectsRepository: ISchoolSubjectsRepository,
+    @inject('ClassroomTeacherSchoolSubjectsRepository')
+    private classroomTeacherSchoolSubjectsRepository: IClassroomTeacherSchoolSubjectsRepository,
     private createClassAttendances: CreateClassAttendancesService,
     private showSchoolYear: ShowSchoolYearService,
     private showSchoolTermPeriod: ShowSchoolTermPeriodService,
@@ -69,6 +72,20 @@ class RegisterClassService {
     if (classroom.school_year_id !== schoolSubject.school_year_id) {
       throw new AppError(
         'Different school year at classroom and school subject',
+      );
+    }
+
+    const classroomTeacherSchoolSubject =
+      await this.classroomTeacherSchoolSubjectsRepository.findOne({
+        classroom_id: classroom.id,
+        employee_id: employee.id,
+        is_multidisciplinary: schoolSubject.is_multidisciplinary,
+        school_subject_id: schoolSubject.id,
+      });
+
+    if (!classroomTeacherSchoolSubject) {
+      throw new AppError(
+        'You cannot register a class for this school subject at this classroom',
       );
     }
 
