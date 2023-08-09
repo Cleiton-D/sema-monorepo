@@ -19,9 +19,10 @@ const createApi = (session?: any) => {
   const jwt = session?.jwt;
 
   const api = axios.create({
-    baseURL: isServer
-      ? process.env.SERVER_API_URL
-      : process.env.NEXT_PUBLIC_API_URL,
+    baseURL:
+      isServer && process.env.APP_ENV === 'prod'
+        ? process.env.SERVER_API_URL
+        : process.env.NEXT_PUBLIC_API_URL,
     headers: {
       authorization: jwt ? `Bearer ${jwt}` : ''
     }
