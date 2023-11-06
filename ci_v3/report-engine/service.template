@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: report-engine
+spec:
+  type: ClusterIP
+  selector:
+    app: report-engine
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-engine
+  labels:
+    app: report-engine
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: report-engine
+  template:
+    metadata:
+      labels:
+        app: report-engine
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: report-engine
+        image: docker.io/cleiton45/sema:${REPORT_IMAGE}
+        ports:
+        - containerPort: 8080
