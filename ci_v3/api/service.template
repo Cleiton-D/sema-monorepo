@@ -34,8 +34,8 @@ spec:
     app: api
   ports:
     - protocol: TCP
-      port: 3333
-      targetPort: 80
+      port: 80
+      targetPort: 3333
 
 ---
 
