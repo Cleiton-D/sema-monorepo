@@ -20,7 +20,7 @@ spec:
             service:
               name: api
               port:
-                number: 3333
+                number: 80
 
 ---
 
@@ -35,7 +35,7 @@ spec:
   ports:
     - protocol: TCP
       port: 3333
-      targetPort: 3333
+      targetPort: 80
 
 ---
 

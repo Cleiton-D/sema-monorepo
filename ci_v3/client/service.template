@@ -20,7 +20,7 @@ spec:
             service:
               name: client
               port:
-                number: 3000
+                number: 80
 
 ---
 
@@ -35,7 +35,7 @@ spec:
   ports:
     - protocol: TCP
       port: 3000
-      targetPort: 3000
+      targetPort: 80
 
 ---
 
