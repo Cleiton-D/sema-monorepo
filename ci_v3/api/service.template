@@ -1,0 +1,113 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+      - api.diarioescolar.net.br
+      secretName: api-tls-secret
+  rules:
+    - host: api.diarioescolar.net.br
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: api
+              port:
+                number: 3333
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: api
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+    - protocol: TCP
+      port: 3333
+      targetPort: 3333
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      securityContext:
+        fsGroup: 2000
+      volumes:
+        - name: api-data
+          persistentVolumeClaim:
+            claimName: api-data-claim
+            readOnly: false
+      containers:
+      - name: api
+        image: docker.io/cleiton45/sema:${API_IMAGE}
+        ports:
+        - containerPort: 3333
+        volumeMounts:
+            - mountPath: /data
+              name: api-data
+              readOnly: false
+        env:
+          - name: STORAGE_PATH
+            value: /data
+          - name: API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-api-configmap
+                key: API_URL
+          - name: POSTGRES_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_USERNAME
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_PASSWORD
+          - name: POSTGRES_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_DATABASE
+          - name: POSTGRES_HOST
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_PORT
+          - name: POSTGRES_ADMIN_PASS
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-api-secret
+                key: POSTGRES_ADMIN_PASS
