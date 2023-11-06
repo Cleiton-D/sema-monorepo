@@ -7,8 +7,8 @@ metadata:
 spec:
   template:
     metadata:
-      annotations:
-        networking.knative.dev/disable-external-domain-tls: "true"
+#      annotations:
+#        networking.knative.dev/disable-external-domain-tls: "true"
 #        autoscaling.knative.dev/min-scale: "1"
     spec:
       imagePullSecrets:
