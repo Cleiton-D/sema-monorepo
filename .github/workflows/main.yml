@@ -113,7 +113,7 @@ jobs:
       - name: Deploy
         run: |
           envsubst < ci_v3/api/service.template > ci_v3/api/service.yml && \
-          #envsubst < ci_v3/client/service.template > ci_v3/client/service.yml && \
+          envsubst < ci_v3/client/service.template > ci_v3/client/service.yml && \
           #envsubst < ci_v3/report-engine/service.template > ci_v3/report-engine/service.yml && \
           echo '${{ secrets.KUBECONFIG }}' > config.yaml && \
           kubectl --kubeconfig ./config.yaml apply -f ci_v3 -R -n prod 

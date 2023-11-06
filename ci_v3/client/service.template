@@ -1,0 +1,120 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: client-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+      - diarioescolar.net.br
+      secretName: client-tls-secret
+  rules:
+    - host: diarioescolar.net.br
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: client
+              port:
+                number: 3000
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: client
+spec:
+  type: ClusterIP
+  selector:
+    app: client
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  labels:
+    app: client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: client
+        image: docker.io/cleiton45/sema:${CLIENT_IMAGE}
+        ports:
+        - containerPort: 3000
+        env:
+          - name: NEXTAUTH_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: NEXTAUTH_URL
+          - name: NEXTAUTH_URL_INTERNAL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: NEXTAUTH_URL_INTERNAL
+          - name: APP_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: APP_URL
+          - name: NEXT_PUBLIC_APP_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: NEXT_PUBLIC_APP_URL
+          - name: APP_URL_INTERNAL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: APP_URL_INTERNAL
+          - name: REPORT_ENGINE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: REPORT_ENGINE_URL
+          - name: NEXT_PUBLIC_API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: NEXT_PUBLIC_API_URL
+          - name: SERVER_API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: SERVER_API_URL
+          - name: SERVER_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: SERVER_HOSTNAME
+          - name: JWT_SIGNING_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-front-secret
+                key: JWT_SIGNING_PRIVATE_KEY
+          - name: API_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: diarioonline-front-secret
+                key: API_SECRET_KEY
