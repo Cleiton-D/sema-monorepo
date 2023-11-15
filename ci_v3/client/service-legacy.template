@@ -47,6 +47,11 @@ spec:
               configMapKeyRef:
                 name: diarioonline-front-configmap
                 key: NEXTAUTH_URL_INTERNAL
+          - name: REMIX_APP_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-configmap
+                key: REMIX_APP_URL
           - name: APP_URL
             valueFrom:
               configMapKeyRef:

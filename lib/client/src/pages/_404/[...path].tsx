@@ -7,7 +7,7 @@ export default function Page404() {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     redirect: {
-      destination: `http://localhost:3000${context.req.url}`,
+      destination: `${process.env.REMIX_APP_URL}${context.req.url}`,
       permanent: false
     }
   };
