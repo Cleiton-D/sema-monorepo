@@ -7,7 +7,7 @@ FROM base as deps
 RUN mkdir /app
 WORKDIR /app
 
-ADD package.json package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm install --production=false
 
 # Setup production node_modules
@@ -17,7 +17,7 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
-ADD package.json package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm prune --production
 
 # Build the app
@@ -30,7 +30,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
 
-ADD . .
+COPY . .
 RUN npm run build
 
 # Build production image
@@ -45,7 +45,7 @@ COPY --from=production-deps /app/node_modules /app/node_modules
 
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
-ADD . .
+COPY package.json ./package.json
 
 EXPOSE 3000
 
