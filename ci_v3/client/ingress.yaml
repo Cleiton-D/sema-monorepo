@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: client-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+      - diarioescolar.net.br
+      secretName: client-tls-secret
+  rules:
+    - host: diarioescolar.net.br
+      http:
+        paths:
+        - path: /legacy
+          pathType: Prefix
+          backend:
+            service:
+              name: client-legacy
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: client
+              port:
+                number: 80

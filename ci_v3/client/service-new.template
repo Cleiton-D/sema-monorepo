@@ -1,0 +1,50 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: client
+spec:
+  type: ClusterIP
+  selector:
+    app: client
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  labels:
+    app: client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: client-legacy
+        image: docker.io/cleiton45/sema:${CLIENT_IMAGE}
+        ports:
+        - containerPort: 3000
+        env:
+          - name: LEGACY_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-new-configmap
+                key: LEGACY_URL
+          - name: SERVER_API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-new-configmap
+                key: SERVER_API_URL
+

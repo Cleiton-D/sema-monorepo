@@ -1,37 +1,11 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: client-ingress
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-spec:
-  tls:
-    - hosts:
-      - diarioescolar.net.br
-      secretName: client-tls-secret
-  rules:
-    - host: diarioescolar.net.br
-      http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: client
-              port:
-                number: 80
-
----
-
 kind: Service
 apiVersion: v1
 metadata:
-  name: client
+  name: client-legacy
 spec:
   type: ClusterIP
   selector:
-    app: client
+    app: client-legacy
   ports:
     - protocol: TCP
       port: 80
@@ -42,24 +16,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client
+  name: client-legacy
   labels:
-    app: client
+    app: client-legacy
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: client
+      app: client-legacy
   template:
     metadata:
       labels:
-        app: client
+        app: client-legacy
     spec:
       imagePullSecrets:
         - name: regcred
       containers:
-      - name: client
-        image: docker.io/cleiton45/sema:${CLIENT_IMAGE}
+      - name: client-legacy
+        image: docker.io/cleiton45/sema:${CLIENT_LEGACY_IMAGE}
         ports:
         - containerPort: 3000
         env:
