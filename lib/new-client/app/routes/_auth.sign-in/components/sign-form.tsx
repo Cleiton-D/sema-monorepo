@@ -25,7 +25,7 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
 
   useEffect(() => {
     if (actionData?.error) {
-        toast.error(actionData.error, { position: 'top-right', important: true, duration: 3000 })
+        toast.error(actionData.error, { position: 'top-right', important: true, duration: 3000, dismissible: true })
     }
   }, [actionData])
 

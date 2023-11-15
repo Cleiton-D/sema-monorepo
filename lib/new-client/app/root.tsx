@@ -8,16 +8,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Toaster } from "sonner";
 
 import { authLoader } from "./utils/auth-middleware.server";
 
 import styles from "./tailwind.css";
-import { Toaster } from "sonner";
+import sonnerStyles from "./sonner.css";
 
 export const loader = ({ request }: LoaderFunctionArgs) => authLoader(request)
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: sonnerStyles },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 ];
 
@@ -27,6 +29,7 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Diário Escolar</title>
         <Meta />
         <Links />
       </head>
