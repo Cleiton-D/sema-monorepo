@@ -102,7 +102,7 @@ const SignIn = ({ background }: SignInProps) => {
       <S.Content>
         <S.WfLogoContainer>
           <Image
-            src="/img/logowf.gif"
+            src="/legacy/img/logowf.gif"
             layout="fill"
             objectFit="contain"
             quality={80}

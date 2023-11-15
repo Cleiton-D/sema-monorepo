@@ -45,7 +45,7 @@ jobs:
       - name: Docker push
         run: docker push ${{ secrets.DOCKER_USER }}/sema:api-${{ github.sha }}-$BUILD_ID
 
-  build-client:
+  build-client-legacy:
     runs-on: ubuntu-latest
     needs: create-build-id
 
@@ -68,11 +68,36 @@ jobs:
             --build-arg SERVER_HOSTNAME=${{ secrets.SERVER_HOSTNAME }} \
             --build-arg NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }} \
             --build-arg NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }} \
-            --tag ${{ secrets.DOCKER_USER }}/sema:client-${{ github.sha }}-$BUILD_ID \
+            --tag ${{ secrets.DOCKER_USER }}/sema:client-legacy-${{ github.sha }}-$BUILD_ID \
             .
 
       - name: Docker push
+        run: docker push ${{ secrets.DOCKER_USER }}/sema:client-legacy-${{ github.sha }}-$BUILD_ID
+
+  build-client:
+    runs-on: ubuntu-latest
+    needs: create-build-id
+
+    env:
+      BUILD_ID: ${{ needs.create-build-id.outputs.build_id }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        
+      - name: Build docker image
+        run: |
+          cd lib/new-client && \
+          docker build --tag ${{ secrets.DOCKER_USER }}/sema:client-${{ github.sha }}-$BUILD_ID .
+
+      - name: Docker push
         run: docker push ${{ secrets.DOCKER_USER }}/sema:client-${{ github.sha }}-$BUILD_ID
+
 
   build-report-engine:
     runs-on: ubuntu-latest
@@ -103,6 +128,7 @@ jobs:
     env:
       API_IMAGE: api-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
       CLIENT_IMAGE: client-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
+      CLIENT_LEGACY_IMAGE: client-legacy-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
       REPORT_IMAGE: report-engine-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
 
     steps:

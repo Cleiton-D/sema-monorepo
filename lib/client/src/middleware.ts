@@ -54,7 +54,10 @@ export async function middleware(request: NextRequest) {
     headers: { cookie: request.headers.get('cookie') || '' }
   })
     .then((res) => res.json())
-    .catch(() => undefined);
+    .catch((err) => {
+      console.log(`${process.env.APP_URL_INTERNAL}/api/session/user`, err);
+      return undefined;
+    });
 
   if (!user) {
     const res = redirectToSignIn(request, response);
