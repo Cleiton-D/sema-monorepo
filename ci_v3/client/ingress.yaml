@@ -10,6 +10,7 @@ spec:
   tls:
     - hosts:
       - diarioescolar.net.br
+      - www.diarioescolar.net.br
       secretName: client-tls-secret
   rules:
     - host: diarioescolar.net.br
