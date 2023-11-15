@@ -7,8 +7,8 @@ FROM base as deps
 RUN mkdir /app
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm install --production=false
+COPY package.json yarn.lock ./
+RUN yarn install --production=false
 
 # Setup production node_modules
 FROM base as production-deps
@@ -17,8 +17,8 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
-COPY package.json package-lock.json ./
-RUN npm prune --production
+COPY package.json yarn.lock ./
+RUN yarn install --production
 
 # Build the app
 FROM base as build
