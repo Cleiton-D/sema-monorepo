@@ -127,6 +127,7 @@ jobs:
 
     env:
       API_IMAGE: api-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
+      CLIENT_IMAGE: client-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
       CLIENT_LEGACY_IMAGE: client-legacy-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
       REPORT_IMAGE: report-engine-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
 
