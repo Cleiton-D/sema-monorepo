@@ -29,3 +29,20 @@ spec:
               name: client
               port:
                 number: 80
+    - host: www.diarioescolar.net.br
+      http:
+        paths:
+        - path: /legacy
+          pathType: Prefix
+          backend:
+            service:
+              name: client-legacy
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: client
+              port:
+                number: 80
