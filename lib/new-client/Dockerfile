@@ -1,27 +1,52 @@
-FROM node:alpine AS builder
+# Base Node image
+FROM node:16-alpine as base
 
+# Setup all node_modules
+FROM base as deps
+
+RUN mkdir /app
 WORKDIR /app
 
-COPY . .
-RUN yarn install
-RUN yarn build
-RUN rm -rf node_modules
+ADD package.json package-lock.json ./
+RUN npm install --production=false
 
-FROM node:alpine AS runner
+# Setup production node_modules
+FROM base as production-deps
 
-ENV NODE_ENV production
-
+RUN mkdir /app
 WORKDIR /app
 
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
+COPY --from=deps /app/node_modules /app/node_modules
+ADD package.json package-lock.json ./
+RUN npm prune --production
 
-RUN yarn install --production
+# Build the app
+FROM base as build
+
+ENV NODE_ENV=production
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY --from=deps /app/node_modules /app/node_modules
+
+ADD . .
+RUN npm run build
+
+# Build production image
+FROM base
+
+ENV NODE_ENV=production
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY --from=production-deps /app/node_modules /app/node_modules
+
+COPY --from=build /app/build /app/build
+COPY --from=build /app/public /app/public
+ADD . .
 
 EXPOSE 3000
-
-ENV NEXT_TELEMETRY_DISABLED 1
 
 CMD ["npm", "run", "start"]
