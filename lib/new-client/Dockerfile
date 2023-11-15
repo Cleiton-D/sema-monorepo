@@ -1,5 +1,5 @@
 # Base Node image
-FROM node:16-alpine as base
+FROM node:alpine as base
 
 # Setup all node_modules
 FROM base as deps
