@@ -42,6 +42,11 @@ spec:
               configMapKeyRef:
                 name: diarioonline-front-new-configmap
                 key: LEGACY_URL
+          - name: LEGACY_URL_INTERNAL
+            valueFrom:
+              configMapKeyRef:
+                name: diarioonline-front-new-configmap
+                key: LEGACY_URL_INTERNAL
           - name: SERVER_API_URL
             valueFrom:
               configMapKeyRef:
