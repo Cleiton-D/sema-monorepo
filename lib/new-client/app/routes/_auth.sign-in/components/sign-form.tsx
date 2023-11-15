@@ -34,13 +34,13 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
       <ValidatedForm validator={validator} method="post">
         <div className="grid gap-8">
           <ValidatedInputWrapper>
-            <Label className="sr-only" htmlFor="email">
-              Email
+            <Label className="sr-only" htmlFor="username">
+              CPF
             </Label>
             <ValidatedInput
               id="username"
               name="username"
-              placeholder="name@example.com"
+              placeholder="12345678909"
               type="text"
               autoCapitalize="none"
               autoCorrect="off"
