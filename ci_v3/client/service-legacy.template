@@ -20,7 +20,7 @@ metadata:
   labels:
     app: client-legacy
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: client-legacy
