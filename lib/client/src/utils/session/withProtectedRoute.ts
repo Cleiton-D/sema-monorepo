@@ -22,7 +22,6 @@ export const withProtectedRoute = <
   return withSessionSsr(async (context) => {
     const session = await unstable__protectedRoutes(context);
 
-    console.log("secao", session, context.req.url)
     if (!session) return {} as GetServerSidePropsResult<P>;
     const { dehydratedSession, fullSession } = session;
     context.req.fullSession = fullSession;

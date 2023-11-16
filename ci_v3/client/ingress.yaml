@@ -1,57 +1,49 @@
-apiVersion: networking.k8s.io/v1                    
-kind: Ingress                                          
-metadata:                                                                                                                                                                                                                                   
-  annotations:                                                                                                                                                                                                                              
-    cert-manager.io/cluster-issuer: letsencrypt-prod                                      
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/router.middlewares: prod-replacepathlegacy@kubernetescrd,prod-redirect-https@kubernetescrd                         
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
   name: client-ingress
-  namespace: prod
-spec:                          
-  rules:                       
-  - host: diarioescolar.net.br
-    http:                      
-      paths:                   
-      - backend:        
-          service:      
-            name: client-legacy
-            port:       
-              number: 80
-        path: /legacy          
-        pathType: Prefix       
-      - backend:                  
-          service:                
-            name: client-legacy
-            port:       
-              number: 80
-        path: /_next           
-        pathType: Prefix       
-      - backend:        
-          service:      
-            name: client
-            port:                 
-              number: 80          
-        path: /         
-        pathType: Prefix
-  - host: www.diarioescolar.net.br
-    http:                         
-      paths:                   
-      - backend:                  
-          service:      
-            name: client-legacy
-            port:              
-              number: 80
-        path: /legacy          
-        pathType: Prefix          
-      - backend:                  
-          service:                
-            name: client
-            port:                 
-              number: 80          
-        path: /                
-        pathType: Prefix       
-  tls:                  
-  - hosts:                     
-    - diarioescolar.net.br     
-    - www.diarioescolar.net.br
-    secretName: client-tls-secret
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect-https@kubernetescrd
+spec:
+  tls:
+    - hosts:
+      - diarioescolar.net.br
+      - www.diarioescolar.net.br
+      secretName: client-tls-secret
+  rules:
+    - host: diarioescolar.net.br
+      http:
+        paths:
+        - path: /legacy
+          pathType: Prefix
+          backend:
+            service:
+              name: client-legacy
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: client
+              port:
+                number: 80
+    - host: www.diarioescolar.net.br
+      http:
+        paths:
+        - path: /legacy
+          pathType: Prefix
+          backend:
+            service:
+              name: client-legacy
+              port:
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: client
+              port:
+                number: 80
