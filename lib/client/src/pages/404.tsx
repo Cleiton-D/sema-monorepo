@@ -1,5 +1,7 @@
+import { isServer } from "utils/isServer";
+
 export default function Page404() {
-  if (window) {
+  if (!isServer) {
     const url = new URL(window.location.href);
     const newpathname = url.pathname.replace('/legacy', '');
     url.pathname = newpathname;
