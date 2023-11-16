@@ -5,8 +5,6 @@ export default function Page404() {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  console.log("caiu aqui", context)
-
   return {
     redirect: {
       destination: `${process.env.REMIX_APP_URL}${context.req.url}`,
