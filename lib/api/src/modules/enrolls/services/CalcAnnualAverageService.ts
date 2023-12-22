@@ -39,19 +39,19 @@ class CalcAnnualAverageService {
     }
 
     if (!first_recIsNull) {
-      if (!fistIsNull && first < 500 && first < first_rec) {
+      if (fistIsNull || (first < 600 && first < first_rec)) {
         first = first_rec
       }
-      if (!secondIsNull && second < 500 && second < first_rec) {
+      if (secondIsNull || (second < 600 && second < first_rec)) {
         second = first_rec
       }
     }
 
     if (!second_recIsNull) {
-      if (!thirdIsNull && third < 500 && third < second_rec) {
+      if (thirdIsNull || (third < 600 && third < second_rec)) {
         third = second_rec
       }
-      if (!fourthIsNull && fourth < 500 && fourth < second_rec) {
+      if (fourthIsNull || (fourth < 600 && fourth < second_rec)) {
         fourth = second_rec
       }
     }
