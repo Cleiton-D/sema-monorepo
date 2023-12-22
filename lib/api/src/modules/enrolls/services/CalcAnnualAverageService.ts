@@ -23,10 +23,10 @@ class CalcAnnualAverageService {
       return null;
     }
 
-    const first = schoolReport.first || 0;
-    const second = schoolReport.second || 0;
-    const third = schoolReport.third || 0;
-    const fourth = schoolReport.fourth || 0;
+    let first = schoolReport.first || 0;
+    let second = schoolReport.second || 0;
+    let third = schoolReport.third || 0;
+    let fourth = schoolReport.fourth || 0;
     const first_rec = schoolReport.first_rec || 0;
     const second_rec = schoolReport.second_rec || 0;
 
@@ -38,9 +38,26 @@ class CalcAnnualAverageService {
       if (!secondIsNull) lengthFirst += 1;
     }
 
+    if (!first_recIsNull) {
+      if (!fistIsNull && first < 500 && first < first_rec) {
+        first = first_rec
+      }
+      if (!secondIsNull && second < 500 && second < first_rec) {
+        second = first_rec
+      }
+    }
+
+    if (!second_recIsNull) {
+      if (!thirdIsNull && third < 500 && third < second_rec) {
+        third = second_rec
+      }
+      if (!fourthIsNull && fourth < 500 && fourth < second_rec) {
+        fourth = second_rec
+      }
+    }
+
+
     let firstSemAverage = (first + second) / lengthFirst;
-    firstSemAverage =
-      firstSemAverage >= first_rec ? firstSemAverage : first_rec;
     firstSemAverage *= lengthFirst;
 
     let lengthSecond = 0;
@@ -52,8 +69,6 @@ class CalcAnnualAverageService {
     }
 
     let secondSemAverage = (third + fourth) / lengthSecond;
-    secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : second_rec;
     secondSemAverage *= lengthSecond;
 
     const totalReports = lengthFirst + lengthSecond;

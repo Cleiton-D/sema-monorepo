@@ -36,20 +36,33 @@ class CalcFinalAverageService {
       return null;
     }
 
-    const first = schoolReport.first || 0;
-    const second = schoolReport.second || 0;
-    const third = schoolReport.third || 0;
-    const fourth = schoolReport.fourth || 0;
+    let first = schoolReport.first || 0;
+    let second = schoolReport.second || 0;
+    let third = schoolReport.third || 0;
+    let fourth = schoolReport.fourth || 0;
     const first_rec = schoolReport.first_rec || 0;
     const second_rec = schoolReport.second_rec || 0;
 
-    let firstSemAverage = (first + second) / 2;
-    firstSemAverage =
-      firstSemAverage >= first_rec ? firstSemAverage : first_rec;
+    if (!first_recIsNull) {
+      if (!fistIsNull && first < 500 && first < first_rec) {
+        first = first_rec
+      }
+      if (!secondIsNull && second < 500 && second < first_rec) {
+        second = first_rec
+      }
+    }
 
-    let secondSemAverage = (third + fourth) / 2;
-    secondSemAverage =
-      secondSemAverage >= second_rec ? secondSemAverage : second_rec;
+    if (!second_recIsNull) {
+      if (!thirdIsNull && third < 500 && third < second_rec) {
+        third = second_rec
+      }
+      if (!fourthIsNull && fourth < 500 && fourth < second_rec) {
+        fourth = second_rec
+      }
+    }
+
+    const firstSemAverage = (first + second) / 2;
+    const secondSemAverage = (third + fourth) / 2;
 
     const finalAverage = (firstSemAverage + secondSemAverage) / 2;
     return Math.round(finalAverage);
