@@ -30,6 +30,14 @@ class CalcAnnualAverageService {
     const first_rec = schoolReport.first_rec || 0;
     const second_rec = schoolReport.second_rec || 0;
 
+    console.log("first", first, typeof first)
+    console.log("second", second, typeof second)
+    console.log("third", third, typeof third)
+    console.log("fourth", fourth, typeof fourth)
+
+    console.log("first_rec", first_rec, typeof first_rec)
+    console.log("second_rec", second_rec, typeof second_rec)
+
     let lengthFirst = 0;
     if (fistIsNull && secondIsNull && !first_recIsNull) {
       lengthFirst = 2;
@@ -37,6 +45,8 @@ class CalcAnnualAverageService {
       if (!fistIsNull) lengthFirst += 1;
       if (!secondIsNull) lengthFirst += 1;
     }
+
+    console.log("length first", lengthFirst, typeof lengthFirst)
 
     if (!first_recIsNull) {
       if (fistIsNull || (first < 600 && first < first_rec)) {
@@ -47,6 +57,9 @@ class CalcAnnualAverageService {
       }
     }
 
+    console.log("first after", first, typeof first)
+    console.log("second after", second, typeof second)
+
     if (!second_recIsNull) {
       if (thirdIsNull || (third < 600 && third < second_rec)) {
         third = second_rec
@@ -56,9 +69,12 @@ class CalcAnnualAverageService {
       }
     }
 
+    console.log("third after", third, typeof third)
+    console.log("fourth after", fourth, typeof fourth)
 
-    let firstSemAverage = (first + second) / lengthFirst;
-    firstSemAverage *= lengthFirst;
+    const firstSemSum = (first + second);
+
+    console.log("first sem sum", firstSemSum, typeof firstSemSum)
 
     let lengthSecond = 0;
     if (thirdIsNull && fourthIsNull && !second_recIsNull) {
@@ -68,11 +84,19 @@ class CalcAnnualAverageService {
       if (!fourthIsNull) lengthSecond += 1;
     }
 
-    let secondSemAverage = (third + fourth) / lengthSecond;
-    secondSemAverage *= lengthSecond;
+    console.log("length second", lengthSecond, typeof lengthSecond)
+
+    const secondSemSum = (third + fourth);
+
+    console.log("second sem sum", secondSemSum, typeof secondSemSum)
 
     const totalReports = lengthFirst + lengthSecond;
-    const annualAverage = (firstSemAverage + secondSemAverage) / totalReports;
+
+    console.log("total reports", totalReports, typeof totalReports)
+
+    const annualAverage = (firstSemSum + secondSemSum) / totalReports;
+
+    console.log("anual average", annualAverage, typeof annualAverage)
     return Math.round(annualAverage);
   }
 }
