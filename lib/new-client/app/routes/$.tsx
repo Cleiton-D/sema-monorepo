@@ -11,10 +11,9 @@ export const loader = ({request}:LoaderFunctionArgs) => {
     const pathname = `/legacy${url.pathname}`
     
     url.href = `${host}${pathname}`
-    console.log("caiu aqui", url.toString())
 
     return redirectDocument(url.toString())
-}
+ }
 
 export default function RedirectPage() {
     useLoaderData()

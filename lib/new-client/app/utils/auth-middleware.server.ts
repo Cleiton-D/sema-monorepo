@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/node";
+import { redirect, redirectDocument } from "@remix-run/node";
 
 import { authCookie, getIronSession, getUser } from "~/utils/session.server";
 
@@ -55,7 +55,7 @@ export async function authLoader(request: Request) {
   if (!isAuth) {
     url.pathname = "/auth";
     url.searchParams.delete("callbackUrl");
-    throw redirect(url.toString(), 302);
+    throw redirectDocument(url.toString(), 302);
   }
 
   if (
@@ -66,7 +66,7 @@ export async function authLoader(request: Request) {
     url.pathname = callbackUrl || "/auth";
     url.searchParams.delete("callbackUrl");
 
-    throw redirect(url.toString(), 302);
+    throw redirectDocument(url.toString(), 302);
   }
 
   return user;
