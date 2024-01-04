@@ -1,5 +1,6 @@
 import { redirectDocument } from "@remix-run/node"
 import type {LoaderFunctionArgs} from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react"
 
 
 export const loader = ({request}:LoaderFunctionArgs) => {
@@ -13,4 +14,10 @@ export const loader = ({request}:LoaderFunctionArgs) => {
     console.log("caiu aqui", url.toString())
 
     return redirectDocument(url.toString())
+}
+
+export default function RedirectPage() {
+    useLoaderData()
+
+    return <></>
 }
