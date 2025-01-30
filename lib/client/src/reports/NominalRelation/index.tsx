@@ -5,6 +5,7 @@ import { EnrollClassroom } from 'models/EnrollClassroom';
 import { Classroom } from 'models/Classroom';
 
 import { parseDateWithoutTimezone } from 'utils/parseDateWithoutTimezone';
+import { translateStatus } from 'utils/translateStatus';
 
 import * as S from './styles';
 
