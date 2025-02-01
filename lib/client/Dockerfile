@@ -1,4 +1,4 @@
-FROM node:16-alpine AS builder
+FROM node:alpine3.12 AS builder
 
 ARG SERVER_HOSTNAME
 ARG NEXT_PUBLIC_API_URL
@@ -19,7 +19,7 @@ RUN yarn add --dev typescript @types/react @types/node autoprefixer
 RUN yarn build
 RUN rm -rf node_modules
 
-FROM node:16-slim AS runner
+FROM node:current-slim AS runner
 
 ENV APP_ENV prod
 ENV NODE_ENV production
