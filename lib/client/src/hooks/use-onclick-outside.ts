@@ -6,6 +6,8 @@ export default function useOnClickOutside(
   handler: ClickOutsideHandler
 ) {
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     const listener = (event: MouseEvent | TouchEvent) => {
       if (!ref.current || ref.current.contains(event.target as Node)) {
         return;
@@ -15,6 +17,8 @@ export default function useOnClickOutside(
     document.addEventListener('mousedown', listener);
     document.addEventListener('touchstart', listener);
     return () => {
+      if (typeof document === 'undefined') return;
+
       document.removeEventListener('mousedown', listener);
       document.removeEventListener('touchstart', listener);
     };

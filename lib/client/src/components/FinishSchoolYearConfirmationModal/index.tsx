@@ -38,6 +38,8 @@ const FinishSchoolYearConfirmationModal: React.ForwardRefRenderFunction<
   };
 
   const handleSubmit = (values: { passwd: string }) => {
+    if (typeof document === 'undefined') return;
+
     modalRef.current?.closeModal();
     finishSchoolYear
       .mutateAsync({

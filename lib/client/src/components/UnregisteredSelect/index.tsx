@@ -113,6 +113,8 @@ const UnregisteredSelect: React.ForwardRefRenderFunction<
   }, [options]);
 
   const handleOpen = () => {
+    if (typeof document === 'undefined') return;
+
     if (containerRef.current && inputRef.current) {
       const boundingRect = inputRef.current.getBoundingClientRect();
 

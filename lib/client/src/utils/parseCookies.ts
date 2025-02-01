@@ -1,8 +1,12 @@
+'use client';
+
 import cookie from 'cookie';
 import Cookies from 'cookies';
 import { GetServerSidePropsContext } from 'next';
 
 export function parseCookies(context: GetServerSidePropsContext) {
+  if (typeof document === 'undefined') return;
+
   const request = context.req;
 
   return cookie.parse(request ? request.headers.cookie || '' : document.cookie);

@@ -1,4 +1,6 @@
 export const getDatabaseDump = async () => {
+  if (typeof document === 'undefined') return;
+
   const now = new Date();
   const currentDate = `${now.getFullYear()}.${
     now.getMonth() + 1

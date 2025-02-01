@@ -76,6 +76,8 @@ function AutocompleteField<T>({
   );
 
   const handleOpen = () => {
+    if (typeof document === 'undefined') return;
+
     if (containerRef.current && inputRef.current) {
       const boundingRect = inputRef.current.getBoundingClientRect();
       const windowBottom =
