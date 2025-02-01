@@ -89,7 +89,7 @@ const ClassesTemplate = () => {
   }, [enableAccess, schoolYear]);
 
   return (
-    <Base>
+    (<Base>
       <Heading>Aulas</Heading>
       {canChangeClass && (
         <S.AddButtonContainer>
@@ -103,9 +103,7 @@ const ClassesTemplate = () => {
           </Button>
         </S.AddButtonContainer>
       )}
-
       <SearchClasses handleSearch={setFilters} currentValues={filters} />
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Aulas</h4>
@@ -119,7 +117,7 @@ const ClassesTemplate = () => {
             tableKey="classroom.description"
             actionColumn
             render={(classEntity: FormattedClass) => (
-              <Link href={`/auth/classes/${classEntity.id}`} passHref>
+              <Link href={`/auth/classes/${classEntity.id}`} passHref legacyBehavior>
                 <S.TableLink title="Visualizar aula">
                   {classEntity.classroom.description}
                 </S.TableLink>
@@ -177,7 +175,7 @@ const ClassesTemplate = () => {
           />
         </S.PaginatorContainer>
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 

@@ -60,11 +60,11 @@ const Enrolls = () => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Matrículas</Heading>
       {canChangeEnroll && schoolId && (
         <S.AddButtonContainer>
-          <Link href={`/auth/enrolls/new?school_id=${schoolId}`} passHref>
+          <Link href={`/auth/enrolls/new?school_id=${schoolId}`} passHref legacyBehavior>
             <Button
               styleType="normal"
               size="medium"
@@ -76,9 +76,7 @@ const Enrolls = () => {
           </Link>
         </S.AddButtonContainer>
       )}
-
       <SearchEnrolls handleSearch={handleSearch} />
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Matrículas</h4>
@@ -98,7 +96,7 @@ const Enrolls = () => {
           />
         </S.PaginatorContainer>
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 

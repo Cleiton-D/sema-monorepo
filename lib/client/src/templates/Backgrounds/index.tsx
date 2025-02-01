@@ -122,7 +122,7 @@ const BackgroundsTemplate = () => {
                 layout="fill"
                 objectFit="cover"
                 quality={80}
-                placeholder="blur"
+                placeholder="blur-xs"
                 blurDataURL={background.blurhash}
               />
               <S.ImageMessage>

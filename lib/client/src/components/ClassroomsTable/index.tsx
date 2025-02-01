@@ -30,14 +30,13 @@ export const ClassroomsTable = ({
   const { data: profile } = useProfile();
 
   return (
-    <Table items={classrooms} keyExtractor={(value) => value.id}>
+    (<Table items={classrooms} keyExtractor={(value) => value.id}>
       <TableColumn tableKey="description" label="Turma">
         {subTable && subTable}
       </TableColumn>
       {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
-
       <TableColumn
         label="Série"
         tableKey="grade"
@@ -48,7 +47,6 @@ export const ClassroomsTable = ({
         tableKey="class_period.description"
         render={(class_period) => translateDescription(class_period)}
       />
-
       {!!link && (
         <TableColumn
           label="Links"
@@ -56,13 +54,12 @@ export const ClassroomsTable = ({
           contentAlign="center"
           actionColumn
           render={(classroom: Classroom) => (
-            <Link href={link.createHref(classroom)} passHref>
+            <Link href={link.createHref(classroom)} passHref legacyBehavior>
               <S.TableLink>{link.name}</S.TableLink>
             </Link>
           )}
         />
       )}
-
       {!!actions && (
         <TableColumn
           label="Ações"
@@ -72,7 +69,7 @@ export const ClassroomsTable = ({
           render={actions}
         />
       )}
-    </Table>
+    </Table>)
   );
 };
 

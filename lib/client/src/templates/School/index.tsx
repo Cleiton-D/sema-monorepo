@@ -56,7 +56,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Escola</Heading>
       {/* <S.AddButtonContainer>
         <Link href={`/auth/school/${query.school_id}/edit`} passHref>
@@ -65,7 +65,6 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
           </Button>
         </Link>
       </S.AddButtonContainer> */}
-
       <S.Wrapper>
         <div>
           <S.SchoolName size="md" color="primary">
@@ -76,7 +75,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
         <S.Details>
           <S.Grid>
             {canAccessEnrolls ? (
-              <Link href={`/auth/enrolls?school_id=${query.school_id}`}>
+              <Link href={`/auth/enrolls?school_id=${query.school_id}`} legacyBehavior>
                 <S.LinkGridItem>
                   <strong>Alunos ativos</strong>
                   <span>{schoolDetail?.enroll_count}</span>
@@ -91,7 +90,7 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
 
             {canAccessClassrooms ? (
               <>
-                <Link href={`/auth/school/${query.school_id}/classrooms`}>
+                <Link href={`/auth/school/${query.school_id}/classrooms`} legacyBehavior>
                   <S.LinkGridItem>
                     <strong>Turmas</strong>
                     <span>{schoolDetail?.classrooms_count}</span>
@@ -160,7 +159,6 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
           </S.Grid>
         </S.Details>
       </S.Wrapper>
-
       <S.Wrapper>
         <S.SectionTitle>
           <h1>Administração</h1>
@@ -228,13 +226,12 @@ const SchoolPageTemplate = ({ school }: SchoolProps) => {
           </S.Section>
         </S.EmployeesSection>
       </S.Wrapper>
-
       <SchoolDirectoryModal
         ref={schoolDiretoryModalRef}
         school={schoolDetail || school}
         refetchFn={refetch}
       />
-    </Base>
+    </Base>)
   );
 };
 

@@ -17,10 +17,10 @@ const Page = ({ children, orientation }: PageProps) => {
     //     ...(orientation === 'landscape' ? { overflow: 'hidden' } : {})
     //   }}
     // >
-    <S.Wrapper orientation={orientation} ref={wrapperRef}>
-      {children}
-    </S.Wrapper>
     // </div>
+    (<S.Wrapper orientation={orientation} ref={wrapperRef}>
+      {children}
+    </S.Wrapper>)
   );
 };
 

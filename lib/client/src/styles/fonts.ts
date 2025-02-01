@@ -3,7 +3,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'normal',
     weight: 300,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-300.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-300.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -11,7 +11,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'italic',
     weight: 300,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-300italic.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-300italic.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -19,7 +19,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'normal',
     weight: 400,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-regular.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-regular.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -27,7 +27,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'italic',
     weight: 400,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-italic.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-italic.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -35,7 +35,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'normal',
     weight: 500,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-500.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-500.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -43,7 +43,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'italic',
     weight: 500,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-500italic.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-500italic.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -51,7 +51,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'normal',
     weight: 600,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-600.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-600.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -59,7 +59,7 @@ const fonts = [
     name: "'Poppins'",
     style: 'italic',
     weight: 600,
-    url: '/legacy/fonts/poppins/poppins-v15-latin-600italic.woff2',
+    url: '/fonts/poppins/poppins-v15-latin-600italic.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -67,7 +67,7 @@ const fonts = [
     name: "'Inter'",
     style: 'normal',
     weight: 300,
-    url: '/legacy/fonts/inter/inter-v3-latin-300.woff2',
+    url: '/fonts/inter/inter-v3-latin-300.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -75,7 +75,7 @@ const fonts = [
     name: "'Inter'",
     style: 'normal',
     weight: 400,
-    url: '/legacy/fonts/inter/inter-v3-latin-regular.woff2',
+    url: '/fonts/inter/inter-v3-latin-regular.woff2',
     display: 'swap',
     format: 'woff2'
   },
@@ -83,7 +83,7 @@ const fonts = [
     name: "'Inter'",
     style: 'normal',
     weight: 600,
-    url: '/legacy/fonts/inter/inter-v3-latin-600.woff2',
+    url: '/fonts/inter/inter-v3-latin-600.woff2',
     display: 'swap',
     format: 'woff2'
   }

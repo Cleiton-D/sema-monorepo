@@ -93,7 +93,7 @@ const ClassroomClassReportItem = ({
   }, [schoolSubjects]);
 
   return (
-    <S.Wrapper>
+    (<S.Wrapper>
       <S.Header>
         <UnregisteredSelect
           label="Disciplina"
@@ -118,7 +118,7 @@ const ClassroomClassReportItem = ({
             }
           }}
           passHref
-        >
+          legacyBehavior>
           <S.LightLink target="_blank">
             <Printer
               size={20}
@@ -128,7 +128,6 @@ const ClassroomClassReportItem = ({
           </S.LightLink>
         </Link>
       </S.Header>
-
       {classes?.items && (
         <S.TableSection>
           <Table
@@ -158,7 +157,7 @@ const ClassroomClassReportItem = ({
           </S.PaginatorContainer>
         </S.TableSection>
       )}
-    </S.Wrapper>
+    </S.Wrapper>)
   );
 };
 

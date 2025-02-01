@@ -50,11 +50,11 @@ const Employees = () => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Servidores</Heading>
       {canEditEmployees && (
         <S.AddButtonContainer>
-          <Link href={`/auth/administration/employees/new`} passHref>
+          <Link href={`/auth/administration/employees/new`} passHref legacyBehavior>
             <Button
               styleType="normal"
               size="medium"
@@ -66,7 +66,6 @@ const Employees = () => {
           </Link>
         </S.AddButtonContainer>
       )}
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Servidores</h4>
@@ -126,7 +125,7 @@ const Employees = () => {
         </Table>
       </S.TableSection>
       <CreateEmployeeUserProfileModal ref={employeeUserProfileModalRef} />
-    </Base>
+    </Base>)
   );
 };
 

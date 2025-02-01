@@ -94,7 +94,7 @@ const SignIn = ({ background }: SignInProps) => {
           layout="fill"
           objectFit="cover"
           quality={80}
-          placeholder="blur"
+          placeholder="blur-xs"
           blurDataURL={background.blurhash}
         />
       )}
@@ -102,7 +102,7 @@ const SignIn = ({ background }: SignInProps) => {
       <S.Content>
         <S.WfLogoContainer>
           <Image
-            src="/legacy/img/logowf.gif"
+            src="/img/logowf.gif"
             layout="fill"
             objectFit="contain"
             quality={80}

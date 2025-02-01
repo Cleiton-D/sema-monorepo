@@ -24,17 +24,14 @@ const EnrollsReportTable = ({
   const { data: profile } = useProfile();
 
   return (
-    <Table<Enroll> items={enrolls || []} keyExtractor={(value) => value.id}>
+    (<Table<Enroll> items={enrolls || []} keyExtractor={(value) => value.id}>
       <TableColumn label="Nome" tableKey="student.name">
         {subTable && subTable}
       </TableColumn>
-
       <TableColumn label="NIS" tableKey="student.nis" />
-
       {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
-
       <TableColumn label="Turma" tableKey="current_classroom.description" />
       <TableColumn label="Série" tableKey="grade.description" />
       <TableColumn
@@ -54,12 +51,12 @@ const EnrollsReportTable = ({
         contentAlign="center"
         actionColumn
         render={(enroll: Enroll) => (
-          <Link href={`/auth/student/${enroll.id}`} passHref>
+          <Link href={`/auth/student/${enroll.id}`} passHref legacyBehavior>
             <S.TableLink>Ver aluno</S.TableLink>
           </Link>
         )}
       />
-    </Table>
+    </Table>)
   );
 };
 

@@ -35,9 +35,8 @@ const Schools = () => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Escolas</Heading>
-
       {canChangeSchools && (
         <S.AddButtonContainer>
           <Button
@@ -50,7 +49,6 @@ const Schools = () => {
           </Button>
         </S.AddButtonContainer>
       )}
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Escolas</h4>
@@ -64,7 +62,7 @@ const Schools = () => {
             tableKey=""
             actionColumn
             render={(school: SchoolWithEnrollCount) => (
-              <Link href={`/auth/school/${school.id}`} passHref>
+              <Link href={`/auth/school/${school.id}`} passHref legacyBehavior>
                 <S.TableLink>{school.name}</S.TableLink>
               </Link>
             )}
@@ -79,7 +77,7 @@ const Schools = () => {
           />
         </Table>
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 

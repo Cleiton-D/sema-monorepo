@@ -92,7 +92,7 @@ const Classrooms = () => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Turmas</Heading>
       {canChangeClassroom && schoolId && (
         <S.AddButtonContainer>
@@ -106,9 +106,7 @@ const Classrooms = () => {
           </Button>
         </S.AddButtonContainer>
       )}
-
       <ClassroomsSearch handleSearch={handleSearch} />
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Turmas</h4>
@@ -157,7 +155,7 @@ const Classrooms = () => {
                   }
                 }}
                 passHref
-              >
+                legacyBehavior>
                 <S.TableLink>Ver turma</S.TableLink>
               </Link>
             )}
@@ -178,7 +176,7 @@ const Classrooms = () => {
                     }
                   }}
                   passHref
-                >
+                  legacyBehavior>
                   <S.ActionButton color="primary" as="a" target="_blank">
                     <FileText title={`Imprimir boletim`} />
                   </S.ActionButton>
@@ -222,7 +220,7 @@ const Classrooms = () => {
         </S.PaginatorContainer>
       </S.TableSection>
       {schoolId && <ClassroomModal ref={modalRef} schoolId={schoolId} />}
-    </Base>
+    </Base>)
   );
 };
 

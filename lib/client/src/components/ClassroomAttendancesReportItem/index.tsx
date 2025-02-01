@@ -56,7 +56,7 @@ const ClassroomAttendancesReportItem = ({
   }, [schoolSubjects]);
 
   return (
-    <S.Wrapper>
+    (<S.Wrapper>
       <S.Header>
         <UnregisteredSelect
           label="Disciplina"
@@ -77,7 +77,7 @@ const ClassroomAttendancesReportItem = ({
             }
           }}
           passHref
-        >
+          legacyBehavior>
           <S.LightLink target="_blank">
             <Printer
               size={20}
@@ -87,7 +87,6 @@ const ClassroomAttendancesReportItem = ({
           </S.LightLink>
         </Link>
       </S.Header>
-
       {classroom && (
         <AttendancesReportTable
           schoolSubjectId={selectedSchoolSubject}
@@ -95,7 +94,7 @@ const ClassroomAttendancesReportItem = ({
           schoolTermPeriod={schoolTermPeriod}
         />
       )}
-    </S.Wrapper>
+    </S.Wrapper>)
   );
 };
 

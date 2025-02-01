@@ -44,12 +44,11 @@ const Sidebar = () => {
       }}
       className="bg-background grid grid-rows-[8rem_1fr]"
     >
-      <Link href="/auth" passHref>
+      <Link href="/auth" passHref legacyBehavior>
         <S.Logo>
-          <Image src="/legacy/img/new-logo.svg" width={160} height={90} />
+          <Image src="/img/new-logo.svg" alt="logo" width={160} height={90} />
         </S.Logo>
       </Link>
-
       <div className={cn('pb-12')}>
         <div className="space-y py-4">
           <div className="px-4 py-2">
@@ -59,10 +58,12 @@ const Sidebar = () => {
                 size="sm"
                 className="w-full justify-start"
               >
-                <Link href="/auth" passHref>
-                  <a className="w-full h-full flex flex-wrap justify-start content-center">
-                    Início
-                  </a>
+                <Link
+                  href="/auth"
+                  passHref
+                  className="w-full h-full flex flex-wrap justify-start content-center"
+                >
+                  Início
                 </Link>
               </Button>
 
@@ -78,10 +79,12 @@ const Sidebar = () => {
                   size="sm"
                   className="w-full justify-start"
                 >
-                  <Link href={route.path} passHref>
-                    <a className="w-full h-full flex flex-wrap justify-start content-center">
-                      {route.name}
-                    </a>
+                  <Link
+                    href={route.path}
+                    passHref
+                    className="w-full h-full flex flex-wrap justify-start content-center"
+                  >
+                    {route.name}
                   </Link>
                 </Button>
               ))}

@@ -23,7 +23,7 @@ export type CardProps = {
 
 const Card = ({ children, description, icon, link, onClick }: CardProps) => {
   return (
-    <ShadCnCard className="flex flex-col">
+    (<ShadCnCard className="flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-md font-medium">{description}</CardTitle>
         {!!icon && icon}
@@ -36,10 +36,13 @@ const Card = ({ children, description, icon, link, onClick }: CardProps) => {
       <CardFooter className="flex-1 items-end">
         {link ? (
           <Button className="w-full py-0 px-0">
-            <Link href={link} passHref>
-              <a className="w-full h-full flex items-center justify-center">
+            <Link
+              href={link}
+              passHref
+              className="w-full h-full flex items-center justify-center">
+              
                 acessar
-              </a>
+              
             </Link>
           </Button>
         ) : (
@@ -52,7 +55,7 @@ const Card = ({ children, description, icon, link, onClick }: CardProps) => {
           </>
         )}
       </CardFooter>
-    </ShadCnCard>
+    </ShadCnCard>)
   );
 };
 

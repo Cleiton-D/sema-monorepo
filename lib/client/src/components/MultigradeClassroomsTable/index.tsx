@@ -32,12 +32,11 @@ export const MultigradeClassroomsTable = ({
   );
 
   return (
-    <Table items={classrooms} keyExtractor={(value) => value.id} minimal>
+    (<Table items={classrooms} keyExtractor={(value) => value.id} minimal>
       <TableColumn tableKey="description" label="Turma" />
       {!profile?.school?.id && (
         <TableColumn label="Escola" tableKey="school.name" />
       )}
-
       <TableColumn label="Série" tableKey="grade.description" />
       <TableColumn
         label="Período"
@@ -60,12 +59,12 @@ export const MultigradeClassroomsTable = ({
               }
             }}
             passHref
-          >
+            legacyBehavior>
             <S.TableLink>Ver turma</S.TableLink>
           </Link>
         )}
       />
-    </Table>
+    </Table>)
   );
 };
 

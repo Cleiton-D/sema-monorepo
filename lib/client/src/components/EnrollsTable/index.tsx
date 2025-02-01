@@ -37,100 +37,98 @@ const EnrollsTable = ({
 
   const moveEnrollModalRef = useRef<MoveEnrollModalRef>(null);
 
-  return (
-    <>
-      <Table<Enroll>
-        items={enrolls || []}
-        keyExtractor={(value) => value.id}
-        minimal={minimal}
-      >
-        {!minimal ? (
-          <TableColumn label="Nome" tableKey="student.name">
-            {({ id }: Enroll) => <SchoolReportTable enrollId={id} isMininal />}
-          </TableColumn>
-        ) : (
-          <TableColumn label="Nome" tableKey="student.name" />
+  return (<>
+    <Table<Enroll>
+      items={enrolls || []}
+      keyExtractor={(value) => value.id}
+      minimal={minimal}
+    >
+      {!minimal ? (
+        <TableColumn label="Nome" tableKey="student.name">
+          {({ id }: Enroll) => <SchoolReportTable enrollId={id} isMininal />}
+        </TableColumn>
+      ) : (
+        <TableColumn label="Nome" tableKey="student.name" />
+      )}
+
+      <TableColumn
+        label="Idade"
+        tableKey="student.birth_date"
+        render={function (birth_date: string) {
+          const parsedBirthDate = parseDateWithoutTimezone(birth_date);
+
+          return <>{differenceInYears(new Date(), parsedBirthDate)}</>;
+        }}
+      />
+
+      <TableColumn label="NIS" tableKey="student.nis" />
+      <TableColumn label="Código único" tableKey="student.unique_code" />
+
+      {!profile?.school?.id && (
+        <TableColumn label="Escola" tableKey="school.name" />
+      )}
+
+      <TableColumn label="Série" tableKey="grade.description" />
+      <TableColumn
+        label="Período"
+        tableKey="class_period.description"
+        render={translateDescription}
+      />
+      <TableColumn label="Turma" tableKey="current_classroom.description" />
+      <TableColumn
+        label="Situação"
+        tableKey="status"
+        contentAlign="center"
+        render={(status) => translateStatus(status)}
+      />
+      <TableColumn
+        label="Links"
+        tableKey=""
+        contentAlign="center"
+        actionColumn
+        module="ENROLL"
+        render={(enroll: Enroll) => (
+          <Link href={`/auth/student/${enroll.id}`} passHref legacyBehavior>
+            <S.TableLink>Ver aluno</S.TableLink>
+          </Link>
         )}
+      />
 
+      {showActions && (
         <TableColumn
-          label="Idade"
-          tableKey="student.birth_date"
-          render={function (birth_date: string) {
-            const parsedBirthDate = parseDateWithoutTimezone(birth_date);
-
-            return <>{differenceInYears(new Date(), parsedBirthDate)}</>;
-          }}
-        />
-
-        <TableColumn label="NIS" tableKey="student.nis" />
-        <TableColumn label="Código único" tableKey="student.unique_code" />
-
-        {!profile?.school?.id && (
-          <TableColumn label="Escola" tableKey="school.name" />
-        )}
-
-        <TableColumn label="Série" tableKey="grade.description" />
-        <TableColumn
-          label="Período"
-          tableKey="class_period.description"
-          render={translateDescription}
-        />
-        <TableColumn label="Turma" tableKey="current_classroom.description" />
-        <TableColumn
-          label="Situação"
-          tableKey="status"
-          contentAlign="center"
-          render={(status) => translateStatus(status)}
-        />
-        <TableColumn
-          label="Links"
+          label="Ações"
           tableKey=""
           contentAlign="center"
           actionColumn
           module="ENROLL"
+          rule="WRITE"
           render={(enroll: Enroll) => (
-            <Link href={`/auth/student/${enroll.id}`} passHref>
-              <S.TableLink>Ver aluno</S.TableLink>
-            </Link>
+            <S.ActionButtons>
+              <S.ActionButton
+                type="button"
+                title="Movimentar estudante"
+                onClick={() => moveEnrollModalRef.current?.openModal(enroll)}
+              >
+                <Repeat
+                  size={20}
+                  color="#0393BE"
+                  title="Movimentar estudante"
+                />
+              </S.ActionButton>
+              <S.ActionButton
+                type="button"
+                title="Editar aluno"
+                onClick={() => router.push(`/auth/student/${enroll.id}/edit`)}
+              >
+                <Edit size={20} color="#0393BE" title="Editar aluno" />
+              </S.ActionButton>
+            </S.ActionButtons>
           )}
         />
-
-        {showActions && (
-          <TableColumn
-            label="Ações"
-            tableKey=""
-            contentAlign="center"
-            actionColumn
-            module="ENROLL"
-            rule="WRITE"
-            render={(enroll: Enroll) => (
-              <S.ActionButtons>
-                <S.ActionButton
-                  type="button"
-                  title="Movimentar estudante"
-                  onClick={() => moveEnrollModalRef.current?.openModal(enroll)}
-                >
-                  <Repeat
-                    size={20}
-                    color="#0393BE"
-                    title="Movimentar estudante"
-                  />
-                </S.ActionButton>
-                <S.ActionButton
-                  type="button"
-                  title="Editar aluno"
-                  onClick={() => router.push(`/auth/student/${enroll.id}/edit`)}
-                >
-                  <Edit size={20} color="#0393BE" title="Editar aluno" />
-                </S.ActionButton>
-              </S.ActionButtons>
-            )}
-          />
-        )}
-      </Table>
-      <MoveEnrollModal ref={moveEnrollModalRef} />
-    </>
-  );
+      )}
+    </Table>
+    <MoveEnrollModal ref={moveEnrollModalRef} />
+  </>);
 };
 
 export default EnrollsTable;

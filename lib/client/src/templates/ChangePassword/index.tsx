@@ -80,7 +80,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
           layout="fill"
           objectFit="cover"
           quality={80}
-          placeholder="blur"
+          placeholder="blur-xs"
           blurDataURL={background.blurhash}
         />
       )}
@@ -90,7 +90,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
           <Heading>Criar senha</Heading>
           <S.UserImageContainer>
             <Image
-              src="/legacy/img/user2.png"
+              src="/img/user2.png"
               layout="fill"
               objectFit="cover"
               quality={80}

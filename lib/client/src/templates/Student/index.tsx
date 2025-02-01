@@ -35,11 +35,11 @@ const StudentPageTemplate = () => {
   );
 
   return (
-    <Base>
+    (<Base>
       <Heading>Detalhes do aluno</Heading>
       {enroll && canEditEnroll && (
         <S.EditButtonContainer>
-          <Link href={`/auth/student/${enroll.id}/edit`} passHref>
+          <Link href={`/auth/student/${enroll.id}/edit`} passHref legacyBehavior>
             <Button styleType="normal" size="medium" icon={<Edit />} as="a">
               Editar aluno
             </Button>
@@ -156,7 +156,6 @@ const StudentPageTemplate = () => {
           )}
         </S.Details>
       </S.Wrapper>
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Boletim</h4>
@@ -169,7 +168,7 @@ const StudentPageTemplate = () => {
               }
             }}
             passHref
-          >
+            legacyBehavior>
             <S.LightLink target="_blank">
               <Printer
                 size={18}
@@ -181,7 +180,6 @@ const StudentPageTemplate = () => {
         </S.SectionTitle>
         <SchoolReportTable enrollId={query.enroll_id as string} isMininal />
       </S.TableSection>
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Faltas</h4>
@@ -189,7 +187,7 @@ const StudentPageTemplate = () => {
 
         <EnrollAbsencesTable enrollId={query.enroll_id as string} />
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 

@@ -6,15 +6,15 @@ import * as S from './styles';
 
 const NoAccessTemplate = () => {
   return (
-    <Base>
+    (<Base>
       <S.Text>
         Desculpe!
         <br /> Você não tem acesso a esse recurso.{' '}
         <Link href="/" passHref>
-          <a>Voltar para o Inicio</a>
+          Voltar para o Inicio
         </Link>
       </S.Text>
-    </Base>
+    </Base>)
   );
 };
 

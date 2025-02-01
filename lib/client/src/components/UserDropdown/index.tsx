@@ -35,7 +35,7 @@ const UserDropdown = () => {
         <Button variant="ghost" className="relative">
           {user?.username}
           <Avatar className="h-10 w-10 ml-2">
-            <AvatarImage src="/legacy/img/user2.png" alt="@shadcn" />
+            <AvatarImage src="/img/user2.png" alt="@shadcn" />
             <AvatarFallback>SC</AvatarFallback>
           </Avatar>
         </Button>

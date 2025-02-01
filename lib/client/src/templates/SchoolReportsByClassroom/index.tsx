@@ -47,9 +47,8 @@ const SchoolReportsByClassroomTemplate = () => {
   const { data: classrooms } = useListClassrooms(classroomsFilters);
 
   return (
-    <Base>
+    (<Base>
       <Heading>Notas - selecione uma turma</Heading>
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Turmas</h4>
@@ -63,7 +62,7 @@ const SchoolReportsByClassroomTemplate = () => {
             tableKey="description"
             actionColumn
             render={(classroom: Classroom) => (
-              <Link href={`/auth/school-reports/${classroom.id}`} passHref>
+              <Link href={`/auth/school-reports/${classroom.id}`} passHref legacyBehavior>
                 <S.TableLink>{classroom.description}</S.TableLink>
               </Link>
             )}
@@ -98,7 +97,7 @@ const SchoolReportsByClassroomTemplate = () => {
           />
         </S.PaginatorContainer>
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 

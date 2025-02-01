@@ -36,7 +36,7 @@ const ClassroomTemplate = () => {
   }, [enrollClassrooms]);
 
   return (
-    <Base>
+    (<Base>
       <Heading>Detalhes da turma</Heading>
       <S.Wrapper>
         <div>
@@ -77,7 +77,7 @@ const ClassroomTemplate = () => {
               }
             }}
             passHref
-          >
+            legacyBehavior>
             <S.LightLink target="_blank">
               <Printer
                 size={18}
@@ -91,7 +91,6 @@ const ClassroomTemplate = () => {
           <ClassroomStudentNominalRelation classroomId={classroom.id} />
         )}
       </S.TableSection>
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Quadro de notas</h4>
@@ -104,7 +103,7 @@ const ClassroomTemplate = () => {
               }
             }}
             passHref
-          >
+            legacyBehavior>
             <S.LightLink target="_blank">
               <Printer
                 size={18}
@@ -117,7 +116,6 @@ const ClassroomTemplate = () => {
 
         <EnrollsTable enrolls={enrolls || []} />
       </S.TableSection>
-
       <S.TableSection>
         <S.SectionTitle>
           <h4>Total geral de faltas</h4>
@@ -125,7 +123,7 @@ const ClassroomTemplate = () => {
 
         {classroom && <FinalAttendancesTable classroomId={classroom.id} />}
       </S.TableSection>
-    </Base>
+    </Base>)
   );
 };
 
