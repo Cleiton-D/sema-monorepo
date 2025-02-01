@@ -19,7 +19,7 @@ RUN yarn add --dev typescript @types/react @types/node autoprefixer
 RUN yarn build
 RUN rm -rf node_modules
 
-FROM node:current-slim AS runner
+FROM node:slim AS runner
 
 ENV APP_ENV prod
 ENV NODE_ENV production
