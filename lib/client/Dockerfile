@@ -15,7 +15,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 COPY . .
 RUN yarn install
-RUN yarn add --dev typescript @types/react @types/node autoprefixer
+RUN yarn add --dev typescript @types/react @types/node autoprefixer @tailwindcss/postcss
 RUN yarn build
 RUN rm -rf node_modules
 
