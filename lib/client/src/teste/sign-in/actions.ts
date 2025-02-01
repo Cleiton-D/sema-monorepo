@@ -1,6 +1,6 @@
 'use server';
 
-import { createUserSession } from 'app/session/session';
+import { createUserSession } from 'teste/session/session';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
