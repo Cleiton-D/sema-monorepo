@@ -21,7 +21,6 @@ import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
 import { SessionProvider } from 'context/Session';
-import { Cpu } from '@styled-icons/feather';
 
 type AppProps = NextAppProps & {
   Component: NextAppProps['Component'] & {
@@ -30,40 +29,38 @@ type AppProps = NextAppProps & {
 };
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    // <QueryClientProvider client={queryClient}>
-    //   <Hydrate state={pageProps.dehydratedState}>
-    //     <SessionProvider session={pageProps.session}>
-    //       <AtomProvider initialState={pageProps.initialState}>
-    //         <AtomHydrator initialState={pageProps.initialState}>
-    //           <ThemeProvider theme={theme}>
-    //             <Head>
-    //               <title>Diário Online</title>
-    //             </Head>
-    //             <GlobalStyles />
-    //             <NextNprogress
-    //               color={theme.colors.primary}
-    //               startPosition={0.3}
-    //               stopDelayMs={200}
-    //               height={5}
-    //             />
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <SessionProvider session={pageProps.session}>
+          <AtomProvider initialState={pageProps.initialState}>
+            <AtomHydrator initialState={pageProps.initialState}>
+              <ThemeProvider theme={theme}>
+                <Head>
+                  <title>Diário Online</title>
+                </Head>
+                <GlobalStyles />
+                <NextNprogress
+                  color={theme.colors.primary}
+                  startPosition={0.3}
+                  stopDelayMs={200}
+                  height={5}
+                />
 
-    //             {Component.auth ? (
-    //               <AccessProvider access={Component.auth}>
-    //                 <Component {...pageProps} />
-    //               </AccessProvider>
-    //             ) : (
-    //               <Component {...pageProps} />
-    //             )}
+                {Component.auth ? (
+                  <AccessProvider access={Component.auth}>
+                    <Component {...pageProps} />
+                  </AccessProvider>
+                ) : (
+                  <Component {...pageProps} />
+                )}
 
-    //             <ToastContainer />
-    //           </ThemeProvider>
-    //         </AtomHydrator>
-    //       </AtomProvider>
-    //     </SessionProvider>
-    //   </Hydrate>
-    // </QueryClientProvider>
-
-    <Component {...pageProps} />
+                <ToastContainer />
+              </ThemeProvider>
+            </AtomHydrator>
+          </AtomProvider>
+        </SessionProvider>
+      </Hydrate>
+    </QueryClientProvider>
   );
 };
 
