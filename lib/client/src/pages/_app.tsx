@@ -33,7 +33,9 @@ const App = ({ Component, pageProps }: AppProps) => {
       <Hydrate state={pageProps.dehydratedState}>
         <SessionProvider session={pageProps.session}>
           <AtomProvider initialState={pageProps.initialState}>
-            <Component {...pageProps} />
+            <AtomHydrator initialState={pageProps.initialState}>
+              <Component {...pageProps} />
+            </AtomHydrator>
           </AtomProvider>
         </SessionProvider>
       </Hydrate>
@@ -41,7 +43,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   // return (
-  //   //       <AtomProvider initialState={pageProps.initialState}>
   //   //         <AtomHydrator initialState={pageProps.initialState}>
   //   //           <ThemeProvider theme={theme}>
   //   //             <Head>
@@ -66,7 +67,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   //   //             <ToastContainer />
   //   //           </ThemeProvider>
   //   //         </AtomHydrator>
-  //   //       </AtomProvider>
   // );
 };
 
