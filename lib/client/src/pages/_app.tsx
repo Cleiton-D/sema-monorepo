@@ -20,7 +20,7 @@ import { Hydrate } from 'react-query/hydration';
 import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
-// import { SessionProvider } from 'context/Session';
+import { SessionProvider } from 'context/Session';
 
 type AppProps = NextAppProps & {
   Component: NextAppProps['Component'] & {
@@ -31,13 +31,14 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <Component {...pageProps} />
+        <SessionProvider session={pageProps.session}>
+          <Component {...pageProps} />
+        </SessionProvider>
       </Hydrate>
     </QueryClientProvider>
   );
 
   // return (
-  //   //   <Hydrate state={pageProps.dehydratedState}>
   //   //     <SessionProvider session={pageProps.session}>
   //   //       <AtomProvider initialState={pageProps.initialState}>
   //   //         <AtomHydrator initialState={pageProps.initialState}>
@@ -66,8 +67,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   //   //         </AtomHydrator>
   //   //       </AtomProvider>
   //   //     </SessionProvider>
-  //   //   </Hydrate>
-  //   // </QueryClientProvider>
   // );
 };
 
