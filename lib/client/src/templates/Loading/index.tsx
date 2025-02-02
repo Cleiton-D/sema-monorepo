@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import lottie from 'lottie-web';
+// import lottie from 'lottie-web';
 
 import Base from 'templates/Base';
 
@@ -14,24 +14,24 @@ const Loading = () => {
     const container = containerRef.current;
     if (!container) return undefined;
 
-    return lottie.loadAnimation({
-      container,
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      animationData: loading,
-      rendererSettings: {
-        viewBoxOnly: true
-      }
-    });
+    // return lottie.loadAnimation({
+    //   container,
+    //   renderer: 'svg',
+    //   loop: true,
+    //   autoplay: true,
+    //   animationData: loading,
+    //   rendererSettings: {
+    //     viewBoxOnly: true
+    //   }
+    // });
   };
 
   useEffect(() => {
     const animation = startAnimation();
 
-    return () => {
-      if (animation) animation.destroy();
-    };
+    // return () => {
+    //   if (animation) animation.destroy();
+    // };
   }, []);
 
   return (
