@@ -27,8 +27,6 @@ export function SignInForm({ className, ...props }: SignInFormProps) {
     }
   }, [state]);
 
-  console.log(state?.error);
-
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <form action={formAction}>
