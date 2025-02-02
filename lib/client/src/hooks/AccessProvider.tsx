@@ -27,18 +27,18 @@ type AccessProviderProps = {
   children: React.ReactNode;
 };
 const AccessProvider = ({ children, access }: AccessProviderProps) => {
-  // const { data: modules = [], isLoading } = useAccessModules();
+  const { data: modules = [], isLoading } = useAccessModules();
 
-  // const hasAccess = useMemo(() => {
-  //   return validateHasAccess(modules, access);
-  // }, [modules, access]);
+  const hasAccess = useMemo(() => {
+    return validateHasAccess(modules, access);
+  }, [modules, access]);
 
-  // const enableAccess = useCallback(
-  //   (options: WithAccessOptions) => {
-  //     return validateHasAccess(modules, options);
-  //   },
-  //   [modules]
-  // );
+  const enableAccess = useCallback(
+    (options: WithAccessOptions) => {
+      return validateHasAccess(modules, options);
+    },
+    [modules]
+  );
 
   // return (
   //   <AccessContext.Provider value={{ modules, enableAccess }}>
@@ -50,7 +50,11 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
   //   </AccessContext.Provider>
   // );
 
-  return <>{children}</>;
+  return (
+    <AccessContext.Provider value={{ modules, enableAccess }}>
+      {children}
+    </AccessContext.Provider>
+  );
 };
 
 function useAccess() {
