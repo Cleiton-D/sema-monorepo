@@ -6,7 +6,7 @@ import * as S from './styles';
 
 const NoAccessTemplate = () => {
   return (
-    (<Base>
+    <Base>
       <S.Text>
         Desculpe!
         <br /> Você não tem acesso a esse recurso.{' '}
@@ -14,7 +14,7 @@ const NoAccessTemplate = () => {
           Voltar para o Inicio
         </Link>
       </S.Text>
-    </Base>)
+    </Base>
   );
 };
 

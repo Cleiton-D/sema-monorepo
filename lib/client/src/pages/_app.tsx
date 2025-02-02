@@ -12,7 +12,7 @@ import { Hydrate } from 'react-query/hydration';
 import { ThemeProvider } from 'styled-components';
 
 import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
-// import { AccessProvider } from 'hooks/AccessProvider';
+import { AccessProvider } from 'hooks/AccessProvider';
 
 import GlobalStyles from 'styles/global';
 import theme from 'styles/theme';
@@ -48,7 +48,13 @@ const App = ({ Component, pageProps }: AppProps) => {
                   height={5}
                 />
 
-                <Component {...pageProps} />
+                {Component.auth ? (
+                  <AccessProvider access={Component.auth}>
+                    <Component {...pageProps} />
+                  </AccessProvider>
+                ) : (
+                  <Component {...pageProps} />
+                )}
 
                 <ToastContainer />
               </ThemeProvider>
@@ -60,15 +66,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   // return (
-
-
-  //   //             {Component.auth ? (
-  //   //               <AccessProvider access={Component.auth}>
-  //   //                 <Component {...pageProps} />
-  //   //               </AccessProvider>
-  //   //             ) : (
-  //   //               <Component {...pageProps} />
-  //   //             )}
 
   //   //             <ToastContainer />
   // );
