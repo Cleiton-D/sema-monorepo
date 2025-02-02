@@ -3,7 +3,7 @@ import 'styles/global.css';
 import { AppProps as NextAppProps } from 'next/app';
 import Head from 'next/head';
 import NextNprogress from 'nextjs-progressbar';
-// import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -49,6 +49,8 @@ const App = ({ Component, pageProps }: AppProps) => {
                 />
 
                 <Component {...pageProps} />
+
+                <ToastContainer />
               </ThemeProvider>
             </AtomHydrator>
           </AtomProvider>
@@ -58,12 +60,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   // return (
-  //   //             <NextNprogress
-  //   //               color={theme.colors.primary}
-  //   //               startPosition={0.3}
-  //   //               stopDelayMs={200}
-  //   //               height={5}
-  //   //             />
+
 
   //   //             {Component.auth ? (
   //   //               <AccessProvider access={Component.auth}>
