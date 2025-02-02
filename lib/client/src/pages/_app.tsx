@@ -8,7 +8,7 @@ import { AppProps as NextAppProps } from 'next/app';
 // import 'react-toastify/dist/ReactToastify.css';
 
 import { QueryClientProvider } from 'react-query';
-// import { Hydrate } from 'react-query/hydration';
+import { Hydrate } from 'react-query/hydration';
 // import { ThemeProvider } from 'styled-components';
 
 // import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
@@ -30,12 +30,13 @@ type AppProps = NextAppProps & {
 const App = ({ Component, pageProps }: AppProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Component {...pageProps} />
+      <Hydrate state={pageProps.dehydratedState}>
+        <Component {...pageProps} />
+      </Hydrate>
     </QueryClientProvider>
   );
 
   // return (
-  //   // <QueryClientProvider client={queryClient}>
   //   //   <Hydrate state={pageProps.dehydratedState}>
   //   //     <SessionProvider session={pageProps.session}>
   //   //       <AtomProvider initialState={pageProps.initialState}>
