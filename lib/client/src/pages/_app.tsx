@@ -11,7 +11,7 @@ import { QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
 // import { ThemeProvider } from 'styled-components';
 
-// import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
+import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
 // import { AccessProvider } from 'hooks/AccessProvider';
 
 // import GlobalStyles from 'styles/global';
@@ -32,14 +32,15 @@ const App = ({ Component, pageProps }: AppProps) => {
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
         <SessionProvider session={pageProps.session}>
-          <Component {...pageProps} />
+          <AtomProvider initialState={pageProps.initialState}>
+            <Component {...pageProps} />
+          </AtomProvider>
         </SessionProvider>
       </Hydrate>
     </QueryClientProvider>
   );
 
   // return (
-  //   //     <SessionProvider session={pageProps.session}>
   //   //       <AtomProvider initialState={pageProps.initialState}>
   //   //         <AtomHydrator initialState={pageProps.initialState}>
   //   //           <ThemeProvider theme={theme}>
@@ -66,7 +67,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   //   //           </ThemeProvider>
   //   //         </AtomHydrator>
   //   //       </AtomProvider>
-  //   //     </SessionProvider>
   // );
 };
 

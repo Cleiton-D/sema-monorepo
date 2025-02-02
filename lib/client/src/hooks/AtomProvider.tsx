@@ -35,7 +35,7 @@ function getStoredAtom<T = unknown>(key: string): T | undefined {
 
 export function getStoredInitalState(context: GetServerSidePropsContext) {
   const cookies = parseCookies(context);
-  const stored = cookies[APP_KEY];
+  const stored = cookies?.[APP_KEY];
 
   return stored ? JSON.parse(stored) : {};
 }
