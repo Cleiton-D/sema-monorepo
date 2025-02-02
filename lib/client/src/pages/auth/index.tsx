@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import Dashboard from 'templates/Dashboard';
+import Dashboard from 'templates/Dashboard';
 
 import { getSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { enrollCount } from 'requests/queries/enrolls';
@@ -14,7 +14,7 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 export default function DashboardPage() {
-  return <>Plataforma em manutencao</>;
+  return <Dashboard />;
 }
 
 const getSchoolData = async (context: GetServerSidePropsContext) => {

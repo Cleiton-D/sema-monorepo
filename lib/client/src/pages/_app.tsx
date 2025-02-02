@@ -5,7 +5,7 @@ import Head from 'next/head';
 import NextNprogress from 'nextjs-progressbar';
 import { ToastContainer } from 'react-toastify';
 
-// import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
