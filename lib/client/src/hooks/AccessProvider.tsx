@@ -52,7 +52,7 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
 
   return (
     <AccessContext.Provider value={{ modules, enableAccess }}>
-      {children}
+      <Loading />
     </AccessContext.Provider>
   );
 };
