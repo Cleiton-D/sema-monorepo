@@ -1,11 +1,9 @@
-// import ClassesTemplate from 'templates/Classes';
+import ClassesTemplate from 'templates/Classes';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassesPage() {
-  return <>teste</>;
-
-  // return <ClassesTemplate />;
+  return <ClassesTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

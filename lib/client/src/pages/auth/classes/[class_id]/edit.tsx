@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import EditClassTemplate from 'templates/EditClass';
+import EditClassTemplate from 'templates/EditClass';
 
 import {
   listAttendancesByClasses,
@@ -17,9 +17,7 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EditClassPage() {
-  return <>teste</>;
-
-  // return <EditClassTemplate />;
+  return <EditClassTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute(

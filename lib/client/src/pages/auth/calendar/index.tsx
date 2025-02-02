@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from 'next';
-// import CalendarTemplate from 'templates/Calendar';
+import CalendarTemplate from 'templates/Calendar';
 
 import { showSchoolYear } from 'requests/queries/school-year';
 import {
@@ -12,9 +12,7 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function CalendarPage() {
-  return <>teste</>;
-
-  // return <CalendarTemplate />;
+  return <CalendarTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute(
