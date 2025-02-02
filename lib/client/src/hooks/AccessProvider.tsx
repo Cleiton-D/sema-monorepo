@@ -6,7 +6,6 @@ import {
   forwardRef
 } from 'react';
 
-import Loading from 'templates/Loading';
 import NoAccessTemplate from 'templates/NoAccess';
 
 import { useAccessModules } from 'requests/queries/session';
@@ -52,7 +51,7 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
 
   return (
     <AccessContext.Provider value={{ modules, enableAccess }}>
-      <Loading />
+      <NoAccessTemplate />
     </AccessContext.Provider>
   );
 };
