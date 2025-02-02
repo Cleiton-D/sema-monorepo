@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import NewMultigradeTemplate from 'templates/Multigrades/New';
+import Classrooms from 'templates/Classrooms';
 
 import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
@@ -8,17 +8,17 @@ import { getSchool, schoolKeys } from 'requests/queries/schools';
 import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-function NewMultigradePage() {
-  return <>teste</>;
-
-  // return <NewMultigradeTemplate type="new" />;
+function ClassroomsPage() {
+  return <Classrooms />;
 }
 
 const getData = async (id: string, session?: AppSession) => {
   const school = await getSchool({ id }, session);
 
   const filters = {
-    school_id: school.id
+    school_id: school.id,
+    page: 1,
+    size: 20
   };
 
   return prefetchQuery([
@@ -39,7 +39,7 @@ export const getServerSideProps = withProtectedRoute(
     if (school_id === 'me') {
       if (context.req.fullSession?.profile.school?.id) {
         const dehydratedState = await getData(
-          context.req.fullSession?.profile.school?.id,
+          context.req.fullSession.profile.school.id,
           context.req.session
         );
         return {
@@ -67,9 +67,8 @@ export const getServerSideProps = withProtectedRoute(
   }
 );
 
-NewMultigradePage.auth = {
-  module: 'CLASSROOM',
-  rule: 'WRITE'
+ClassroomsPage.auth = {
+  module: 'CLASSROOM'
 };
 
-export default NewMultigradePage;
+export default ClassroomsPage;

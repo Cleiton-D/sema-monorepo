@@ -1,33 +1,20 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import Classrooms from 'templates/Classrooms';
+import TeacherSchoolSubjects from 'templates/TeacherSchoolSubjects';
 
-import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-function ClassroomsPage() {
-  return <>teste</>;
-
-  // return <Classrooms />;
+function TeacherSchoolSubjectsPage() {
+  return <TeacherSchoolSubjects />;
 }
 
 const getData = async (id: string, session?: AppSession) => {
   const school = await getSchool({ id }, session);
 
-  const filters = {
-    school_id: school.id,
-    page: 1,
-    size: 20
-  };
-
   return prefetchQuery([
-    {
-      key: classroomsKeys.list(JSON.stringify(filters)),
-      fetcher: () => listClassrooms(filters, session)
-    },
     {
       key: schoolKeys.show(JSON.stringify({ id: id })),
       fetcher: () => school
@@ -41,7 +28,7 @@ export const getServerSideProps = withProtectedRoute(
     if (school_id === 'me') {
       if (context.req.fullSession?.profile.school?.id) {
         const dehydratedState = await getData(
-          context.req.fullSession.profile.school.id,
+          context.req.fullSession?.profile.school?.id,
           context.req.session
         );
         return {
@@ -69,8 +56,8 @@ export const getServerSideProps = withProtectedRoute(
   }
 );
 
-ClassroomsPage.auth = {
-  module: 'CLASSROOM'
+TeacherSchoolSubjectsPage.auth = {
+  module: 'TEACHER_SCHOOL_SUBJECT'
 };
 
-export default ClassroomsPage;
+export default TeacherSchoolSubjectsPage;

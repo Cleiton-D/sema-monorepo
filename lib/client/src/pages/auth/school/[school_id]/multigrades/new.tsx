@@ -1,22 +1,29 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import TeacherSchoolSubjects from 'templates/TeacherSchoolSubjects';
+import NewMultigradeTemplate from 'templates/Multigrades/New';
 
+import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 
 import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-function TeacherSchoolSubjectsPage() {
-  return <>teste</>;
-
-  // return <TeacherSchoolSubjects />;
+function NewMultigradePage() {
+  return <NewMultigradeTemplate type="new" />;
 }
 
 const getData = async (id: string, session?: AppSession) => {
   const school = await getSchool({ id }, session);
 
+  const filters = {
+    school_id: school.id
+  };
+
   return prefetchQuery([
+    {
+      key: classroomsKeys.list(JSON.stringify(filters)),
+      fetcher: () => listClassrooms(filters, session)
+    },
     {
       key: schoolKeys.show(JSON.stringify({ id: id })),
       fetcher: () => school
@@ -58,8 +65,9 @@ export const getServerSideProps = withProtectedRoute(
   }
 );
 
-TeacherSchoolSubjectsPage.auth = {
-  module: 'TEACHER_SCHOOL_SUBJECT'
+NewMultigradePage.auth = {
+  module: 'CLASSROOM',
+  rule: 'WRITE'
 };
 
-export default TeacherSchoolSubjectsPage;
+export default NewMultigradePage;
