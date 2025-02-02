@@ -7,7 +7,7 @@ import { AppProps as NextAppProps } from 'next/app';
 
 // import 'react-toastify/dist/ReactToastify.css';
 
-// import { QueryClientProvider } from 'react-query';
+import { QueryClientProvider } from 'react-query';
 // import { Hydrate } from 'react-query/hydration';
 // import { ThemeProvider } from 'styled-components';
 
@@ -17,7 +17,7 @@ import { AppProps as NextAppProps } from 'next/app';
 // import GlobalStyles from 'styles/global';
 // import theme from 'styles/theme';
 
-// import { queryClient } from 'services/api';
+import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
 // import { SessionProvider } from 'context/Session';
@@ -28,7 +28,11 @@ type AppProps = NextAppProps & {
   };
 };
 const App = ({ Component, pageProps }: AppProps) => {
-  return <Component {...pageProps} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Component {...pageProps} />
+    </QueryClientProvider>
+  );
 
   // return (
   //   // <QueryClientProvider client={queryClient}>
