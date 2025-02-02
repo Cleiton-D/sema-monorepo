@@ -1,26 +1,26 @@
 import 'styles/global.css';
 
 import { AppProps as NextAppProps } from 'next/app';
-import Head from 'next/head';
-import NextNprogress from 'nextjs-progressbar';
-import { ToastContainer } from 'react-toastify';
+// import Head from 'next/head';
+// import NextNprogress from 'nextjs-progressbar';
+// import { ToastContainer } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
+// import 'react-toastify/dist/ReactToastify.css';
 
-import { QueryClientProvider } from 'react-query';
-import { Hydrate } from 'react-query/hydration';
-import { ThemeProvider } from 'styled-components';
+// import { QueryClientProvider } from 'react-query';
+// import { Hydrate } from 'react-query/hydration';
+// import { ThemeProvider } from 'styled-components';
 
-import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
-import { AccessProvider } from 'hooks/AccessProvider';
+// import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
+// import { AccessProvider } from 'hooks/AccessProvider';
 
-import GlobalStyles from 'styles/global';
-import theme from 'styles/theme';
+// import GlobalStyles from 'styles/global';
+// import theme from 'styles/theme';
 
-import { queryClient } from 'services/api';
+// import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
-import { SessionProvider } from 'context/Session';
+// import { SessionProvider } from 'context/Session';
 
 type AppProps = NextAppProps & {
   Component: NextAppProps['Component'] & {
@@ -28,40 +28,42 @@ type AppProps = NextAppProps & {
   };
 };
 const App = ({ Component, pageProps }: AppProps) => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <SessionProvider session={pageProps.session}>
-          <AtomProvider initialState={pageProps.initialState}>
-            <AtomHydrator initialState={pageProps.initialState}>
-              <ThemeProvider theme={theme}>
-                <Head>
-                  <title>Diário Online</title>
-                </Head>
-                <GlobalStyles />
-                <NextNprogress
-                  color={theme.colors.primary}
-                  startPosition={0.3}
-                  stopDelayMs={200}
-                  height={5}
-                />
+  return <Component {...pageProps} />;
 
-                {Component.auth ? (
-                  <AccessProvider access={Component.auth}>
-                    <Component {...pageProps} />
-                  </AccessProvider>
-                ) : (
-                  <Component {...pageProps} />
-                )}
+  // return (
+  //   // <QueryClientProvider client={queryClient}>
+  //   //   <Hydrate state={pageProps.dehydratedState}>
+  //   //     <SessionProvider session={pageProps.session}>
+  //   //       <AtomProvider initialState={pageProps.initialState}>
+  //   //         <AtomHydrator initialState={pageProps.initialState}>
+  //   //           <ThemeProvider theme={theme}>
+  //   //             <Head>
+  //   //               <title>Diário Online</title>
+  //   //             </Head>
+  //   //             <GlobalStyles />
+  //   //             <NextNprogress
+  //   //               color={theme.colors.primary}
+  //   //               startPosition={0.3}
+  //   //               stopDelayMs={200}
+  //   //               height={5}
+  //   //             />
 
-                <ToastContainer />
-              </ThemeProvider>
-            </AtomHydrator>
-          </AtomProvider>
-        </SessionProvider>
-      </Hydrate>
-    </QueryClientProvider>
-  );
+  //   //             {Component.auth ? (
+  //   //               <AccessProvider access={Component.auth}>
+  //   //                 <Component {...pageProps} />
+  //   //               </AccessProvider>
+  //   //             ) : (
+  //   //               <Component {...pageProps} />
+  //   //             )}
+
+  //   //             <ToastContainer />
+  //   //           </ThemeProvider>
+  //   //         </AtomHydrator>
+  //   //       </AtomProvider>
+  //   //     </SessionProvider>
+  //   //   </Hydrate>
+  //   // </QueryClientProvider>
+  // );
 };
 
 export default App;
