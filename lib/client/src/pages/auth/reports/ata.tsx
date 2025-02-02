@@ -1,9 +1,11 @@
-import AtaTemplate from 'templates/Reports/Ata';
+// import AtaTemplate from 'templates/Reports/Ata';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function Ata() {
-  return <AtaTemplate />;
+  return <>teste</>;
+
+  // return <AtaTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

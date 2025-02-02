@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import ClassroomTeacher from 'templates/ClassroomTeacher';
+// import ClassroomTeacher from 'templates/ClassroomTeacher';
 
 import prefetchQuery from 'utils/prefetch-query';
 
@@ -9,7 +9,9 @@ import { getSchool, schoolKeys } from 'requests/queries/schools';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassroomTeacherPage() {
-  return <ClassroomTeacher />;
+  return <>teste</>;
+
+  // return <ClassroomTeacher />;
 }
 
 const getData = async (id: string, session?: AppSession) => {

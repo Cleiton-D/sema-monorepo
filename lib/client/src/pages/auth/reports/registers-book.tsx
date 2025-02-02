@@ -1,9 +1,11 @@
-import RegistersBookTemplate from 'templates/Reports/RegistersBook';
+// import RegistersBookTemplate from 'templates/Reports/RegistersBook';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function RegistersBook() {
-  return <RegistersBookTemplate />;
+  return <>teste</>;
+
+  // return <RegistersBookTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

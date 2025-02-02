@@ -1,9 +1,11 @@
-import ClassroomSchoolReport from 'templates/ClassroomSchoolReport';
+// import ClassroomSchoolReport from 'templates/ClassroomSchoolReport';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassroomSchoolReportPage() {
-  return <ClassroomSchoolReport />;
+  return <>teste</>;
+
+  // return <ClassroomSchoolReport />;
 }
 
 export const getServerSideProps = withProtectedRoute();

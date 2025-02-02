@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import MunicipalSecretary from 'templates/Administration/MunicipalSecretary';
+// import MunicipalSecretary from 'templates/Administration/MunicipalSecretary';
 
 import { showBranch } from 'requests/queries/branch';
 
@@ -9,7 +9,9 @@ import { listEmployees, showEmployee } from 'requests/queries/employee';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function MunicipalSecretaryPage() {
-  return <MunicipalSecretary />;
+  return <>teste</>;
+
+  // return <MunicipalSecretary />;
 }
 
 export const getServerSideProps = withProtectedRoute(

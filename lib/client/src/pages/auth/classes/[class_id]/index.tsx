@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import ClassTemplate from 'templates/Class';
+// import ClassTemplate from 'templates/Class';
 
 import {
   listAttendancesByClasses,
@@ -16,7 +16,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassPage() {
-  return <ClassTemplate />;
+  return <>teste</>;
+
+  // return <ClassTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute(

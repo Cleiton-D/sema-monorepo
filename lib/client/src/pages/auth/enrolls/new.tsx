@@ -1,14 +1,17 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewEnroll, { NewEnrollProps } from 'templates/Enrolls/New';
+// import NewEnroll, { NewEnrollProps } from 'templates/Enrolls/New';
 
 import { getSchool } from 'requests/queries/schools';
 
 import ufs from 'assets/data/uf.json';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-function NewEnrollPage(props: NewEnrollProps) {
-  return <NewEnroll {...props} />;
+// function NewEnrollPage(props: NewEnrollProps) {
+function NewEnrollPage() {
+  return <>teste</>;
+
+  // return <NewEnroll {...props} />;
 }
 
 export const getServerSideProps = withProtectedRoute(

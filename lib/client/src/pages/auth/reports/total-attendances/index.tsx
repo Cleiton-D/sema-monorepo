@@ -1,9 +1,11 @@
-import TotalAttendancesTemplate from 'templates/Reports/TotalAttendances';
+// import TotalAttendancesTemplate from 'templates/Reports/TotalAttendances';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function TotalAttendances() {
-  return <TotalAttendancesTemplate />;
+  return <>teste</>;
+
+  // return <TotalAttendancesTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

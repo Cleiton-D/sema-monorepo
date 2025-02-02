@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import Timetables from 'templates/Timetables';
+// import Timetables from 'templates/Timetables';
 
 import { getSchool, schoolKeys } from 'requests/queries/schools';
 import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
@@ -9,7 +9,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function TimetablesPage() {
-  return <Timetables />;
+  return <>teste</>;
+
+  // return <Timetables />;
 }
 
 const getData = async (id: string, session?: AppSession) => {

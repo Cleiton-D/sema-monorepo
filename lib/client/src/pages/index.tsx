@@ -11,7 +11,6 @@ export default function AppIndex() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    console.log(session)
     if (session?.token) {
       push('/auth');
     } else {

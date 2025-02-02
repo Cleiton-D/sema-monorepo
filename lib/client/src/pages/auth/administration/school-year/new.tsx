@@ -1,12 +1,14 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewSchoolYear from 'templates/Administration/SchoolYear/NewSchoolYear';
+// import NewSchoolYear from 'templates/Administration/SchoolYear/NewSchoolYear';
 
 import { getStoredInitalState } from 'hooks/AtomProvider';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function NewSchoolYearPage() {
-  return <NewSchoolYear />;
+  return <>teste</>;
+
+  // return <NewSchoolYear />;
 }
 
 export const getServerSideProps = withProtectedRoute(

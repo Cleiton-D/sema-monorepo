@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import Enrolls from 'templates/Enrolls';
+// import Enrolls from 'templates/Enrolls';
 
 import { listEnrolls, enrollsKeys } from 'requests/queries/enrolls';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
@@ -9,7 +9,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EnrollsPage() {
-  return <Enrolls />;
+  return <>teste</>;
+
+  // return <Enrolls />;
 }
 
 const getData = async (context: GetServerSidePropsContext, id?: string) => {

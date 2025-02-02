@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewMultigradeTemplate from 'templates/Multigrades/New';
+// import NewMultigradeTemplate from 'templates/Multigrades/New';
 
 import {
   listClassPeriods,
@@ -12,7 +12,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EditMultigradePage() {
-  return <NewMultigradeTemplate type="update" />;
+  return <>teste</>;
+
+  // return <NewMultigradeTemplate type="update" />;
 }
 
 const getData = async (

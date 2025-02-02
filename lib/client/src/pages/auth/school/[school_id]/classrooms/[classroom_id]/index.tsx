@@ -1,8 +1,10 @@
-import ClassroomTemplate from 'templates/Classroom';
+// import ClassroomTemplate from 'templates/Classroom';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 const ClassroomPage = () => {
-  return <ClassroomTemplate />;
+  return <>teste</>;
+
+  // return <ClassroomTemplate />;
 };
 
 export const getServerSideProps = withProtectedRoute();

@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import ClassReportsTemplate from 'templates/ClassReports';
+// import ClassReportsTemplate from 'templates/ClassReports';
 
 import { listClassrooms, classroomsKeys } from 'requests/queries/classrooms';
 
@@ -8,7 +8,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function ClassesReportsPage() {
-  return <ClassReportsTemplate />;
+  return <>teste</>;
+
+  // return <ClassReportsTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute(

@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewSchoolYear from 'templates/Administration/SchoolYear/NewSchoolYear';
+// import NewSchoolYear from 'templates/Administration/SchoolYear/NewSchoolYear';
 
 import { storeServerAtom } from 'hooks/AtomProvider';
 
@@ -8,7 +8,9 @@ import { getSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function EditSchoolYearPage() {
-  return <NewSchoolYear />;
+  return <>teste</>;
+
+  // return <NewSchoolYear />;
 }
 
 export const getServerSideProps = withProtectedRoute(

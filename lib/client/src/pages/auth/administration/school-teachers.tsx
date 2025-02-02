@@ -1,9 +1,11 @@
-import SchoolTeachers from 'templates/Administration/SchoolTeachers';
+// import SchoolTeachers from 'templates/Administration/SchoolTeachers';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolTeachersPage() {
-  return <SchoolTeachers />;
+  return <>teste</>;
+
+  // return <SchoolTeachers />;
 }
 
 export const getServerSideProps = withProtectedRoute(() => {

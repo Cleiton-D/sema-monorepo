@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import Multigrades from 'templates/Multigrades';
+// import Multigrades from 'templates/Multigrades';
 
 import {
   listClassPeriods,
@@ -11,7 +11,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function MultigradesPage() {
-  return <Multigrades />;
+  return <>teste</>;
+
+  // return <Multigrades />;
 }
 
 export const getServerSideProps = withProtectedRoute(

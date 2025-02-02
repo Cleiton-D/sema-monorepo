@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import SchoolYear from 'templates/Administration/SchoolYear';
+// import SchoolYear from 'templates/Administration/SchoolYear';
 
 import { getSchoolYearWithSchoolTerms } from 'requests/queries/school-year';
 
@@ -8,7 +8,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolYearPage() {
-  return <SchoolYear />;
+  return <>teste</>;
+
+  // return <SchoolYear />;
 }
 
 export const getServerSideProps = withProtectedRoute(

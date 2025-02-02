@@ -1,9 +1,11 @@
-import BackgroundsTemplate from 'templates/Backgrounds';
+// import BackgroundsTemplate from 'templates/Backgrounds';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function Backgrounds() {
-  return <BackgroundsTemplate />;
+  return <>teste</>;
+
+  // return <BackgroundsTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

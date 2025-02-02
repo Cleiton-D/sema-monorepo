@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import SchoolSubject from 'templates/Administration/SchoolSubjects';
+// import SchoolSubject from 'templates/Administration/SchoolSubjects';
 
 import { listSchoolSubjects } from 'requests/queries/school-subjects';
 
@@ -8,7 +8,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 const SchoolSubjectPage = () => {
-  return <SchoolSubject />;
+  return <>teste</>;
+
+  // return <SchoolSubject />;
 };
 
 export const getServerSideProps = withProtectedRoute(

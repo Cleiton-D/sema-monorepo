@@ -1,9 +1,11 @@
-import SaveEmployee from 'templates/Administration/Employees/Save';
+// import SaveEmployee from 'templates/Administration/Employees/Save';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function NewEmployeePage() {
-  return <SaveEmployee />;
+  return <>teste</>;
+
+  // return <SaveEmployee />;
 }
 
 export const getServerSideProps = withProtectedRoute(() => {

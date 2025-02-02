@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewClass from 'templates/Classes/NewClass';
+// import NewClass from 'templates/Classes/NewClass';
 
 import {
   calendarEventsKeys,
@@ -12,7 +12,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function NewClassPage() {
-  return <NewClass />;
+  return <>teste</>;
+
+  // return <NewClass />;
 }
 
 export const getServerSideProps = withProtectedRoute(

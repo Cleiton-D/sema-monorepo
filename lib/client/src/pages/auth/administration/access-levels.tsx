@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import AccessLevels from 'templates/Administration/AccessLevels';
+// import AccessLevels from 'templates/Administration/AccessLevels';
 
 import { listAccessLevels } from 'requests/queries/access-levels';
 
@@ -8,7 +8,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function AccessLevelPage() {
-  return <AccessLevels />;
+  return <>teste</>;
+
+  // return <AccessLevels />;
 }
 
 export const getServerSideProps = withProtectedRoute(

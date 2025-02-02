@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import Grades from 'templates/Administration/Grades';
+// import Grades from 'templates/Administration/Grades';
 
 import { gradesKeys, listGrades } from 'requests/queries/grades';
 
@@ -8,7 +8,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function GradePage() {
-  return <Grades />;
+  return <>teste</>;
+
+  // return <Grades />;
 }
 
 export const getServerSideProps = withProtectedRoute(

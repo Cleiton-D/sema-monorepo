@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-import NewMultigradeTemplate from 'templates/Multigrades/New';
+// import NewMultigradeTemplate from 'templates/Multigrades/New';
 
 import { classroomsKeys, listClassrooms } from 'requests/queries/classrooms';
 import { getSchool, schoolKeys } from 'requests/queries/schools';
@@ -9,7 +9,9 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function NewMultigradePage() {
-  return <NewMultigradeTemplate type="new" />;
+  return <>teste</>;
+
+  // return <NewMultigradeTemplate type="new" />;
 }
 
 const getData = async (id: string, session?: AppSession) => {
