@@ -1,7 +1,7 @@
 import 'styles/global.css';
 
 import { AppProps as NextAppProps } from 'next/app';
-// import Head from 'next/head';
+import Head from 'next/head';
 // import NextNprogress from 'nextjs-progressbar';
 // import { ToastContainer } from 'react-toastify';
 
@@ -35,6 +35,10 @@ const App = ({ Component, pageProps }: AppProps) => {
           <AtomProvider initialState={pageProps.initialState}>
             <AtomHydrator initialState={pageProps.initialState}>
               <ThemeProvider theme={theme}>
+                <Head>
+                  <title>Diário Online</title>
+                </Head>
+
                 <Component {...pageProps} />
               </ThemeProvider>
             </AtomHydrator>
@@ -45,7 +49,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   // return (
-  //   //           <ThemeProvider theme={theme}>
   //   //             <Head>
   //   //               <title>Diário Online</title>
   //   //             </Head>
@@ -66,7 +69,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   //   //             )}
 
   //   //             <ToastContainer />
-  //   //           </ThemeProvider>
   // );
 };
 
