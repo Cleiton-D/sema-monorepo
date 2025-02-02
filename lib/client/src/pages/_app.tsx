@@ -14,7 +14,7 @@ import { ThemeProvider } from 'styled-components';
 import { AtomProvider, AtomHydrator } from 'hooks/AtomProvider';
 // import { AccessProvider } from 'hooks/AccessProvider';
 
-// import GlobalStyles from 'styles/global';
+import GlobalStyles from 'styles/global';
 import theme from 'styles/theme';
 
 import { queryClient } from 'services/api';
@@ -39,6 +39,8 @@ const App = ({ Component, pageProps }: AppProps) => {
                   <title>Diário Online</title>
                 </Head>
 
+                <GlobalStyles />
+
                 <Component {...pageProps} />
               </ThemeProvider>
             </AtomHydrator>
@@ -49,9 +51,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   // return (
-  //   //             <Head>
-  //   //               <title>Diário Online</title>
-  //   //             </Head>
   //   //             <GlobalStyles />
   //   //             <NextNprogress
   //   //               color={theme.colors.primary}
