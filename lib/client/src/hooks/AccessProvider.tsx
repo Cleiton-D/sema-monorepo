@@ -39,19 +39,13 @@ const AccessProvider = ({ children, access }: AccessProviderProps) => {
     [modules]
   );
 
-  // return (
-  //   <AccessContext.Provider value={{ modules, enableAccess }}>
-  //     {isLoading ? (
-  //       <Loading />
-  //     ) : (
-  //       <>{hasAccess ? children : <NoAccessTemplate />}</>
-  //     )}
-  //   </AccessContext.Provider>
-  // );
-
   return (
     <AccessContext.Provider value={{ modules, enableAccess }}>
-      <NoAccessTemplate />
+      {isLoading ? (
+        <>Carregando...</>
+      ) : (
+        <>{hasAccess ? children : <NoAccessTemplate />}</>
+      )}
     </AccessContext.Provider>
   );
 };

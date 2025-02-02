@@ -9,7 +9,7 @@ export const validateHasAccess = (
   modules: SessionAccess[],
   { module, rule }: WithAccessOptions
 ) => {
-  const findedModule = modules.find(({ app_module }) => app_module === module);
+  const findedModule = modules?.find(({ app_module }) => app_module === module);
   if (!findedModule) return false;
 
   if (!rule) return true;
