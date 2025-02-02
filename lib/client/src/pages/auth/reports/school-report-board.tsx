@@ -1,11 +1,9 @@
-// import SchoolReportBoardTemplate from 'templates/Reports/SchoolReportBoard';
+import SchoolReportBoardTemplate from 'templates/Reports/SchoolReportBoard';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function SchoolReportBoard() {
-  return <>teste</>;
-
-  // return <SchoolReportBoardTemplate />;
+  return <SchoolReportBoardTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

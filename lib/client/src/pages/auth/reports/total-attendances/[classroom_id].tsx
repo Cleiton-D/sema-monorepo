@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import AttendancesReportTemplate from 'templates/AttendancesReportPage';
+import AttendancesReportTemplate from 'templates/AttendancesReportPage';
 
 import { listSchoolTermPeriods } from 'requests/queries/school-term-periods';
 import { classroomsKeys, showClassroom } from 'requests/queries/classrooms';
@@ -9,9 +9,7 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 const AttendancesReportPage = () => {
-  return <>teste</>;
-
-  // return <AttendancesReportTemplate />;
+  return <AttendancesReportTemplate />;
 };
 
 export const getServerSideProps = withProtectedRoute(
