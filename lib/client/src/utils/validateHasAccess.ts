@@ -9,6 +9,8 @@ export const validateHasAccess = (
   modules: SessionAccess[],
   { module, rule }: WithAccessOptions
 ) => {
+  if (!Array.isArray(modules)) return true;
+
   const findedModule = modules?.find(({ app_module }) => app_module === module);
   if (!findedModule) return false;
 
