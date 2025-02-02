@@ -1,8 +1,8 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import EditStudentPageTemplate, {
-//   EditStudentPageTemplateProps
-// } from 'templates/EditStudent';
+import EditStudentPageTemplate, {
+  EditStudentPageTemplateProps
+} from 'templates/EditStudent';
 
 import { enrollsKeys, getEnrollDetails } from 'requests/queries/enrolls';
 import { listSchoolReports } from 'requests/queries/school-reports';
@@ -12,10 +12,8 @@ import prefetchQuery from 'utils/prefetch-query';
 import ufs from 'assets/data/uf.json';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-function StudentPage(props: any) {
-  return <>teste</>;
-
-  // return <EditStudentPageTemplate {...props} />;
+function StudentPage(props: EditStudentPageTemplateProps) {
+  return <EditStudentPageTemplate {...props} />;
 }
 
 export const getServerSideProps = withProtectedRoute(

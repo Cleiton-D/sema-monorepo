@@ -1,11 +1,9 @@
-// import BackgroundsTemplate from 'templates/Backgrounds';
+import BackgroundsTemplate from 'templates/Backgrounds';
 
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function Backgrounds() {
-  return <>teste</>;
-
-  // return <BackgroundsTemplate />;
+  return <BackgroundsTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute();

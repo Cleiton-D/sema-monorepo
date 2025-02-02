@@ -1,15 +1,13 @@
 import { GetServerSidePropsContext } from 'next';
-// import ChangePassword, { ChangePasswordProps } from 'templates/ChangePassword';
+import ChangePassword, { ChangePasswordProps } from 'templates/ChangePassword';
 
 import { SystemBackground } from 'models/SystemBackground';
 
 import { createUnstableApi } from 'services/api';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
-export default function ChangePasswordPage(props: any) {
-  return <>teste</>;
-
-  // return <ChangePassword {...props} />;
+export default function ChangePasswordPage(props: ChangePasswordProps) {
+  return <ChangePassword {...props} />;
 }
 
 export const getServerSideProps = withProtectedRoute<{

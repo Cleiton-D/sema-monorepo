@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext } from 'next';
 
-// import StudentPageTemplate from 'templates/Student';
+import StudentPageTemplate from 'templates/Student';
 
 import { getEnrollDetails } from 'requests/queries/enrolls';
 import { listSchoolReports } from 'requests/queries/school-reports';
@@ -9,9 +9,7 @@ import prefetchQuery from 'utils/prefetch-query';
 import { withProtectedRoute } from 'utils/session/withProtectedRoute';
 
 function StudentPage() {
-  return <>teste</>;
-
-  // return <StudentPageTemplate />;
+  return <StudentPageTemplate />;
 }
 
 export const getServerSideProps = withProtectedRoute(
