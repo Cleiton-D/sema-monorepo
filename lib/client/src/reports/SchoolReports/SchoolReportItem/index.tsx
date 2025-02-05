@@ -4,6 +4,7 @@ import { SchoolReport } from 'models/SchoolReport';
 import { SchoolSubject } from 'models/SchoolSubject';
 import { schoolReportsSubjectsMapper } from 'utils/mappers/schoolReportsMapper';
 import { masks } from 'utils/masks';
+import { translateEnrollStatus } from 'utils/mappers/enrollMapper';
 
 import * as S from './styles';
 
@@ -166,7 +167,7 @@ const SchoolReportItem = ({ completeEnroll }: SchoolReportItem) => {
 
           <tr style={{ borderTop: 'none' }}>
             <td rowSpan={2} colSpan={16} style={{ borderTop: 'none' }}>
-              Resultado Final: Cursando
+              Resultado Final: {translateEnrollStatus(enrollClassroom.enroll.status)} 
               <br />
               Observacao: -
             </td>
