@@ -18,7 +18,7 @@ export const statusMap: Record<EnrollStatus | string, string> = {
   APPROVED: 'Aprovado',
   DISAPPROVED: 'Reprovado',
   RELOCATED: 'Remanejado',
-  DISAPPROVED_FOR_ABSENCES: 'Reprovado por faltas',
+  DISAPPROVED_FOR_ABSENCES: 'Reprovado',
   EXAM: 'Exame',
   RECOVERY: 'Recuperação'
 };
