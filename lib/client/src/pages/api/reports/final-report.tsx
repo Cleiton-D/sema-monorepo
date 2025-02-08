@@ -61,11 +61,15 @@ export default withSessionRoute(
       finalResult: finalResult
     };
 
+    console.log(`${process.env.REPORT_ENGINE_URL}/generate/final-result`)
     const { data } = await api.post(
       `${process.env.REPORT_ENGINE_URL}/generate/final-result`,
       newRequestData,
       { params: { extension }, responseType: 'arraybuffer' }
-    );
+    ).catch(error => {
+      console.log(error.response)
+      return error;
+    });
 
     const filename = `Ata_${classroom.description.replace(/\s/g, '_')}_${
       classroom.school?.name
