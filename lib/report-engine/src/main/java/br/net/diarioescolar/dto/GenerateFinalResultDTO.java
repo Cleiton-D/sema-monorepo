@@ -10,6 +10,7 @@ import lombok.Setter;
 public class GenerateFinalResultDTO {
   private List<FinalResultDTO> finalResult;
 
+  private String schoolYearEndDate;
   private String schoolName;
   private String referenceYear;
   private String grade;

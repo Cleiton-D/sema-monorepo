@@ -183,6 +183,7 @@ export default withSessionRoute(
     const newRequestData = {
       schoolName: classroom.school?.name,
       referenceYear: schoolYear.reference_year,
+      schoolYearEndDate: schoolYear.date_end,
       grade: grade.description,
       classroom: classroom.description,
       classPeriod: classroom.class_period.description,

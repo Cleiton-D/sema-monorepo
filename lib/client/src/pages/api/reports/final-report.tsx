@@ -57,6 +57,7 @@ export default withSessionRoute(
       classroom: classroom.description,
       classPeriod: classroom.class_period.description,
       referenceYear: schoolYear.reference_year,
+      schoolYearEndDate: schoolYear.date_end,
       finalResult: finalResult
     };
 

@@ -21,7 +21,7 @@ public class FinalResultService {
       .setList(data.getFinalResult())
       .setParam("school_name", data.getSchoolName())
       .setParam("reference_year", data.getReferenceYear())
-      .setParam("current_date", new Date())
+      .setParam("school_year_end_date", data.getSchoolYearEndDate())
       .setParam("grade", data.getGrade())
       .setParam("classroom", data.getClassroom())
       .setParam("class_period", data.getClassPeriod())

@@ -12,6 +12,7 @@ public class GenerateClassDiaryDTO {
   private List<EnrollmentDTO> enrolls;
   private List<FinalResultDTO> finalResult;
 
+  private String schoolYearEndDate;
   private String schoolName;
   private String referenceYear;
   private String grade;
