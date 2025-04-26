@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import ToastContent from 'components/ToastContent';
 
@@ -90,10 +90,8 @@ const TimetableTeacherSchoolSubjectSelector = ({
             Verificando disponibilidade...
           </ToastContent>,
           {
-            position: toast.POSITION.TOP_RIGHT,
-            toastId: toastKey,
-            autoClose: false,
-            closeButton: false
+            id: toastKey,
+            dismissible: false
           }
         );
 

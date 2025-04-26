@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { FormHandles } from '@unform/core';
 import { ValidationError } from 'yup';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import Image from 'next/image';
 
 import Heading from 'components/Heading';
@@ -47,7 +47,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
       });
 
       toast.success('Senha criada com sucesso.', {
-        position: toast.POSITION.TOP_RIGHT
+        position: 'top-right'
       });
 
       return push(`${query?.callbackUrl || '/auth'}`);
@@ -64,7 +64,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
         formRef.current?.setErrors(validationErrors);
       } else {
         toast.error('Não foi possível salvar sua nova senha!', {
-          position: toast.POSITION.TOP_RIGHT
+          position: 'top-right'
         });
       }
     }
@@ -80,7 +80,7 @@ const ChangePassword = ({ background }: ChangePasswordProps) => {
           layout="fill"
           objectFit="cover"
           quality={80}
-          placeholder="blur-xs"
+          placeholder="blur"
           blurDataURL={background.blurhash}
         />
       )}

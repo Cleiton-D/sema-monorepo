@@ -9,7 +9,7 @@ import {
   useQueryClient
 } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
-import { toast, Flip, ToastContent } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { isServer } from 'utils/isServer';
 
@@ -86,9 +86,9 @@ export type ProcessQueryDataFn = (oldData: any, newData: any) => any;
 
 type UseMutationOptions = {
   linkedQueries?: Record<string, ProcessQueryDataFn>;
-  renderLoading?: (data: any) => ToastContent;
-  renderError?: (data: any, error: any) => ToastContent;
-  renderSuccess?: (data: any) => ToastContent;
+  renderLoading?: (data: any) => React.ReactNode;
+  renderError?: (data: any, error: any) => React.ReactNode;
+  renderSuccess?: (data: any) => React.ReactNode;
   onMutate?: () => void;
 };
 
@@ -104,10 +104,9 @@ export function useMutation(
       const toastKey = options.renderLoading ? `${key}-${uuidv4()}` : undefined;
       if (toastKey && options.renderLoading) {
         toast.info(options.renderLoading(data), {
-          position: toast.POSITION.TOP_RIGHT,
-          toastId: toastKey,
-          autoClose: false,
-          closeButton: false
+          position: 'top-right',
+          id: toastKey,
+          dismissible: false
         });
       }
 
@@ -136,20 +135,11 @@ export function useMutation(
       const ctx = context || {};
 
       if (options.renderError) {
-        const toastObj = {
-          type: toast.TYPE.ERROR,
-          render: options.renderError(data, err),
-          autoClose: 3000
-        };
-
-        if (ctx.toastKey) {
-          toast.update(ctx.toastKey, {
-            ...toastObj,
-            transition: Flip
-          });
-        } else {
-          toast(toastObj as unknown as ToastContent);
-        }
+        toast.error(options.renderError(data, err), {
+          position: 'top-right',
+          dismissible: false,
+          duration: 3000
+        });
       } else if (ctx.toastKey) {
         toast.dismiss(ctx.toastKey);
       }
@@ -160,20 +150,11 @@ export function useMutation(
     },
     onSuccess: (_, data, context) => {
       if (options.renderSuccess) {
-        const toastObj = {
-          type: toast.TYPE.SUCCESS,
-          render: options.renderSuccess(data),
-          autoClose: 3000
-        };
-
-        if (context.toastKey) {
-          toast.update(context.toastKey, {
-            ...toastObj,
-            transition: Flip
-          });
-        } else {
-          toast(toastObj as unknown as ToastContent);
-        }
+        toast.success(options.renderSuccess(data), {
+          position: 'top-right',
+          dismissible: false,
+          duration: 3000
+        });
       } else if (context.toastKey) {
         toast.dismiss(context.toastKey);
       }

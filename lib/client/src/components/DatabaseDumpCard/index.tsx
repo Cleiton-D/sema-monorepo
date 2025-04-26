@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
 import Card from 'components/Card';
@@ -24,10 +24,8 @@ const DatabaseDumpCard = () => {
           Gerando dump da base de dados...
         </ToastContent>,
         {
-          position: toast.POSITION.TOP_RIGHT,
-          toastId: toastKey,
-          autoClose: false,
-          closeButton: false
+          id: toastKey,
+          dismissible: false
         }
       );
 
@@ -37,9 +35,9 @@ const DatabaseDumpCard = () => {
     } catch (err) {
       console.error(err);
       toast.info('Não foi possível exportar a base de dados', {
-        position: toast.POSITION.TOP_RIGHT,
-        type: toast.TYPE.ERROR,
-        autoClose: 3000
+        id: toastKey,
+        dismissible: false,
+        duration: 3000
       });
     } finally {
       setLoading(false);

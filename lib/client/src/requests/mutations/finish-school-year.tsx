@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 import { SchoolYear } from 'models/SchoolYear';
 
@@ -25,12 +25,20 @@ export const useFinishSchoolYear = () => {
         })
         .catch((err) => {
           console.log(err);
-          toast.error('Não foi possível realizar a autenticação');
+          toast.error('Não foi possível realizar a autenticação', {
+            position: 'top-right',
+            dismissible: false,
+            duration: 3000
+          });
           return err;
         });
 
       if (!response.token) {
-        toast.error('Não foi possível realizar a autenticação');
+        toast.error('Não foi possível realizar a autenticação', {
+          position: 'top-right',
+          dismissible: false,
+          duration: 3000
+        });
       }
 
       return api
@@ -44,7 +52,13 @@ export const useFinishSchoolYear = () => {
           }
         )
         .then((res) => res.data)
-        .catch(() => toast.error('Ocorreu um erro ao encerrar o ano letivo.'));
+        .catch(() =>
+          toast.error('Ocorreu um erro ao encerrar o ano letivo.', {
+            position: 'top-right',
+            dismissible: false,
+            duration: 3000
+          })
+        );
     },
     []
   );

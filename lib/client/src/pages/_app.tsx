@@ -3,9 +3,7 @@ import 'styles/global.css';
 import { AppProps as NextAppProps } from 'next/app';
 import Head from 'next/head';
 import NextNprogress from 'nextjs-progressbar';
-import { ToastContainer } from 'react-toastify';
 
-import 'react-toastify/dist/ReactToastify.css';
 
 import { QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
@@ -21,6 +19,7 @@ import { queryClient } from 'services/api';
 
 import { WithAccessOptions } from 'utils/validateHasAccess';
 import { SessionProvider } from 'context/Session';
+import { Toaster } from 'sonner';
 
 type AppProps = NextAppProps & {
   Component: NextAppProps['Component'] & {
@@ -40,6 +39,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                 </Head>
 
                 <GlobalStyles />
+                <Toaster richColors position="top-right" />
 
                 <NextNprogress
                   color={theme.colors.primary}
@@ -56,7 +56,6 @@ const App = ({ Component, pageProps }: AppProps) => {
                   <Component {...pageProps} />
                 )}
 
-                <ToastContainer />
               </ThemeProvider>
             </AtomHydrator>
           </AtomProvider>
