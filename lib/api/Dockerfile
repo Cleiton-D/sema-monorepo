@@ -16,13 +16,14 @@ WORKDIR /app
 #     echo "https://mirror.uepg.br/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/main/" >> /etc/apk/repositories && \
 #     echo "https://mirror.uepg.br/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/community/" >> /etc/apk/repositories
 
-RUN apt-get update
-RUN apt-get install -y postgresql-client
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y postgresql-client
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
