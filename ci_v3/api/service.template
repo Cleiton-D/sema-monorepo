@@ -58,13 +58,21 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
-      securityContext:
-        fsGroup: 2000
       volumes:
         - name: api-data
           persistentVolumeClaim:
             claimName: api-data-claim
             readOnly: false
+
+      initContainers:
+        - name: volume-permissions
+          image: busybox
+          securityContext:
+            runAsUser: 0
+          command: ["sh", "-c", "chown -R 1001:1001 /data && chmod -R 755 /data"]
+          volumeMounts:
+            - mountPath: /data
+              name: api-data
       containers:
       - name: api
         image: docker.io/cleiton45/sema:${API_IMAGE}
