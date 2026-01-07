@@ -20,8 +20,8 @@ RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y postgresql-client
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nodejs -u 1001
+RUN addgroup --gid 1001 --system nodejs
+RUN adduser --system --uid 1001 nodejs
 
 ENV NODE_ENV=production
 
