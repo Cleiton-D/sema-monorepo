@@ -97,7 +97,7 @@ jobs:
 
   deploy-on-kubernetes:
     runs-on: arc-runner-set
-    needs: [create-build-id, build-api, build-report-engine]
+    needs: [create-build-id, build-api, build-report-engine, build-client-legacy]
 
     env:
       API_IMAGE: api-${{ github.sha }}-${{ needs.create-build-id.outputs.build_id }}
@@ -117,7 +117,7 @@ jobs:
       - name: Deploy
         run: |
           envsubst < ci_v3/api/service.template > ci_v3/api/service.yml && \
-          #envsubst < ci_v3/client/service-legacy.template > ci_v3/client/service-legacy.yml && \
+          envsubst < ci_v3/client/service-legacy.template > ci_v3/client/service-legacy.yml && \
           # envsubst < ci_v3/client/service-new.template > ci_v3/client/service-new.yml && \
           envsubst < ci_v3/report-engine/service.template > ci_v3/report-engine/service.yml && \
           kubectl apply -f ci_v3 -R -n prod 
