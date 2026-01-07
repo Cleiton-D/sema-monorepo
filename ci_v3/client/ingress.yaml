@@ -4,14 +4,7 @@ metadata:
   name: client-ingress
   annotations:
     kubernetes.io/ingress.class: "traefik"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    traefik.ingress.kubernetes.io/router.middlewares: prod-redirect-https@kubernetescrd
 spec:
-  tls:
-    - hosts:
-      - diarioescolar.net.br
-      - www.diarioescolar.net.br
-      secretName: client-tls-secret
   rules:
     - host: diarioescolar.net.br
       http:
