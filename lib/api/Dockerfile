@@ -1,4 +1,4 @@
-FROM node:16-slim AS builder
+FROM node:18-slim AS builder
 WORKDIR /app
 COPY . .
 
@@ -9,15 +9,14 @@ RUN rm -rf node_modules
 RUN yarn install --production
 
 
-FROM node:16-slim AS runner
+FROM node:18-slim AS runner
 WORKDIR /app
 
 # RUN \
 #     echo "https://mirror.uepg.br/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/main/" >> /etc/apk/repositories && \
 #     echo "https://mirror.uepg.br/alpine/v$(cut -d'.' -f1,2 /etc/alpine-release)/community/" >> /etc/apk/repositories
 
-RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y postgresql-client
 
 RUN addgroup --gid 1001 --system nodejs
