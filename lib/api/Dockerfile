@@ -2,7 +2,7 @@ FROM node:18-slim AS builder
 WORKDIR /app
 COPY . .
 
-RUN yarn install
+RUN yarn install --verbose
 RUN yarn build
 RUN rm -rf node_modules
 
