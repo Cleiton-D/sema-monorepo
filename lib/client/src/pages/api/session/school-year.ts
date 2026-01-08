@@ -29,4 +29,4 @@ const getSchoolYearRoute: NextApiHandler = async (req, res) => {
   res.send(schoolYear);
 };
 
-export default withSessionRoute(getSchoolYearRoute);
+export default getSchoolYearRoute;
