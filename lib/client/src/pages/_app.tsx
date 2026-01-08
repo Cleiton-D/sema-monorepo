@@ -4,7 +4,6 @@ import { AppProps as NextAppProps } from 'next/app';
 import Head from 'next/head';
 import NextNprogress from 'nextjs-progressbar';
 
-
 import { QueryClientProvider } from 'react-query';
 import { Hydrate } from 'react-query/hydration';
 import { ThemeProvider } from 'styled-components';
@@ -55,7 +54,6 @@ const App = ({ Component, pageProps }: AppProps) => {
                 ) : (
                   <Component {...pageProps} />
                 )}
-
               </ThemeProvider>
             </AtomHydrator>
           </AtomProvider>

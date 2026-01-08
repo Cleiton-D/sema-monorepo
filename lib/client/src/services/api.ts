@@ -47,6 +47,28 @@ const createApi = (session?: any) => {
   api.interceptors.response.use(
     (res) => res,
     (error) => {
+      // 1. Coletar dados vitais para debug
+      const url = error.config?.url;
+      const method = error.config?.method?.toUpperCase();
+      const status = error.response?.status;
+      const data = error.response?.data;
+
+      // 2. Logar APENAS se estiver no servidor (para aparecer nos logs do k3s)
+      if (isServer) {
+        console.error(`🚨 [API ERROR] ${status || 'Unknown'} em ${method} ${url}`);
+
+        if (data) {
+          console.error('📦 Payload do Erro Backend:', data);
+        } else if (error.request) {
+           // Se não tem response, é erro de rede (DNS, Timeout, Connection Refused)
+           console.error('🔌 Sem resposta do backend (Erro de Rede/DNS)');
+           console.error('Mensagem:', error.message);
+        } else {
+           console.error('❌ Erro na configuração da requisição:', error.message);
+        }
+      }
+
+
       if (error.response?.status !== 401) return Promise.reject(error);
       if (!error.response?.data) return Promise.reject(error);
       if (error.response.data.status !== 'error') return Promise.reject(error);
