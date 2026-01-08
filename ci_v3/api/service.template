@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   name: api-ingress
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
   rules:
     - host: api.diarioescolar.net.br
       http:
