@@ -7,12 +7,12 @@ import { createUnstableApi } from 'services/api';
 import { withSessionRoute } from 'utils/session/withSession';
 
 const getSchoolYearRoute: NextApiHandler = async (req, res) => {
-  console.log('decode', decode);
-  // console.log('createUnstableApi', createUnstableApi);
-  // console.log('withSessionRoute', withSessionRoute);
+  // console.log('decode', decode);
+  console.log('createUnstableApi', createUnstableApi);
+  console.log('withSessionRoute', withSessionRoute);
 
-  // const teste: AccessModule = {} as AccessModule;
-  // console.log('teste', teste);
+  const teste: AccessModule = {} as AccessModule;
+  console.log('teste', teste);
 
   res.status(200).json({ message: 'Funciona sem imports' });
 
