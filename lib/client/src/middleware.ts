@@ -28,6 +28,7 @@ const redirectToSignIn = (request: NextRequest, response: NextResponse) => {
 export async function middleware(request: NextRequest) {
   console.log('Middleware triggered for:', request.nextUrl.pathname);
   const response = NextResponse.next();
+  console.log('response created', response);
 
   return response;
 
