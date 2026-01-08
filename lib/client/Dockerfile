@@ -58,4 +58,6 @@ EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
+ENV NODE_OPTIONS '--trace-warnings --unhandled-rejections=strict'
+
 CMD ["node", "server.js"]
