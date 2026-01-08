@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-import { decode } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import { AccessModule } from 'models/AccessModule';
 
@@ -7,7 +7,7 @@ import { createUnstableApi } from 'services/api';
 import { withSessionRoute } from 'utils/session/withSession';
 
 const getSchoolYearRoute: NextApiHandler = async (req, res) => {
-  // console.log('decode', decode);
+  console.log('decode', jwt);
   console.log('createUnstableApi', createUnstableApi);
   console.log('withSessionRoute', withSessionRoute);
 
