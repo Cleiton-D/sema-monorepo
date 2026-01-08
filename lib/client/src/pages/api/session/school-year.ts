@@ -17,6 +17,8 @@ const getSchoolYearRoute: NextApiHandler = async (req, res) => {
     scy?: string;
   };
 
+  console.log('Decoded token:', { scy });
+
   const api = createUnstableApi(req.session);
   const schoolYear = await api
     .get<AccessModule[]>(`/education/admin/school-years/${scy || 'current'}`)
