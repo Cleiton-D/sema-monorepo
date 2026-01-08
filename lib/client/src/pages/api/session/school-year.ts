@@ -7,6 +7,8 @@ import { createUnstableApi } from 'services/api';
 import { withSessionRoute } from 'utils/session/withSession';
 
 const getSchoolYearRoute: NextApiHandler = async (req, res) => {
+  console.log('getSchoolYearRoute called');
+  console.log('request data', req);
   if (!req.session.token) {
     return res.status(403).send({ error: 'unauthorized' });
   }
