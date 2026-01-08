@@ -1,5 +1,5 @@
 import { NextApiHandler } from 'next';
-// import { decode } from 'jsonwebtoken';
+import { decode } from 'jsonwebtoken';
 
 // import { AccessModule } from 'models/AccessModule';
 
