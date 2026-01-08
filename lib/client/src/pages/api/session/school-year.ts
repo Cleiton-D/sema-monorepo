@@ -4,7 +4,7 @@ import { decode } from 'jsonwebtoken';
 import { AccessModule } from 'models/AccessModule';
 
 import { createUnstableApi } from 'services/api';
-// import { withSessionRoute } from 'utils/session/withSession';
+import { withSessionRoute } from 'utils/session/withSession';
 
 const getSchoolYearRoute: NextApiHandler = async (req, res) => {
   console.log('getSchoolYearRoute called');
