@@ -21,6 +21,16 @@ export const grpcFinalResultMapper = ({
     {}
   );
 
+  if (!schoolReports.length) {
+    return enrollClassrooms.map((enrollClassroom) => ({
+      studentName: enrollClassroom.enroll.student.name,
+      schoolSubject: '',
+      schoolSubjectOrder: 0,
+      finalResult: translateStatus(enrollClassroom.enroll.status),
+      average: masks['school-report']('0')
+    }));
+  }
+
   return schoolReports
     .map((schoolReport) => {
       const enroll = enrollClassroomsMap[schoolReport.enroll_id];
