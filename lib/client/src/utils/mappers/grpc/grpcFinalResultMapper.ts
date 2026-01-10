@@ -27,7 +27,7 @@ export const grpcFinalResultMapper = ({
       schoolSubject: '',
       schoolSubjectOrder: 0,
       finalResult: translateStatus(enrollClassroom.enroll.status),
-      average: masks['school-report']('0')
+      average: ''
     }));
   }
 
