@@ -42,7 +42,6 @@ class UpdateEnrollService {
       const currentEnrollClassroom =
         await this.enrollClassroomsRepository.findOne({
           enroll_id,
-          status: 'ACTIVE',
         });
       if (currentEnrollClassroom) {
         const updatedEnrollClassroom = Object.assign(currentEnrollClassroom, {

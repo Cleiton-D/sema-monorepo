@@ -23,6 +23,7 @@ import { enrollsKeys } from 'requests/queries/enrolls';
 import { useRelocateEnroll, useUpdateEnroll } from 'requests/mutations/enroll';
 
 import * as S from './styles';
+import { useAccess } from 'hooks/AccessProvider';
 
 export type MoveEnrollModalRef = {
   openModal: (enroll: Enroll) => void;
@@ -50,6 +51,8 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
 
   const relocateEnroll = useRelocateEnroll();
   const updateEnroll = useUpdateEnroll();
+
+  const { enableAccess } = useAccess();
 
   const handleBack = useCallback(() => {
     modalRef.current?.closeModal();
@@ -90,7 +93,61 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
 
   useImperativeHandle(ref, () => ({ openModal: handleOpenModal }));
 
+  const canMoveEnroll = useMemo(
+    () => enableAccess({ module: 'MOVE_ENROLL_ANYTIME', rule: 'WRITE' }),
+    [enableAccess]
+  );
+
   const moveOptions = useMemo(() => {
+    if (canMoveEnroll) {
+      return [
+        {
+          label: 'Transferido',
+          value: 'TRANSFERRED'
+        },
+        {
+          label: 'Remanejar',
+          value: 'RELOCATE'
+        },
+        {
+          label: 'Desistente',
+          value: 'QUITTER'
+        },
+        {
+          label: 'Falecido',
+          value: 'DECEASED'
+        },
+        {
+          label: 'Reativar matricula',
+          value: 'ACTIVE'
+        },
+        {
+          label: 'Cancelar matricula',
+          value: 'INACTIVE'
+        },
+        {
+          label: 'Aprovar',
+          value: 'APPROVED'
+        },
+        {
+          label: 'Reprovar',
+          value: 'DISAPPROVED'
+        },
+        {
+          label: 'Recuperação',
+          value: 'RECOVERY'
+        },
+        {
+          label: 'Exame',
+          value: 'EXAM'
+        },
+        {
+          label: 'Reprovar por faltas',
+          value: 'DISAPPROVED_BY_ABSENCES'
+        }
+      ];
+    }
+
     if (enroll?.status === 'ACTIVE') {
       return [
         {
@@ -164,7 +221,7 @@ const MoveEnrollModal: ForwardRefRenderFunction<MoveEnrollModalRef> = (
     }
 
     return [];
-  }, [enroll]);
+  }, [enroll, canMoveEnroll]);
 
   const classroomSearchParams = useMemo(() => {
     return {

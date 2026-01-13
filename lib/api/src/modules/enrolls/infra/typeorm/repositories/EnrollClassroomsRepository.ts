@@ -75,6 +75,7 @@ class EnrollClassroomsRepository implements IEnrollClassroomsRepository {
     filters: FindEnrollClassroomDTO,
   ): Promise<EnrollClassroom | undefined> {
     const queryBuilder = this.createQueryBuilder(filters);
+    queryBuilder.addOrderBy('enroll_classroom.created_at', 'DESC');
 
     const enrollClassroom = await queryBuilder.getOne();
 
