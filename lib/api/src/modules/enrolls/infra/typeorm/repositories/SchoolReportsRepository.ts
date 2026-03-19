@@ -41,7 +41,8 @@ class SchoolReportsRepository implements ISchoolReportsRepository {
       .innerJoinAndSelect('enroll.student', 'student')
       .leftJoinAndSelect('enroll.enroll_classrooms', 'enroll_classroom')
       .leftJoinAndSelect('enroll_classroom.classroom', 'current_classroom')
-      .addOrderBy('student.name');
+      .addOrderBy('enroll.enroll_date', 'ASC')
+      .addOrderBy('student.name', 'ASC');
 
     const schoolReports = await queryBuilder.getMany();
 

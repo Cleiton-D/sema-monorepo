@@ -46,7 +46,8 @@ class EnrollClassroomsRepository implements IEnrollClassroomsRepository {
       .leftJoinAndSelect('student.student_contacts', 'student_contacts')
       .leftJoinAndSelect('student_contacts.contact', 'student_contact')
       .leftJoinAndSelect('enroll_classroom.classroom', 'classroom')
-      .addOrderBy('student.name');
+      .addOrderBy('enroll.enroll_date', 'ASC')
+      .addOrderBy('student.name', 'ASC');
 
     // if (classroom_id) {
     //   queryBuilder.andWhere(
