@@ -82,7 +82,6 @@ const ClassroomModal: React.ForwardRefRenderFunction<
   }, [grades]);
 
   const handleSubmit = async (values: ClassroomForm) => {
-    console.log(values);
     const selectedGrade = gradesOptions.find(
       ({ value }) => value === values.grade_id
     );
