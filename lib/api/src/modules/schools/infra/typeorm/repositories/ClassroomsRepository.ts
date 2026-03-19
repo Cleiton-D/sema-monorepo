@@ -65,13 +65,13 @@ class ClassroomsRepository implements IClassroomsRepository {
     size,
   }: FindClassroomsDTO): Promise<PaginatedResponse<Classroom>> {
     const queryBuilder = this.ormRepository.createQueryBuilder('classroom');
-
-    if (!with_multigrades) {
-      queryBuilder.andWhere(`classroom.is_multigrade = :isMultigrade`, {
-        isMultigrade: false,
-      });
-    }
-
+    /*
+        if (!with_multigrades) {
+          queryBuilder.andWhere(`classroom.is_multigrade = :isMultigrade`, {
+            isMultigrade: false,
+          });
+        }
+    */
     if (description) {
       queryBuilder.andWhere(`classroom.description = :description`, {
         description,
@@ -141,7 +141,8 @@ class ClassroomsRepository implements IClassroomsRepository {
             )
             .where("enroll.status = 'ACTIVE'")
             .andWhere("enroll_classroom.status = 'ACTIVE'"),
-      );
+      )
+      .orderBy('classroom.description', 'ASC');
 
     const total = await queryBuilder.getCount();
     if (size) {

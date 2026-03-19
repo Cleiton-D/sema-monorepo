@@ -11,6 +11,7 @@ import Modal, { ModalRef } from 'components/Modal';
 import TextInput from 'components/TextInput';
 import Select from 'components/Select';
 import Button from 'components/Button';
+import Checkbox from 'components/Checkbox';
 
 import { Classroom } from 'models/Classroom';
 
@@ -36,6 +37,7 @@ type ClassroomForm = {
   description: string;
   class_period_id: string;
   grade_id: string;
+  is_multigrade?: boolean;
 };
 
 const ClassroomModal: React.ForwardRefRenderFunction<
@@ -43,6 +45,8 @@ const ClassroomModal: React.ForwardRefRenderFunction<
   ClassroomModalProps
 > = ({ schoolId }, ref) => {
   const [classroom, setClassroom] = useState<Classroom>();
+
+  const [isMultigrade, setIsMultigrade] = useState(false);
 
   const modalRef = useRef<ModalRef>(null);
 
@@ -78,6 +82,7 @@ const ClassroomModal: React.ForwardRefRenderFunction<
   }, [grades]);
 
   const handleSubmit = async (values: ClassroomForm) => {
+    console.log(values);
     const selectedGrade = gradesOptions.find(
       ({ value }) => value === values.grade_id
     );
@@ -85,7 +90,7 @@ const ClassroomModal: React.ForwardRefRenderFunction<
     await addClassroomMutation.mutateAsync({
       ...values,
       id: classroom?.id,
-      is_multigrade: false,
+      is_multigrade: isMultigrade,
       school_id: schoolId,
       enroll_count: 0,
       school_year_id: schoolYear?.id,
@@ -133,6 +138,11 @@ const ClassroomModal: React.ForwardRefRenderFunction<
           <Select name="grade_id" label="Série" options={gradesOptions} />
 
           <TextInput name="capacity" label="Lotação" type="number" min="0" />
+          <Checkbox
+            label="Multisseriada"
+            isChecked={classroom?.is_multigrade}
+            onCheck={(checked) => setIsMultigrade(checked)}
+          />
           <S.ButtonsContainer>
             <Button
               styleType="outlined"
