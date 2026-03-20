@@ -107,7 +107,7 @@ class RegisterClassService {
       class_date,
       period,
     });
-    if (existentClass) {
+    if (existentClass && classroom.is_multigrade == false) {
       throw new AppError(
         'Already exist a class registered for you in this period',
       );

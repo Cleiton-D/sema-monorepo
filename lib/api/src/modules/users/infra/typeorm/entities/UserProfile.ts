@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 import AccessLevel from '@modules/authorization/infra/typeorm/entities/AccessLevel';
@@ -50,6 +51,9 @@ class UserProfile {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }
 
 export default UserProfile;
