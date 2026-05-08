@@ -62,7 +62,7 @@ const SchoolReportItem = ({ completeEnroll }: SchoolReportItem) => {
           <tr>
             <th colSpan={2}>1º Bim</th>
             <th colSpan={2}>2º Bim</th>
-            <th rowSpan={2}>Recup.</th>
+            {/*<th rowSpan={2}>Recup.</th>*/}
             <th colSpan={2}>3º Bim</th>
             <th colSpan={2}>4º Bim</th>
             <th rowSpan={2}>Rec.</th>
@@ -107,13 +107,13 @@ const SchoolReportItem = ({ completeEnroll }: SchoolReportItem) => {
                   : masks['school-report'](String(item.SECOND))}
               </td>
               <td>{item['attendances-SECOND'] || '-'}</td>
-
+{/* 
               <td>
                 {item['FIRST-REC'] === '-'
                   ? '-'
                   : masks['school-report'](String(item['FIRST-REC']))}
               </td>
-
+*/}
               <td>
                 {item.THIRD === '-'
                   ? '-'

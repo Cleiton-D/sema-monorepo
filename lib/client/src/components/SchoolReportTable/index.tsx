@@ -91,12 +91,18 @@ const SchoolReportTable = ({
           tableKey="attendances-SECOND"
           contentAlign="center"
           render={(value) => value || 0}
-        />
+        />{/*
         <TableColumn
           label="Nota Rec 1° Sem."
           tableKey="FIRST-REC"
           contentAlign="center"
           render={(value) => masks['school-report'](`${value} `) || '-'}
+        /> */}
+        <TableColumn
+          label="Ferias"
+          tableKey="FIRST-REC"
+          contentAlign="center"
+          render={(value) => '-'}
         />
         <TableColumn
           label="Notas 3° Bi."

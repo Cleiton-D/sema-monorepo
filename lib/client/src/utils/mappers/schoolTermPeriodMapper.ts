@@ -20,8 +20,8 @@ const descriptions: Record<SchoolTerm, string> = {
   SECOND: 'Segundo Bimestre',
   THIRD: 'Terceiro Bimestre',
   FOURTH: 'Quarto Bimestre',
-  'FIRST-REC': 'Recuperação 1º semestre',
-  'SECOND-REC': 'Recuperação 2º semestre',
+  'FIRST-REC': 'Ferias do 1º semestre',
+  'SECOND-REC': 'Recuperação',
   EXAM: 'Exame'
 };
 
@@ -71,8 +71,8 @@ const shortDescriptions: Record<SchoolTerm, string> = {
   SECOND: '2º Bimestre',
   THIRD: '3º Bimestre',
   FOURTH: '4º Bimestre',
-  'FIRST-REC': 'Rec. 1º Semestre',
-  'SECOND-REC': 'Rec. 2º Semestre',
+  'FIRST-REC': 'Ferias do 1º semestre',
+  'SECOND-REC': 'Recuperação',
   EXAM: 'Exame'
 };
 export const shortTranslateSchoolTerm = (schoolTerm: SchoolTerm) => {
