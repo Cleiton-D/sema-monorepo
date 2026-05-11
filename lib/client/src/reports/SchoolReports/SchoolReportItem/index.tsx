@@ -41,7 +41,7 @@ const SchoolReportItem = ({ completeEnroll }: SchoolReportItem) => {
         <strong>BOLETIM APROVEITAMENTO ESCOLAR</strong>
       </S.Head>
       <S.Row>
-        <div>Ano Letivo: 2025</div>
+        <div>Ano Letivo: 2026</div>
         <div>Ano: {enrollClassroom.enroll.grade?.description}</div>
         <div>Turma: {enrollClassroom.classroom.description}</div>
         <div>Nível de Ensino: Fundamental</div>
