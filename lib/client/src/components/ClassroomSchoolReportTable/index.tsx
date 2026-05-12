@@ -50,10 +50,19 @@ const ClassroomSchoolReportTable = ({
           return !isNaN(parsed);
         })
         .reduce((acc, [key, value]) => {
-          if (value === '') return { ...acc, [key]: null };
+          const parsed = value === '' ? null : Number(value);
 
-          return { ...acc, [key]: Number(value) };
+          if (key === 'second_rec') {
+            return {
+              ...acc,
+              second_rec: parsed,
+              first_rec: parsed
+            };
+          }
+
+          return { ...acc, [key]: parsed };
         }, {});
+
 
       return {
         enroll_id: enroll,
@@ -190,6 +199,7 @@ const ClassroomSchoolReportTable = ({
               )
             }
           />
+          {/*
           <TableColumn
             label="Rec. 1º Semestre"
             tableKey="first_rec"
@@ -209,6 +219,7 @@ const ClassroomSchoolReportTable = ({
               )
             }
           />
+          */}
           <TableColumn
             label="3º Bimestre"
             tableKey="third"
@@ -250,7 +261,7 @@ const ClassroomSchoolReportTable = ({
             }
           />
           <TableColumn
-            label="Rec. 2º Semestre"
+            label="Recuperação"
             tableKey="formattedAverages.second_rec"
             contentAlign={canChangeSchoolReport ? undefined : 'center'}
             actionColumn
