@@ -19,8 +19,7 @@ ENV SERVER_API_URL=${NEXT_PUBLIC_API_URL}
 # 3. Optimization: Copy package files first to leverage Docker layer caching
 COPY package.json yarn.lock* ./
 
-# 4. Fix Error 127: Enable Corepack so 'yarn' is recognized
-RUN corepack enable && yarn install
+RUN npm install -g yarn && yarn install
 
 # Copy the rest of the application code
 COPY . .
